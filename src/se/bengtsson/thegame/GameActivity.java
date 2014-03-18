@@ -27,6 +27,8 @@ public class GameActivity extends LayoutGameActivity implements IAccelerationLis
 
 	private ResourceManager resources;
 
+	Fighter playerFighter;
+
 	@Override
 	public Engine onCreateEngine(EngineOptions pEngineOptions) {
 		return new FixedStepEngine(pEngineOptions, 60);
@@ -35,9 +37,12 @@ public class GameActivity extends LayoutGameActivity implements IAccelerationLis
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+		EngineOptions engineOptions =
+				new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH,
+						CAMERA_HEIGHT), camera);
+		engineOptions.getRenderOptions().setDithering(true);
 
-		return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH,
-				CAMERA_HEIGHT), camera);
+		return engineOptions;
 	}
 
 	@Override
@@ -64,7 +69,7 @@ public class GameActivity extends LayoutGameActivity implements IAccelerationLis
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
 		pScene.registerUpdateHandler(physicsWorld);
 
-		Fighter playerFighter = new Fighter(resources, CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2);
+		playerFighter = new Fighter(resources, CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2);
 		playerFighter.attachTo(pScene);
 
 		pOnPopulateSceneCallback.onPopulateSceneFinished();
@@ -78,8 +83,19 @@ public class GameActivity extends LayoutGameActivity implements IAccelerationLis
 
 	@Override
 	public void onAccelerationChanged(AccelerationData pAccelerationData) {
-		// TODO Auto-generated method stub
+		playerFighter.rotate(pAccelerationData.getX());
+	}
 
+	@Override
+	public void onResumeGame() {
+		super.onResumeGame();
+		this.enableAccelerationSensor(this);
+	}
+
+	@Override
+	public void onPauseGame() {
+		super.onPauseGame();
+		this.disableAccelerationSensor();
 	}
 
 	@Override

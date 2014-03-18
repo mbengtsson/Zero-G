@@ -2,6 +2,7 @@ package se.bengtsson.thegame.game.objects.fighter;
 
 import static org.andengine.extension.physics.box2d.util.constants.PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT;
 
+import org.andengine.entity.Entity;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.shape.IAreaShape;
 import org.andengine.entity.sprite.Sprite;
@@ -16,16 +17,14 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
-public class Fighter {
+public class Fighter extends Entity {
 
-	// TODO: Implement this, rotation as rads
-	// TODO: rotate method, rotate all Sprites and body.
-	// TODO: Set xSpeed and ySpeed and vector method.
+	private float velocityX;
+	private float velocityY;
 
-	private float xPos;
-	private float yPos;
+	private final float THRUST = 0.5f;
 
-	private Vector2 velocity;
+	private boolean thrusting = false;
 
 	private float rotation;
 
@@ -36,21 +35,23 @@ public class Fighter {
 	private Body fighterBody;
 
 	public Fighter(ResourceManager resources, int xPos, int yPos) {
+
 		this.fighter = new Sprite(xPos, yPos, resources.fighterTextureRegion, resources.vbom);
-		this.mainThrust =
-				new Sprite(xPos - fighter.getWidth() / 2, yPos - fighter.getHeight() / 2,
-						resources.fighterThrustTextureRegion, resources.vbom);
-		this.leftThrust =
-				new Sprite(xPos - fighter.getWidth() / 2, yPos - fighter.getHeight() / 2,
-						resources.fighterLeftTextureRegion, resources.vbom);
-		this.rightThrust =
-				new Sprite(xPos - fighter.getWidth() / 2, yPos - fighter.getHeight() / 2,
-						resources.fighterRightTextureRegion, resources.vbom);
+		this.mainThrust = new Sprite(xPos, yPos, resources.fighterThrustTextureRegion, resources.vbom);
+		this.leftThrust = new Sprite(xPos, yPos, resources.fighterLeftTextureRegion, resources.vbom);
+		this.rightThrust = new Sprite(xPos, yPos, resources.fighterRightTextureRegion, resources.vbom);
 		fighterBody =
-				createTriangleBody(resources.physicsWorld, fighter, BodyType.DynamicBody,
+				createFighterBody(resources.physicsWorld, fighter, BodyType.DynamicBody,
 						PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f));
 
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(fighter, fighterBody, true, true));
+		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(mainThrust, fighterBody, true, true));
+		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(leftThrust, fighterBody, true, true));
+		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(rightThrust, fighterBody, true, true));
+
+		mainThrust.setVisible(false);
+		leftThrust.setVisible(false);
+		rightThrust.setVisible(false);
 
 	}
 
@@ -60,9 +61,86 @@ public class Fighter {
 		scene.attachChild(mainThrust);
 		scene.attachChild(leftThrust);
 		scene.attachChild(rightThrust);
+		scene.attachChild(this);
 	}
 
-	private Body createTriangleBody(final PhysicsWorld physicsWorld, final IAreaShape areaShape,
+	@Override
+	protected void onManagedUpdate(float pSecondsElapsed) {
+
+		if (isThrusting()) {
+			mainThrust.setVisible(true);
+			thrust();
+		} else {
+			mainThrust.setVisible(false);
+		}
+
+		super.onManagedUpdate(pSecondsElapsed);
+	}
+
+	public void rotate(float velocity) {
+
+		if (velocity < 0) {
+			leftThrust.setVisible(true);
+			rightThrust.setVisible(false);
+			if (velocity > -1) {
+				leftThrust.setAlpha(Math.abs(velocity));
+			}
+		} else if (velocity > 0) {
+			leftThrust.setVisible(false);
+			rightThrust.setVisible(true);
+			if (velocity < 1) {
+				rightThrust.setAlpha(velocity);
+			}
+		} else {
+			leftThrust.setVisible(false);
+			rightThrust.setVisible(false);
+		}
+
+		fighterBody.setAngularVelocity(velocity);
+		this.rotation = fighterBody.getAngle();
+	}
+
+	public void thrust() {
+
+		velocityX += (float) (Math.sin(rotation) * THRUST);
+		velocityY += (float) (Math.sin(rotation) * THRUST);
+
+		fighterBody.setLinearVelocity(velocityX, velocityY);
+	}
+
+	public float getXpos() {
+		return fighterBody.getPosition().x * PIXEL_TO_METER_RATIO_DEFAULT;
+	}
+
+	public float getYpos() {
+		return fighterBody.getPosition().y * PIXEL_TO_METER_RATIO_DEFAULT;
+	}
+
+	public void setPosition(float xPos, float yPos) {
+
+		xPos /= PIXEL_TO_METER_RATIO_DEFAULT;
+		yPos /= PIXEL_TO_METER_RATIO_DEFAULT;
+
+		fighterBody.setTransform(xPos, yPos, rotation);
+	}
+
+	public float getWidth() {
+		return fighter.getWidth();
+	}
+
+	public float getHeight() {
+		return fighter.getHeight();
+	}
+
+	public boolean isThrusting() {
+		return thrusting;
+	}
+
+	public void setThrusting(boolean thrusting) {
+		this.thrusting = thrusting;
+	}
+
+	private Body createFighterBody(final PhysicsWorld physicsWorld, final IAreaShape areaShape,
 			final BodyType bodyType, final FixtureDef fixtureDef) {
 
 		final float halfWidth = areaShape.getWidthScaled() * 0.5f / PIXEL_TO_METER_RATIO_DEFAULT;
@@ -79,43 +157,4 @@ public class Fighter {
 		return PhysicsFactory.createPolygonBody(physicsWorld, areaShape, vertices, bodyType, fixtureDef);
 	}
 
-	public Sprite getFighter() {
-		return fighter;
-	}
-
-	public Sprite getMainThrust() {
-		return mainThrust;
-	}
-
-	public Sprite getLeftThrust() {
-		return leftThrust;
-	}
-
-	public Sprite getRightThrust() {
-		return rightThrust;
-	}
-
-	public Body getFighterBody() {
-		return fighterBody;
-	}
-
-	public void setFighter(Sprite fighter) {
-		this.fighter = fighter;
-	}
-
-	public void setMainThrust(Sprite mainThrust) {
-		this.mainThrust = mainThrust;
-	}
-
-	public void setLeftThrust(Sprite leftThrust) {
-		this.leftThrust = leftThrust;
-	}
-
-	public void setRightThrust(Sprite rightThrust) {
-		this.rightThrust = rightThrust;
-	}
-
-	public void setFighterBody(Body fighterBody) {
-		this.fighterBody = fighterBody;
-	}
 }
