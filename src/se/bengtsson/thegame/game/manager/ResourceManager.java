@@ -27,11 +27,13 @@ public class ResourceManager {
 	private ITexture fighterLeftTexture;
 	private ITexture fighterRightTexture;
 	private ITexture fighterThrustTexture;
+	private ITexture triggerTexture;
 
 	public ITextureRegion fighterTextureRegion;
 	public ITextureRegion fighterLeftTextureRegion;
 	public ITextureRegion fighterRightTextureRegion;
 	public ITextureRegion fighterThrustTextureRegion;
+	public ITextureRegion triggerTextureRegion;
 
 	private ResourceManager() {
 
@@ -72,6 +74,10 @@ public class ResourceManager {
 				new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/thrust.png");
 		fighterThrustTextureRegion = TextureRegionFactory.extractFromTexture(fighterThrustTexture);
 		fighterThrustTexture.load();
+
+		triggerTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/trigger.png");
+		triggerTextureRegion = TextureRegionFactory.extractFromTexture(triggerTexture);
+		triggerTexture.load();
 	}
 
 	public void loadFonts() {

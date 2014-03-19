@@ -3,13 +3,13 @@ package se.bengtsson.thegame.game.objects.fighter;
 import static org.andengine.extension.physics.box2d.util.constants.PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT;
 
 import org.andengine.entity.Entity;
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.shape.IAreaShape;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 
+import se.bengtsson.thegame.game.controller.Controller;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 
 import com.badlogic.gdx.math.Vector2;
@@ -19,12 +19,20 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class Fighter extends Entity {
 
+	private Controller controller;
+
+	private float worldWidth;
+	private float worldHeight;
+
+	private float xPos;
+	private float yPos;
+
 	private float velocityX;
 	private float velocityY;
 
-	private final float THRUST = 0.5f;
+	private final float THRUST = 1.5f / PIXEL_TO_METER_RATIO_DEFAULT;
 
-	private boolean thrusting = false;
+	private boolean accelerating = false;
 
 	private float rotation;
 
@@ -34,7 +42,11 @@ public class Fighter extends Entity {
 	private Sprite rightThrust;
 	private Body fighterBody;
 
-	public Fighter(ResourceManager resources, int xPos, int yPos) {
+	public Fighter(Controller controller, ResourceManager resources, float xPos, float yPos) {
+
+		this.controller = controller;
+		this.worldWidth = resources.camera.getWidth() / PIXEL_TO_METER_RATIO_DEFAULT;
+		this.worldHeight = resources.camera.getHeight() / PIXEL_TO_METER_RATIO_DEFAULT;
 
 		this.fighter = new Sprite(xPos, yPos, resources.fighterTextureRegion, resources.vbom);
 		this.mainThrust = new Sprite(xPos, yPos, resources.fighterThrustTextureRegion, resources.vbom);
@@ -49,29 +61,51 @@ public class Fighter extends Entity {
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(leftThrust, fighterBody, true, true));
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(rightThrust, fighterBody, true, true));
 
+		this.attachChild(fighter);
+		this.attachChild(mainThrust);
+		this.attachChild(leftThrust);
+		this.attachChild(rightThrust);
+
 		mainThrust.setVisible(false);
 		leftThrust.setVisible(false);
 		rightThrust.setVisible(false);
 
-	}
+		setTag(1);
 
-	public void attachTo(Scene scene) {
-
-		scene.attachChild(fighter);
-		scene.attachChild(mainThrust);
-		scene.attachChild(leftThrust);
-		scene.attachChild(rightThrust);
-		scene.attachChild(this);
 	}
 
 	@Override
 	protected void onManagedUpdate(float pSecondsElapsed) {
 
-		if (isThrusting()) {
+		xPos = fighterBody.getPosition().x;
+		yPos = fighterBody.getPosition().y;
+
+		if (controller.isRightTriggerPressed()) {
 			mainThrust.setVisible(true);
-			thrust();
+			accelerate();
 		} else {
 			mainThrust.setVisible(false);
+		}
+
+		rotate(controller.getTilt());
+
+		if (xPos < 0) {
+
+			fighterBody.setTransform(worldWidth, yPos, rotation);
+
+		} else if (xPos > worldWidth) {
+
+			fighterBody.setTransform(0, yPos, rotation);
+
+		}
+		if (yPos < 0) {
+
+			fighterBody.setTransform(xPos, worldHeight, rotation);
+
+		} else if (yPos > worldHeight) {
+
+			fighterBody.setTransform(xPos, 0, rotation);
+
 		}
 
 		super.onManagedUpdate(pSecondsElapsed);
@@ -100,20 +134,20 @@ public class Fighter extends Entity {
 		this.rotation = fighterBody.getAngle();
 	}
 
-	public void thrust() {
+	public void accelerate() {
 
 		velocityX += (float) (Math.sin(rotation) * THRUST);
-		velocityY += (float) (Math.sin(rotation) * THRUST);
+		velocityY -= (float) (Math.cos(rotation) * THRUST);
 
 		fighterBody.setLinearVelocity(velocityX, velocityY);
 	}
 
 	public float getXpos() {
-		return fighterBody.getPosition().x * PIXEL_TO_METER_RATIO_DEFAULT;
+		return xPos * PIXEL_TO_METER_RATIO_DEFAULT;
 	}
 
 	public float getYpos() {
-		return fighterBody.getPosition().y * PIXEL_TO_METER_RATIO_DEFAULT;
+		return yPos * PIXEL_TO_METER_RATIO_DEFAULT;
 	}
 
 	public void setPosition(float xPos, float yPos) {
@@ -132,12 +166,12 @@ public class Fighter extends Entity {
 		return fighter.getHeight();
 	}
 
-	public boolean isThrusting() {
-		return thrusting;
+	public boolean isAccelerating() {
+		return accelerating;
 	}
 
-	public void setThrusting(boolean thrusting) {
-		this.thrusting = thrusting;
+	public void setAccelerating(boolean accelerating) {
+		this.accelerating = accelerating;
 	}
 
 	private Body createFighterBody(final PhysicsWorld physicsWorld, final IAreaShape areaShape,

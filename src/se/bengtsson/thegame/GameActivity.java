@@ -3,27 +3,28 @@ package se.bengtsson.thegame;
 import org.andengine.engine.Engine;
 import org.andengine.engine.FixedStepEngine;
 import org.andengine.engine.camera.Camera;
+import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
-import org.andengine.input.sensor.acceleration.AccelerationData;
-import org.andengine.input.sensor.acceleration.IAccelerationListener;
 import org.andengine.ui.activity.LayoutGameActivity;
 
+import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
 
 import com.badlogic.gdx.math.Vector2;
 
-public class GameActivity extends LayoutGameActivity implements IAccelerationListener {
+public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	public static final int CAMERA_WIDTH = 800;
 	public static final int CAMERA_HEIGHT = 450;
 
 	private Camera camera;
 	private FixedStepPhysicsWorld physicsWorld;
+	private PlayerController playerController;
 
 	private ResourceManager resources;
 
@@ -62,34 +63,27 @@ public class GameActivity extends LayoutGameActivity implements IAccelerationLis
 	@Override
 	public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback) throws Exception {
 		final Scene scene = new Scene();
+		scene.registerUpdateHandler(physicsWorld);
+		scene.registerUpdateHandler(this);
+
+		playerController = new PlayerController(scene);
+
 		pOnCreateSceneCallback.onCreateSceneFinished(scene);
 	}
 
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
-		pScene.registerUpdateHandler(physicsWorld);
 
-		playerFighter = new Fighter(resources, CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2);
-		playerFighter.attachTo(pScene);
+		playerFighter = new Fighter(playerController, resources, CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2);
+		pScene.attachChild(playerFighter);
 
 		pOnPopulateSceneCallback.onPopulateSceneFinished();
 	}
 
 	@Override
-	public void onAccelerationAccuracyChanged(AccelerationData pAccelerationData) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onAccelerationChanged(AccelerationData pAccelerationData) {
-		playerFighter.rotate(pAccelerationData.getX());
-	}
-
-	@Override
 	public void onResumeGame() {
 		super.onResumeGame();
-		this.enableAccelerationSensor(this);
+		this.enableAccelerationSensor(playerController);
 	}
 
 	@Override
@@ -106,6 +100,17 @@ public class GameActivity extends LayoutGameActivity implements IAccelerationLis
 	@Override
 	protected int getRenderSurfaceViewID() {
 		return R.id.gameSurface;
+	}
+
+	@Override
+	public void onUpdate(float pSecondsElapsed) {
+		// HERE IS THE GAME LOOP
+	}
+
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+
 	}
 
 }
