@@ -1,6 +1,5 @@
 package se.bengtsson.thegame.game.controller;
 
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.sensor.acceleration.AccelerationData;
 import org.andengine.input.sensor.acceleration.IAccelerationListener;
@@ -18,7 +17,7 @@ public class PlayerController implements Controller, IAccelerationListener {
 
 	private float tilt = 0.0f;
 
-	public PlayerController(Scene scene) {
+	public PlayerController() {
 		ResourceManager resources = ResourceManager.getInstance();
 
 		float triggerSize = resources.triggerTextureRegion.getWidth();
@@ -30,14 +29,6 @@ public class PlayerController implements Controller, IAccelerationListener {
 		this.rightTrigger =
 				new Trigger(resources.camera.getWidth() - triggerSize, resources.camera.getHeight() - triggerSize,
 						resources.triggerTextureRegion, resources.vbom);
-
-		scene.attachChild(leftTrigger);
-		scene.attachChild(rightTrigger);
-
-		scene.registerTouchArea(leftTrigger);
-		scene.registerTouchArea(rightTrigger);
-
-		scene.setTouchAreaBindingOnActionDownEnabled(true);
 
 	}
 
@@ -65,6 +56,14 @@ public class PlayerController implements Controller, IAccelerationListener {
 	@Override
 	public float getTilt() {
 		return tilt;
+	}
+
+	public Trigger getLeftTrigger() {
+		return leftTrigger;
+	}
+
+	public Trigger getRightTrigger() {
+		return rightTrigger;
 	}
 
 	private class Trigger extends Sprite {

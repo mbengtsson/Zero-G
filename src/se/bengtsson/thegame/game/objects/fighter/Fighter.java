@@ -8,9 +8,11 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.util.math.MathUtils;
 
 import se.bengtsson.thegame.game.controller.Controller;
 import se.bengtsson.thegame.game.manager.ResourceManager;
+import se.bengtsson.thegame.game.objects.fighter.factories.BulletsFactory;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -21,16 +23,20 @@ public class Fighter extends Entity {
 
 	private Controller controller;
 
-	private float worldWidth;
-	private float worldHeight;
+	private final float WORLD_WIDTH;
+	private final float WORLD_HEIGHT;
+
+	private final float THRUST = 1.5f / PIXEL_TO_METER_RATIO_DEFAULT;
+
+	private BulletsFactory bulletFactory;
+	private final float RATE_OF_FIRE = 5;
+	private long lastFired;
 
 	private float xPos;
 	private float yPos;
 
 	private float velocityX;
 	private float velocityY;
-
-	private final float THRUST = 1.5f / PIXEL_TO_METER_RATIO_DEFAULT;
 
 	private boolean accelerating = false;
 
@@ -45,8 +51,8 @@ public class Fighter extends Entity {
 	public Fighter(Controller controller, ResourceManager resources, float xPos, float yPos) {
 
 		this.controller = controller;
-		this.worldWidth = resources.camera.getWidth() / PIXEL_TO_METER_RATIO_DEFAULT;
-		this.worldHeight = resources.camera.getHeight() / PIXEL_TO_METER_RATIO_DEFAULT;
+		this.WORLD_WIDTH = resources.camera.getWidth() / PIXEL_TO_METER_RATIO_DEFAULT;
+		this.WORLD_HEIGHT = resources.camera.getHeight() / PIXEL_TO_METER_RATIO_DEFAULT;
 
 		this.fighter = new Sprite(xPos, yPos, resources.fighterTextureRegion, resources.vbom);
 		this.mainThrust = new Sprite(xPos, yPos, resources.fighterThrustTextureRegion, resources.vbom);
@@ -54,7 +60,7 @@ public class Fighter extends Entity {
 		this.rightThrust = new Sprite(xPos, yPos, resources.fighterRightTextureRegion, resources.vbom);
 		fighterBody =
 				createFighterBody(resources.physicsWorld, fighter, BodyType.DynamicBody,
-						PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f));
+						PhysicsFactory.createFixtureDef(1.0f, 0.0f, 0.5f));
 
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(fighter, fighterBody, true, true));
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(mainThrust, fighterBody, true, true));
@@ -70,8 +76,7 @@ public class Fighter extends Entity {
 		leftThrust.setVisible(false);
 		rightThrust.setVisible(false);
 
-		setTag(1);
-
+		bulletFactory = new BulletsFactory(this);
 	}
 
 	@Override
@@ -80,6 +85,11 @@ public class Fighter extends Entity {
 		xPos = fighterBody.getPosition().x;
 		yPos = fighterBody.getPosition().y;
 
+		velocityX = fighterBody.getLinearVelocity().x;
+		velocityY = fighterBody.getLinearVelocity().y;
+
+		rotation = fighterBody.getAngle();
+
 		if (controller.isRightTriggerPressed()) {
 			mainThrust.setVisible(true);
 			accelerate();
@@ -87,25 +97,22 @@ public class Fighter extends Entity {
 			mainThrust.setVisible(false);
 		}
 
+		if (controller.isLeftTriggerPressed()) {
+			fire();
+		}
+
 		rotate(controller.getTilt());
 
 		if (xPos < 0) {
-
-			fighterBody.setTransform(worldWidth, yPos, rotation);
-
-		} else if (xPos > worldWidth) {
-
+			fighterBody.setTransform(WORLD_WIDTH, yPos, rotation);
+		} else if (xPos > WORLD_WIDTH) {
 			fighterBody.setTransform(0, yPos, rotation);
-
 		}
+
 		if (yPos < 0) {
-
-			fighterBody.setTransform(xPos, worldHeight, rotation);
-
-		} else if (yPos > worldHeight) {
-
+			fighterBody.setTransform(xPos, WORLD_HEIGHT, rotation);
+		} else if (yPos > WORLD_HEIGHT) {
 			fighterBody.setTransform(xPos, 0, rotation);
-
 		}
 
 		super.onManagedUpdate(pSecondsElapsed);
@@ -131,7 +138,6 @@ public class Fighter extends Entity {
 		}
 
 		fighterBody.setAngularVelocity(velocity);
-		this.rotation = fighterBody.getAngle();
 	}
 
 	public void accelerate() {
@@ -140,6 +146,16 @@ public class Fighter extends Entity {
 		velocityY -= (float) (Math.cos(rotation) * THRUST);
 
 		fighterBody.setLinearVelocity(velocityX, velocityY);
+	}
+
+	public void fire() {
+		long time = System.currentTimeMillis();
+
+		if (time - lastFired > 1000 / RATE_OF_FIRE) {
+			Sprite bullet = bulletFactory.createBullet(xPos, yPos, rotation);
+			this.attachChild(bullet);
+			lastFired = time;
+		}
 	}
 
 	public float getXpos() {
@@ -164,6 +180,11 @@ public class Fighter extends Entity {
 
 	public float getHeight() {
 		return fighter.getHeight();
+	}
+
+	@Override
+	public float getRotation() {
+		return MathUtils.radToDeg(rotation);
 	}
 
 	public boolean isAccelerating() {

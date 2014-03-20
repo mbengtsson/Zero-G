@@ -23,17 +23,21 @@ public class ResourceManager {
 	public Camera camera;
 	public VertexBufferObjectManager vbom;
 
+	private ITexture dummyTexture;
 	private ITexture fighterTexture;
 	private ITexture fighterLeftTexture;
 	private ITexture fighterRightTexture;
 	private ITexture fighterThrustTexture;
 	private ITexture triggerTexture;
+	private ITexture bulletTexture;
 
+	public ITextureRegion dummyTextureRegion;
 	public ITextureRegion fighterTextureRegion;
 	public ITextureRegion fighterLeftTextureRegion;
 	public ITextureRegion fighterRightTextureRegion;
 	public ITextureRegion fighterThrustTextureRegion;
 	public ITextureRegion triggerTextureRegion;
+	public ITextureRegion bulletTextureRegion;
 
 	private ResourceManager() {
 
@@ -57,6 +61,10 @@ public class ResourceManager {
 	}
 
 	public void loadTextures() throws IOException {
+		dummyTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/dummy.png");
+		dummyTextureRegion = TextureRegionFactory.extractFromTexture(dummyTexture);
+		dummyTexture.load();
+
 		fighterTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/fighter.png");
 		fighterTextureRegion = TextureRegionFactory.extractFromTexture(fighterTexture);
 		fighterTexture.load();
@@ -78,6 +86,10 @@ public class ResourceManager {
 		triggerTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/trigger.png");
 		triggerTextureRegion = TextureRegionFactory.extractFromTexture(triggerTexture);
 		triggerTexture.load();
+
+		bulletTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/bullet.png");
+		bulletTextureRegion = TextureRegionFactory.extractFromTexture(bulletTexture);
+		bulletTexture.load();
 	}
 
 	public void loadFonts() {
