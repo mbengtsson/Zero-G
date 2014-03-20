@@ -31,6 +31,7 @@ public class Fighter extends Entity {
 	private BulletsFactory bulletFactory;
 	private final float RATE_OF_FIRE = 5;
 	private long lastFired;
+	private boolean fireLeft;
 
 	private float xPos;
 	private float yPos;
@@ -152,6 +153,20 @@ public class Fighter extends Entity {
 		long time = System.currentTimeMillis();
 
 		if (time - lastFired > 1000 / RATE_OF_FIRE) {
+			float offsetX = 10 / PIXEL_TO_METER_RATIO_DEFAULT;
+			float offsetY;
+
+			if (fireLeft) {
+				offsetY = -10 / PIXEL_TO_METER_RATIO_DEFAULT;
+				fireLeft = false;
+			} else {
+				offsetY = 10 / PIXEL_TO_METER_RATIO_DEFAULT;
+				fireLeft = true;
+			}
+
+			float xPos = (float) (this.xPos + (Math.sin(rotation) * offsetX + Math.cos(rotation) * offsetY));
+			float yPos = (float) (this.yPos + (Math.sin(rotation) * offsetY - Math.cos(rotation) * offsetX));
+
 			Sprite bullet = bulletFactory.createBullet(xPos, yPos, rotation);
 			this.attachChild(bullet);
 			lastFired = time;

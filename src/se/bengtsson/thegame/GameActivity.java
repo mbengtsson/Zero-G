@@ -32,7 +32,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
-	private boolean debug = false;
+	private boolean debug = true;
 
 	public static final int CAMERA_WIDTH = 800;
 	public static final int CAMERA_HEIGHT = 450;
@@ -61,6 +61,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 				new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH,
 						CAMERA_HEIGHT), camera);
 		engineOptions.getRenderOptions().setDithering(true);
+		engineOptions.getTouchOptions().setNeedsMultiTouch(true);
 
 		return engineOptions;
 	}

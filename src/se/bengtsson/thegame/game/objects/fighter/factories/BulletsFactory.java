@@ -36,17 +36,16 @@ public class BulletsFactory {
 		private Body body;
 		private float velocityX;
 		private float velocityY;
-		private float rotation;
 
 		public Bullet(float pX, float pY, float rotation) {
 			super(pX, pY, resources.bulletTextureRegion, resources.vbom);
 
-			this.rotation = rotation;
+			// this.rotation = rotation;
 
 			body =
 					PhysicsFactory.createBoxBody(resources.physicsWorld, this, BodyType.DynamicBody,
 							PhysicsFactory.createFixtureDef(1.0f, 0.0f, 0.0f));
-			resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, false));
+			resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
 
 			WORLD_WIDTH = resources.camera.getWidth();
 			WORLD_HEIGHT = resources.camera.getHeight();
@@ -54,26 +53,25 @@ public class BulletsFactory {
 			velocityY = (float) -(Math.cos(rotation) * VELOCITY);
 			body.setLinearVelocity(velocityX, velocityY);
 			body.setTransform(pX, pY, rotation);
-
 		}
 
 		@Override
 		protected void onManagedUpdate(float pSecondsElapsed) {
 			if (body.getPosition().x < 0) {
-				recycle(this);
+				destroy(this);
 			} else if (body.getPosition().x > WORLD_WIDTH) {
-				recycle(this);
+				destroy(this);
 			}
 
 			if (body.getPosition().y < 0) {
-				recycle(this);
+				destroy(this);
 			} else if (body.getPosition().x > WORLD_HEIGHT) {
-				recycle(this);
+				destroy(this);
 			}
 			super.onManagedUpdate(pSecondsElapsed);
 		}
 
-		public void recycle(final Bullet bullet) {
+		public void destroy(final Bullet bullet) {
 			resources.engine.runOnUpdateThread(new Runnable() {
 
 				@Override
@@ -82,8 +80,11 @@ public class BulletsFactory {
 					final Body body = bullet.body;
 					resources.physicsWorld.unregisterPhysicsConnector(resources.physicsWorld
 							.getPhysicsConnectorManager().findPhysicsConnectorByShape(bullet));
+					body.setActive(false);
 					resources.physicsWorld.destroyBody(body);
 					fighter.detachChild(bullet);
+
+					System.gc();
 
 					Log.d("Bullet", "Destroyed");
 				}
