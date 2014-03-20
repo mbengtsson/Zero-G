@@ -19,4 +19,9 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 	}
 
+	public void multiPlayerClick(View view) {
+		Intent intent = new Intent(this, MultiPlayerActivity.class);
+		startActivity(intent);
+	}
+
 }
