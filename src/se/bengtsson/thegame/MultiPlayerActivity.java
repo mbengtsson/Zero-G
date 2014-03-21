@@ -21,12 +21,16 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MultiPlayerActivity extends Activity implements OnItemClickListener {
 
 	private final UUID MY_UUID = UUID.fromString("F91829ED-DC57-42F0-98A5-F4A695AD64DD");
 	private final int REQUEST_ENABLE_BT = 1;
+	private final int MAC_ADDRESS_LENGTH = 17;
+
+	private boolean isServer;
 
 	private BluetoothAdapter bluetoothAdapter;
 
@@ -76,14 +80,6 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		}
 	}
 
-	public void onServerClicked(View view) {
-		Log.d("MultiPlayerActivity", "onServerClicked() executing");
-
-		Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-		discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-		startActivity(discoverableIntent);
-	}
-
 	public void onClientClicked(View view) {
 		Log.d("MultiPlayerActivity", "onClientClicked() executing");
 
@@ -125,6 +121,21 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		findBluetoothDevices();
 	}
 
+	public void onServerClicked(View view) {
+		Log.d("MultiPlayerActivity", "onServerClicked() executing");
+
+		isServer = true;
+
+		Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+		discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+		startActivity(discoverableIntent);
+
+		AcceptConnectionThread acceptConnectionThread = new AcceptConnectionThread();
+		acceptConnectionThread.start();
+		Log.d("MultiPlayerActivity", "started AcceptConnectionThread ");
+
+	}
+
 	private void findBluetoothDevices() {
 		setProgressBarIndeterminateVisibility(true);
 		setTitle("Finding devices");
@@ -138,14 +149,31 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		bluetoothAdapter.startDiscovery();
 	}
 
-	public void manageConnectedSocket(BluetoothSocket socket) {
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+		isServer = false;
+
+		String info = ((TextView) view).getText().toString();
+		String MACAddress = info.substring(info.length() - MAC_ADDRESS_LENGTH);
+
+		BluetoothDevice device = bluetoothAdapter.getRemoteDevice(MACAddress);
+
+		ConnectToServerThread connectToServerThread = new ConnectToServerThread(device);
+		connectToServerThread.start();
+		Log.d("MultiPlayerActivity", "started ConnectToServerThread ");
 
 	}
 
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		// TODO Auto-generated method stub
+	public void manageConnectedSocket(BluetoothSocket socket) {
+		Log.d("MultiPlayerActivity", "Have connection");
 
+		try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -163,11 +191,11 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		}
 	}
 
-	private class AcceptThread extends Thread {
+	private class AcceptConnectionThread extends Thread {
 
 		private final BluetoothServerSocket serverSocket;
 
-		public AcceptThread() {
+		public AcceptConnectionThread() {
 
 			BluetoothServerSocket tmp = null;
 			try {
@@ -213,12 +241,12 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		}
 	}
 
-	private class ConnectThread extends Thread {
+	private class ConnectToServerThread extends Thread {
 
 		private final BluetoothSocket socket;
 		private final BluetoothDevice device;
 
-		public ConnectThread(BluetoothDevice device) {
+		public ConnectToServerThread(BluetoothDevice device) {
 
 			BluetoothSocket tmp = null;
 			this.device = device;
