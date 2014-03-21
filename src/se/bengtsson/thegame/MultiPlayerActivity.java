@@ -1,10 +1,14 @@
 package se.bengtsson.thegame;
 
+import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,9 +25,9 @@ import android.widget.Toast;
 
 public class MultiPlayerActivity extends Activity implements OnItemClickListener {
 
+	private final UUID MY_UUID = UUID.fromString("F91829ED-DC57-42F0-98A5-F4A695AD64DD");
 	private final int REQUEST_ENABLE_BT = 1;
 
-	private String serverMACAddress;
 	private BluetoothAdapter bluetoothAdapter;
 
 	private ArrayAdapter<String> pairedDevicesAdapter;
@@ -59,7 +63,6 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		setTitle("Multi-player setup");
 
 		bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		serverMACAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
 		if (bluetoothAdapter == null) {
 			Toast.makeText(this, "Your device does not support bluetooth", Toast.LENGTH_LONG).show();
 			finish();
@@ -75,6 +78,10 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 
 	public void onServerClicked(View view) {
 		Log.d("MultiPlayerActivity", "onServerClicked() executing");
+
+		Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+		discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+		startActivity(discoverableIntent);
 	}
 
 	public void onClientClicked(View view) {
@@ -131,6 +138,10 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		bluetoothAdapter.startDiscovery();
 	}
 
+	public void manageConnectedSocket(BluetoothSocket socket) {
+
+	}
+
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// TODO Auto-generated method stub
@@ -145,6 +156,109 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 			bluetoothAdapter.cancelDiscovery();
 		}
 
-		unregisterReceiver(broadcastReceiver);
+		try {
+			unregisterReceiver(broadcastReceiver);
+		} catch (RuntimeException e) {
+			Log.d("MultiPlayerActivity", "No reciver registred");
+		}
+	}
+
+	private class AcceptThread extends Thread {
+
+		private final BluetoothServerSocket serverSocket;
+
+		public AcceptThread() {
+
+			BluetoothServerSocket tmp = null;
+			try {
+				tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord("The Game", MY_UUID);
+			} catch (IOException e) {
+
+			}
+			serverSocket = tmp;
+		}
+
+		@Override
+		public void run() {
+
+			BluetoothSocket socket = null;
+
+			while (true) {
+				try {
+					socket = serverSocket.accept();
+				} catch (IOException e) {
+					break;
+				}
+
+				if (socket != null) {
+
+					manageConnectedSocket(socket);
+
+					try {
+						serverSocket.close();
+					} catch (IOException e) {
+
+					}
+					break;
+				}
+			}
+		}
+
+		public void cancel() {
+			try {
+				serverSocket.close();
+			} catch (IOException e) {
+
+			}
+		}
+	}
+
+	private class ConnectThread extends Thread {
+
+		private final BluetoothSocket socket;
+		private final BluetoothDevice device;
+
+		public ConnectThread(BluetoothDevice device) {
+
+			BluetoothSocket tmp = null;
+			this.device = device;
+
+			try {
+				tmp = this.device.createRfcommSocketToServiceRecord(MY_UUID);
+			} catch (IOException e) {
+
+			}
+
+			socket = tmp;
+		}
+
+		@Override
+		public void run() {
+
+			bluetoothAdapter.cancelDiscovery();
+
+			try {
+				socket.connect();
+			} catch (IOException e) {
+
+				try {
+					socket.close();
+				} catch (IOException e1) {
+
+				}
+				return;
+			}
+
+			manageConnectedSocket(socket);
+		}
+
+		public void cancel() {
+			try {
+				socket.close();
+			} catch (IOException e) {
+
+			}
+		}
+
 	}
 }
