@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
+import se.bengtsson.thegame.bluetooth.BluetoothConnectionManager;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -36,6 +37,8 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 
 	private ArrayAdapter<String> pairedDevicesAdapter;
 	private ArrayAdapter<String> newDevicesAdapter;
+
+	private BluetoothConnectionManager connectionManager;
 
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
@@ -168,12 +171,16 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 	public void manageConnectedSocket(BluetoothSocket socket) {
 		Log.d("MultiPlayerActivity", "Have connection");
 
-		try {
-			socket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		connectionManager = BluetoothConnectionManager.getInstance();
+		connectionManager.initiate(socket);
+
+		Intent intent = new Intent(this, GameActivity.class);
+		intent.putExtra("isServer", isServer);
+		intent.putExtra("isMultiplayerGame", true);
+		startActivity(intent);
+
+		// connectionManager.destroy();
+
 	}
 
 	@Override
