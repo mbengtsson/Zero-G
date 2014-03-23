@@ -27,7 +27,7 @@ public class Fighter extends Entity {
 	private final float WORLD_HEIGHT;
 
 	private final float THRUST = 1.5f / PIXEL_TO_METER_RATIO_DEFAULT;
-	private final float ROTATION_MODIFIER = 1.5f;
+	private final float ROTATION_MODIFIER = 0.15f;
 
 	private BulletsFactory bulletFactory;
 	private final float RATE_OF_FIRE = 5;

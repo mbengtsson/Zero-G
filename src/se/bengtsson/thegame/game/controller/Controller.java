@@ -6,5 +6,5 @@ public interface Controller {
 
 	public boolean isRightTriggerPressed();
 
-	public float getTilt();
+	public byte getTilt();
 }

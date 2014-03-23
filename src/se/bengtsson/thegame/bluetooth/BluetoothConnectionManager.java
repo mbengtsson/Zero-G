@@ -3,7 +3,7 @@ package se.bengtsson.thegame.bluetooth;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
@@ -53,7 +53,7 @@ public class BluetoothConnectionManager {
 		private final BluetoothSocket socket;
 		private final InputStream inputStream;
 		private final OutputStream outputStream;
-		private ConcurrentLinkedQueue<Byte> buffer = new ConcurrentLinkedQueue<Byte>();
+		private LinkedBlockingQueue<Byte> buffer = new LinkedBlockingQueue<Byte>();
 
 		public ConnectedThread(BluetoothSocket socket) {
 			this.socket = socket;

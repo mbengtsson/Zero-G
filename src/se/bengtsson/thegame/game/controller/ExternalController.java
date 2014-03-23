@@ -4,7 +4,7 @@ public class ExternalController implements Controller {
 
 	private boolean leftTriggerPressed;
 	private boolean rightTriggerPressed;
-	private float tilt;
+	private byte tilt;
 
 	@Override
 	public boolean isLeftTriggerPressed() {
@@ -17,7 +17,7 @@ public class ExternalController implements Controller {
 	}
 
 	@Override
-	public float getTilt() {
+	public byte getTilt() {
 		return tilt;
 	}
 
@@ -29,7 +29,7 @@ public class ExternalController implements Controller {
 		this.rightTriggerPressed = rightTriggerPressed;
 	}
 
-	public void setTilt(float tilt) {
+	public void setTilt(byte tilt) {
 		this.tilt = tilt;
 	}
 

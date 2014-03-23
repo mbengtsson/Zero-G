@@ -1,7 +1,5 @@
 package se.bengtsson.thegame;
 
-import java.nio.ByteBuffer;
-
 import org.andengine.engine.Engine;
 import org.andengine.engine.FixedStepEngine;
 import org.andengine.engine.camera.Camera;
@@ -200,19 +198,13 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 					Log.d("byte", Byte.toString(input));
 					byte aByte = input.byteValue();
 					if (aByte == ROTATION_FLAG) {
-						byte[] bytes = new byte[4];
-						for (int i = 0; bytes.length > i; i++) {
-							Byte b = null;
-							while (b == null) {
-								b = connectionManager.readFromSocket();
-							}
 
-							bytes[i] = b.byteValue();
+						Byte tilt = null;
+						while (tilt == null) {
+							tilt = connectionManager.readFromSocket();
 						}
-						float tilt = ByteBuffer.wrap(bytes).getFloat();
+
 						externalController.setTilt(tilt);
-					} else {
-						externalController.setTilt(0);
 					}
 
 					if (aByte == THRUST_FLAG) {
@@ -231,12 +223,9 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 		} else if (isMultiplayerGame && isServer) {
 
-			float tilt = playerController.getTilt();
 			connectionManager.writeToSocket(ROTATION_FLAG);
-			byte[] bytes = ByteBuffer.allocate(4).putFloat(tilt).array();
-			for (int i = 0; bytes.length > i; i++) {
-				connectionManager.writeToSocket(bytes[i]);
-			}
+
+			connectionManager.writeToSocket(playerController.getTilt());
 
 			if (playerController.isRightTriggerPressed()) {
 				connectionManager.writeToSocket(THRUST_FLAG);

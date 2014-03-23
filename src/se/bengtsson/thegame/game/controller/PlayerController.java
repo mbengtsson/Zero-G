@@ -15,7 +15,7 @@ public class PlayerController implements Controller, IAccelerationListener {
 	private Trigger leftTrigger;
 	private Trigger rightTrigger;
 
-	private float tilt = 0.0f;
+	private byte tilt = 0;
 
 	public PlayerController() {
 		ResourceManager resources = ResourceManager.getInstance();
@@ -39,7 +39,8 @@ public class PlayerController implements Controller, IAccelerationListener {
 
 	@Override
 	public void onAccelerationChanged(AccelerationData pAccelerationData) {
-		tilt = pAccelerationData.getX();
+
+		tilt = (byte) (pAccelerationData.getX() * 10);
 
 	}
 
@@ -54,7 +55,7 @@ public class PlayerController implements Controller, IAccelerationListener {
 	}
 
 	@Override
-	public float getTilt() {
+	public byte getTilt() {
 		return tilt;
 	}
 
