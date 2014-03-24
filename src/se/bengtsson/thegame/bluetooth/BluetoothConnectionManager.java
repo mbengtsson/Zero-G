@@ -39,6 +39,10 @@ public class BluetoothConnectionManager {
 		return connectedThread.readByte();
 	}
 
+	public Byte nextFromSocket() {
+		return connectedThread.nextByte();
+	}
+
 	public void destroy() {
 		connectedThread.cancel();
 		try {
@@ -53,6 +57,7 @@ public class BluetoothConnectionManager {
 		private final BluetoothSocket socket;
 		private final InputStream inputStream;
 		private final OutputStream outputStream;
+
 		private LinkedBlockingQueue<Byte> buffer = new LinkedBlockingQueue<Byte>();
 
 		public ConnectedThread(BluetoothSocket socket) {
@@ -75,7 +80,7 @@ public class BluetoothConnectionManager {
 
 			while (true) {
 				try {
-					buffer.add((byte) inputStream.read());
+					buffer.offer((byte) inputStream.read());
 				} catch (IOException e) {
 					break;
 				}
@@ -93,6 +98,11 @@ public class BluetoothConnectionManager {
 		public Byte readByte() {
 
 			return buffer.poll();
+		}
+
+		public Byte nextByte() {
+
+			return buffer.peek();
 		}
 
 		public void cancel() {

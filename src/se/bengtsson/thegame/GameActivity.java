@@ -40,6 +40,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public static final int CAMERA_WIDTH = 800;
 	public static final int CAMERA_HEIGHT = 450;
 
+	public static byte READY_FLAG = -0x1;
 	public static byte ROTATION_FLAG = 0x1;
 	public static byte THRUST_FLAG = 0x2;
 	public static byte FIRE_FLAG = 0x3;
@@ -60,6 +61,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	private Entity foregroundLayer;
 
 	private Fighter playerFighter;
+	private Fighter externalFighter;
 
 	@Override
 	protected void onCreate(Bundle pSavedInstanceState) {
@@ -138,20 +140,34 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
 
-		if (!isMultiplayerGame || isServer) {
-			playerFighter = new Fighter(playerController, resources, CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2);
+		if (!isMultiplayerGame) {
+			playerFighter = new Fighter(playerController, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
 			spriteLayer.attachChild(playerFighter);
-		} else {
-			playerFighter = new Fighter(externalController, resources, CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2);
-			spriteLayer.attachChild(playerFighter);
-		}
 
-		Sprite aSprite = new Sprite(100, 100, resources.dummyTextureRegion, getVertexBufferObjectManager());
-		Body aBody =
-				PhysicsFactory.createCircleBody(physicsWorld, aSprite, BodyType.DynamicBody,
-						PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f));
-		physicsWorld.registerPhysicsConnector(new PhysicsConnector(aSprite, aBody, true, true));
-		spriteLayer.attachChild(aSprite);
+			Sprite aSprite = new Sprite(100, 100, resources.dummyTextureRegion, getVertexBufferObjectManager());
+			Body aBody =
+					PhysicsFactory.createCircleBody(physicsWorld, aSprite, BodyType.DynamicBody,
+							PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f));
+			physicsWorld.registerPhysicsConnector(new PhysicsConnector(aSprite, aBody, true, true));
+			spriteLayer.attachChild(aSprite);
+
+		} else if (isMultiplayerGame && isServer) {
+
+			playerFighter = new Fighter(playerController, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
+			spriteLayer.attachChild(playerFighter);
+
+			externalFighter =
+					new Fighter(externalController, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4), CAMERA_HEIGHT / 2);
+			spriteLayer.attachChild(externalFighter);
+		} else if (isMultiplayerGame && !isServer) {
+
+			playerFighter =
+					new Fighter(playerController, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4), CAMERA_HEIGHT / 2);
+			spriteLayer.attachChild(playerFighter);
+
+			externalFighter = new Fighter(externalController, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
+			spriteLayer.attachChild(externalFighter);
+		}
 
 		pOnPopulateSceneCallback.onPopulateSceneFinished();
 	}
@@ -170,7 +186,9 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	@Override
 	protected void onStop() {
-		connectionManager.destroy();
+		if (isMultiplayerGame) {
+			connectionManager.destroy();
+		}
 		super.onStop();
 	}
 
@@ -187,41 +205,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
 
-		if (isMultiplayerGame && !isServer) {
-
-			Byte input;
-			do {
-
-				input = connectionManager.readFromSocket();
-
-				if (input != null) {
-					Log.d("byte", Byte.toString(input));
-					byte aByte = input.byteValue();
-					if (aByte == ROTATION_FLAG) {
-
-						Byte tilt = null;
-						while (tilt == null) {
-							tilt = connectionManager.readFromSocket();
-						}
-
-						externalController.setTilt(tilt);
-					}
-
-					if (aByte == THRUST_FLAG) {
-						externalController.setRightTriggerPressed(true);
-					} else {
-						externalController.setRightTriggerPressed(false);
-					}
-
-					if (aByte == FIRE_FLAG) {
-						externalController.setLeftTriggerPressed(true);
-					} else {
-						externalController.setLeftTriggerPressed(false);
-					}
-				}
-			} while (input != null);
-
-		} else if (isMultiplayerGame && isServer) {
+		if (isMultiplayerGame) {
 
 			connectionManager.writeToSocket(ROTATION_FLAG);
 
@@ -233,6 +217,29 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 			if (playerController.isLeftTriggerPressed()) {
 				connectionManager.writeToSocket(FIRE_FLAG);
+			}
+
+			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == ROTATION_FLAG) {
+				connectionManager.readFromSocket();
+				Byte tilt = null;
+				while (tilt == null) {
+					tilt = connectionManager.readFromSocket();
+				}
+				externalController.setTilt(tilt);
+			}
+
+			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == THRUST_FLAG) {
+				connectionManager.readFromSocket();
+				externalController.setRightTriggerPressed(true);
+			} else {
+				externalController.setRightTriggerPressed(false);
+			}
+
+			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == FIRE_FLAG) {
+				connectionManager.readFromSocket();
+				externalController.setLeftTriggerPressed(true);
+			} else {
+				externalController.setLeftTriggerPressed(false);
 			}
 
 		}
