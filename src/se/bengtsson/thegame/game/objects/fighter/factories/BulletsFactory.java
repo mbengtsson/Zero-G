@@ -46,6 +46,8 @@ public class BulletsFactory {
 					PhysicsFactory.createBoxBody(resources.physicsWorld, this, BodyType.DynamicBody,
 							PhysicsFactory.createFixtureDef(1.0f, 0.0f, 0.0f));
 			resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
+			body.setUserData(this);
+
 
 			WORLD_WIDTH = resources.camera.getWidth();
 			WORLD_HEIGHT = resources.camera.getHeight();

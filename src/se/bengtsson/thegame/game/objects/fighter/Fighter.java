@@ -8,8 +8,8 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
-import org.andengine.util.math.MathUtils;
 
+import se.bengtsson.thegame.bluetooth.BluetoothConnectionManager;
 import se.bengtsson.thegame.game.controller.Controller;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.objects.fighter.factories.BulletsFactory;
@@ -22,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 public class Fighter extends Entity {
 
 	private Controller controller;
+	private BluetoothConnectionManager connectionManager;
 
 	private final float WORLD_WIDTH;
 	private final float WORLD_HEIGHT;
@@ -79,6 +80,7 @@ public class Fighter extends Entity {
 		rightThrust.setVisible(false);
 
 		bulletFactory = new BulletsFactory(this);
+		connectionManager = BluetoothConnectionManager.getInstance();
 	}
 
 	@Override
@@ -154,7 +156,7 @@ public class Fighter extends Entity {
 		long time = System.currentTimeMillis();
 
 		if (time - lastFired > 1000 / RATE_OF_FIRE) {
-			float offsetX = 10 / PIXEL_TO_METER_RATIO_DEFAULT;
+			float offsetX = 15 / PIXEL_TO_METER_RATIO_DEFAULT;
 			float offsetY;
 
 			if (fireLeft) {
@@ -175,19 +177,21 @@ public class Fighter extends Entity {
 	}
 
 	public float getXpos() {
-		return xPos * PIXEL_TO_METER_RATIO_DEFAULT;
+		// return xPos * PIXEL_TO_METER_RATIO_DEFAULT;
+		return xPos;
 	}
 
 	public float getYpos() {
-		return yPos * PIXEL_TO_METER_RATIO_DEFAULT;
+		// return yPos * PIXEL_TO_METER_RATIO_DEFAULT;
+		return yPos;
 	}
 
-	public void setPosition(float xPos, float yPos) {
+	public float getVelocityX() {
+		return velocityX;
+	}
 
-		xPos /= PIXEL_TO_METER_RATIO_DEFAULT;
-		yPos /= PIXEL_TO_METER_RATIO_DEFAULT;
-
-		fighterBody.setTransform(xPos, yPos, rotation);
+	public float getVelocityY() {
+		return velocityY;
 	}
 
 	public float getWidth() {
@@ -200,15 +204,31 @@ public class Fighter extends Entity {
 
 	@Override
 	public float getRotation() {
-		return MathUtils.radToDeg(rotation);
+		return rotation;
 	}
 
 	public boolean isAccelerating() {
 		return accelerating;
 	}
 
+	public void setPosition(float xPos, float yPos) {
+
+		// xPos /= PIXEL_TO_METER_RATIO_DEFAULT;
+		// yPos /= PIXEL_TO_METER_RATIO_DEFAULT;
+
+		fighterBody.setTransform(xPos, yPos, rotation);
+	}
+
+	public void setVelocity(float velocityX, float velocityY) {
+		fighterBody.setLinearVelocity(velocityX, velocityY);
+	}
+
 	public void setAccelerating(boolean accelerating) {
 		this.accelerating = accelerating;
+	}
+
+	public void setRotation(float rotation) {
+		fighterBody.setTransform(fighterBody.getPosition().x, fighterBody.getPosition().y, rotation);
 	}
 
 	private Body createFighterBody(final PhysicsWorld physicsWorld, final IAreaShape areaShape,

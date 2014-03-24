@@ -1,5 +1,7 @@
 package se.bengtsson.thegame;
 
+import java.nio.ByteBuffer;
+
 import org.andengine.engine.Engine;
 import org.andengine.engine.FixedStepEngine;
 import org.andengine.engine.camera.Camera;
@@ -21,8 +23,8 @@ import se.bengtsson.thegame.game.controller.ExternalController;
 import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
+import se.bengtsson.thegame.game.objects.fighter.factories.BulletsFactory.Bullet;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -40,10 +42,12 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public static final int CAMERA_WIDTH = 800;
 	public static final int CAMERA_HEIGHT = 450;
 
-	public static byte READY_FLAG = -0x1;
 	public static byte ROTATION_FLAG = 0x1;
 	public static byte THRUST_FLAG = 0x2;
 	public static byte FIRE_FLAG = 0x3;
+	public static byte SYNC_ROTATION_FLAG = 0x4;
+	public static byte SYNC_VELOCITY_FLAG = 0x5;
+	public static byte SYNC_POSITION_FLAG = 0x6;
 
 	private BluetoothConnectionManager connectionManager;
 	private boolean isServer;
@@ -63,6 +67,8 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	private Fighter playerFighter;
 	private Fighter externalFighter;
 
+	private double time;
+
 	@Override
 	protected void onCreate(Bundle pSavedInstanceState) {
 		super.onCreate(pSavedInstanceState);
@@ -75,7 +81,9 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	@Override
 	public Engine onCreateEngine(EngineOptions pEngineOptions) {
-		return new FixedStepEngine(pEngineOptions, 60);
+
+		return new FixedStepEngine(pEngineOptions, 30);
+
 	}
 
 	@Override
@@ -92,7 +100,9 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	@Override
 	public void onCreateResources(OnCreateResourcesCallback pOnCreateResourcesCallback) throws Exception {
-		physicsWorld = new FixedStepPhysicsWorld(60, new Vector2(0, 0), false, 8, 3);
+
+		physicsWorld = new FixedStepPhysicsWorld(30, new Vector2(0, 0), false, 8, 3);
+
 		physicsWorld.setContactListener(createContactListener());
 		;
 
@@ -219,6 +229,37 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 				connectionManager.writeToSocket(FIRE_FLAG);
 			}
 
+			if ((System.currentTimeMillis() - time) > 600) {
+				time = System.currentTimeMillis();
+				byte[] rotationBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getRotation()).array();
+				connectionManager.writeToSocket(SYNC_ROTATION_FLAG);
+				for (int i = 0; i < rotationBytes.length; i++) {
+					connectionManager.writeToSocket(rotationBytes[i]);
+				}
+
+			} else if ((System.currentTimeMillis() - time) > 400) {
+				byte[] xPosBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getXpos()).array();
+				byte[] yPosBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getYpos()).array();
+				connectionManager.writeToSocket(SYNC_POSITION_FLAG);
+				for (int i = 0; i < xPosBytes.length; i++) {
+					connectionManager.writeToSocket(xPosBytes[i]);
+				}
+				for (int i = 0; i < yPosBytes.length; i++) {
+					connectionManager.writeToSocket(yPosBytes[i]);
+				}
+
+			} else if ((System.currentTimeMillis() - time) > 200) {
+				byte[] xVelBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getVelocityX()).array();
+				byte[] yVelBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getVelocityY()).array();
+				connectionManager.writeToSocket(SYNC_VELOCITY_FLAG);
+				for (int i = 0; i < xVelBytes.length; i++) {
+					connectionManager.writeToSocket(xVelBytes[i]);
+				}
+				for (int i = 0; i < yVelBytes.length; i++) {
+					connectionManager.writeToSocket(yVelBytes[i]);
+				}
+			}
+
 			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == ROTATION_FLAG) {
 				connectionManager.readFromSocket();
 				Byte tilt = null;
@@ -242,6 +283,63 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 				externalController.setLeftTriggerPressed(false);
 			}
 
+			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_ROTATION_FLAG) {
+				connectionManager.readFromSocket();
+				byte[] rotationBytes = new byte[4];
+				for (int i = 0; i < rotationBytes.length; i++) {
+					Byte aByte = null;
+					while (aByte == null) {
+						aByte = connectionManager.readFromSocket();
+					}
+					rotationBytes[i] = aByte;
+				}
+				externalFighter.setRotation(ByteBuffer.wrap(rotationBytes).getFloat());
+			}
+
+			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_POSITION_FLAG) {
+				connectionManager.readFromSocket();
+				byte[] xPosBytes = new byte[4];
+				byte[] yPosBytes = new byte[4];
+				for (int i = 0; i < xPosBytes.length; i++) {
+					Byte aByte = null;
+					while (aByte == null) {
+						aByte = connectionManager.readFromSocket();
+					}
+					xPosBytes[i] = aByte;
+				}
+				for (int i = 0; i < yPosBytes.length; i++) {
+					Byte aByte = null;
+					while (aByte == null) {
+						aByte = connectionManager.readFromSocket();
+					}
+					yPosBytes[i] = aByte;
+				}
+				externalFighter.setPosition(ByteBuffer.wrap(xPosBytes).getFloat(), ByteBuffer.wrap(yPosBytes)
+						.getFloat());
+			}
+
+			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_VELOCITY_FLAG) {
+				connectionManager.readFromSocket();
+				byte[] xVelBytes = new byte[4];
+				byte[] yVelBytes = new byte[4];
+				for (int i = 0; i < xVelBytes.length; i++) {
+					Byte aByte = null;
+					while (aByte == null) {
+						aByte = connectionManager.readFromSocket();
+					}
+					xVelBytes[i] = aByte;
+				}
+				for (int i = 0; i < yVelBytes.length; i++) {
+					Byte aByte = null;
+					while (aByte == null) {
+						aByte = connectionManager.readFromSocket();
+					}
+					yVelBytes[i] = aByte;
+				}
+				externalFighter.setVelocity(ByteBuffer.wrap(xVelBytes).getFloat(), ByteBuffer.wrap(yVelBytes)
+						.getFloat());
+			}
+
 		}
 
 	}
@@ -259,7 +357,15 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 				final Fixture fixtureA = contact.getFixtureA();
 				final Fixture fixtureB = contact.getFixtureB();
 
-				Log.d("ContactListener", "Contact!!");
+				if (fixtureA.getBody().getUserData() instanceof Bullet) {
+					Bullet bullet = (Bullet) fixtureA.getBody().getUserData();
+					bullet.destroy(bullet);
+				}
+				if (fixtureB.getBody().getUserData() instanceof Bullet) {
+					Bullet bullet = (Bullet) fixtureB.getBody().getUserData();
+					bullet.destroy(bullet);
+				}
+
 			}
 
 			@Override
