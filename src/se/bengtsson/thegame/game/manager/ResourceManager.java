@@ -24,7 +24,9 @@ public class ResourceManager {
 	public VertexBufferObjectManager vbom;
 
 	private ITexture dummyTexture;
-	private ITexture fighterTexture;
+	private ITexture backgroundTexture;
+	private ITexture redFighterTexture;
+	private ITexture blueFighterTexture;
 	private ITexture fighterLeftTexture;
 	private ITexture fighterRightTexture;
 	private ITexture fighterThrustTexture;
@@ -32,7 +34,9 @@ public class ResourceManager {
 	private ITexture bulletTexture;
 
 	public ITextureRegion dummyTextureRegion;
-	public ITextureRegion fighterTextureRegion;
+	public ITextureRegion backgroundTextureRegion;
+	public ITextureRegion redFighterTextureRegion;
+	public ITextureRegion blueFighterTextureRegion;
 	public ITextureRegion fighterLeftTextureRegion;
 	public ITextureRegion fighterRightTextureRegion;
 	public ITextureRegion fighterThrustTextureRegion;
@@ -65,9 +69,20 @@ public class ResourceManager {
 		dummyTextureRegion = TextureRegionFactory.extractFromTexture(dummyTexture);
 		dummyTexture.load();
 
-		fighterTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/fighter.png");
-		fighterTextureRegion = TextureRegionFactory.extractFromTexture(fighterTexture);
-		fighterTexture.load();
+		backgroundTexture =
+				new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/background.png");
+		backgroundTextureRegion = TextureRegionFactory.extractFromTexture(backgroundTexture);
+		backgroundTexture.load();
+
+		redFighterTexture =
+				new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/fighter_red.png");
+		redFighterTextureRegion = TextureRegionFactory.extractFromTexture(redFighterTexture);
+		redFighterTexture.load();
+
+		blueFighterTexture =
+				new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/fighter_blue.png");
+		blueFighterTextureRegion = TextureRegionFactory.extractFromTexture(blueFighterTexture);
+		blueFighterTexture.load();
 
 		fighterLeftTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/left.png");
 		fighterLeftTextureRegion = TextureRegionFactory.extractFromTexture(fighterLeftTexture);

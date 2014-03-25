@@ -11,6 +11,7 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.Entity;
 import org.andengine.entity.scene.Scene;
+import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.debugdraw.DebugRenderer;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
@@ -64,6 +65,8 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	private Entity backgroundLayer;
 	private Entity spriteLayer;
 	private Entity foregroundLayer;
+
+	private Sprite background;
 
 	private Fighter playerFighter;
 	private Fighter externalFighter;
@@ -152,8 +155,12 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
 
+		background = new Sprite(0, 0, resources.backgroundTextureRegion, getVertexBufferObjectManager());
+		pScene.setBackground(new SpriteBackground(background));
+
 		if (!isMultiplayerGame) {
-			playerFighter = new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
+			playerFighter =
+					new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, false);
 			spriteLayer.attachChild(playerFighter);
 
 			Sprite aSprite = new Sprite(100, 100, resources.dummyTextureRegion, getVertexBufferObjectManager());
@@ -165,22 +172,23 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 		} else if (isMultiplayerGame && isServer) {
 
-			playerFighter = new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
+			playerFighter =
+					new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, false);
 			spriteLayer.attachChild(playerFighter);
 
 			externalFighter =
 					new Fighter(externalController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
-							CAMERA_HEIGHT / 2);
+							CAMERA_HEIGHT / 2, true);
 			spriteLayer.attachChild(externalFighter);
 		} else if (isMultiplayerGame && !isServer) {
 
 			playerFighter =
 					new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
-							CAMERA_HEIGHT / 2);
+							CAMERA_HEIGHT / 2, false);
 			spriteLayer.attachChild(playerFighter);
 
 			externalFighter =
-					new Fighter(externalController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
+					new Fighter(externalController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, true);
 			spriteLayer.attachChild(externalFighter);
 		}
 
@@ -234,7 +242,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 				connectionManager.writeToSocket(FIRE_FLAG);
 			}
 
-			if ((System.currentTimeMillis() - time) > 3000) {
+			if ((System.currentTimeMillis() - time) > 1000) {
 				time = System.currentTimeMillis();
 				byte[] rotationBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getRotation()).array();
 				connectionManager.writeToSocket(SYNC_ROTATION_FLAG);
@@ -242,7 +250,6 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 					connectionManager.writeToSocket(rotationBytes[i]);
 				}
 
-				// } else if ((System.currentTimeMillis() - time) > 2000) {
 				byte[] xPosBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getXpos()).array();
 				byte[] yPosBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getYpos()).array();
 				connectionManager.writeToSocket(SYNC_POSITION_FLAG);
@@ -253,7 +260,6 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 					connectionManager.writeToSocket(yPosBytes[i]);
 				}
 
-				// } else if ((System.currentTimeMillis() - time) > 1000) {
 				byte[] xVelBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getVelocityX()).array();
 				byte[] yVelBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getVelocityY()).array();
 				connectionManager.writeToSocket(SYNC_VELOCITY_FLAG);

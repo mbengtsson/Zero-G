@@ -53,14 +53,20 @@ public class Fighter extends Entity {
 	private Sprite rightThrust;
 	private Body fighterBody;
 
-	public Fighter(Controller controller, BulletPool bulletPool, ResourceManager resources, float xPos, float yPos) {
+	public Fighter(Controller controller, BulletPool bulletPool, ResourceManager resources, float xPos, float yPos,
+			boolean enemy) {
 
 		this.controller = controller;
 		this.bulletPool = bulletPool;
 		this.WORLD_WIDTH = resources.camera.getWidth() / PIXEL_TO_METER_RATIO_DEFAULT;
 		this.WORLD_HEIGHT = resources.camera.getHeight() / PIXEL_TO_METER_RATIO_DEFAULT;
 
-		this.fighter = new Sprite(xPos, yPos, resources.fighterTextureRegion, resources.vbom);
+		if (enemy) {
+			this.fighter = new Sprite(xPos, yPos, resources.redFighterTextureRegion, resources.vbom);
+		} else {
+			this.fighter = new Sprite(xPos, yPos, resources.blueFighterTextureRegion, resources.vbom);
+		}
+
 		this.mainThrust = new Sprite(xPos, yPos, resources.fighterThrustTextureRegion, resources.vbom);
 		this.leftThrust = new Sprite(xPos, yPos, resources.fighterLeftTextureRegion, resources.vbom);
 		this.rightThrust = new Sprite(xPos, yPos, resources.fighterRightTextureRegion, resources.vbom);
