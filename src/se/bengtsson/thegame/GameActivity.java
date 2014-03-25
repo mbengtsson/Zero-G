@@ -23,7 +23,8 @@ import se.bengtsson.thegame.game.controller.ExternalController;
 import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
-import se.bengtsson.thegame.game.objects.fighter.factories.BulletsFactory.Bullet;
+import se.bengtsson.thegame.game.objects.pools.BulletPool;
+import se.bengtsson.thegame.game.objects.pools.BulletPool.Bullet;
 import android.os.Bundle;
 
 import com.badlogic.gdx.math.Vector2;
@@ -66,6 +67,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	private Fighter playerFighter;
 	private Fighter externalFighter;
+	private BulletPool bulletPool;
 
 	private double time;
 
@@ -104,7 +106,6 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		physicsWorld = new FixedStepPhysicsWorld(30, new Vector2(0, 0), false, 8, 3);
 
 		physicsWorld.setContactListener(createContactListener());
-		;
 
 		ResourceManager.prepareManager(physicsWorld, mEngine, this, camera, getVertexBufferObjectManager());
 		resources = ResourceManager.getInstance();
@@ -133,6 +134,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
 
 		externalController = new ExternalController();
+		bulletPool = new BulletPool(spriteLayer);
 
 		playerController = new PlayerController();
 		foregroundLayer.attachChild(playerController.getLeftTrigger());
@@ -151,7 +153,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
 
 		if (!isMultiplayerGame) {
-			playerFighter = new Fighter(playerController, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
+			playerFighter = new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
 			spriteLayer.attachChild(playerFighter);
 
 			Sprite aSprite = new Sprite(100, 100, resources.dummyTextureRegion, getVertexBufferObjectManager());
@@ -163,19 +165,22 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 		} else if (isMultiplayerGame && isServer) {
 
-			playerFighter = new Fighter(playerController, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
+			playerFighter = new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
 			spriteLayer.attachChild(playerFighter);
 
 			externalFighter =
-					new Fighter(externalController, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4), CAMERA_HEIGHT / 2);
+					new Fighter(externalController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
+							CAMERA_HEIGHT / 2);
 			spriteLayer.attachChild(externalFighter);
 		} else if (isMultiplayerGame && !isServer) {
 
 			playerFighter =
-					new Fighter(playerController, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4), CAMERA_HEIGHT / 2);
+					new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
+							CAMERA_HEIGHT / 2);
 			spriteLayer.attachChild(playerFighter);
 
-			externalFighter = new Fighter(externalController, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
+			externalFighter =
+					new Fighter(externalController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2);
 			spriteLayer.attachChild(externalFighter);
 		}
 
@@ -359,11 +364,11 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 				if (fixtureA.getBody().getUserData() instanceof Bullet) {
 					Bullet bullet = (Bullet) fixtureA.getBody().getUserData();
-					bullet.destroy(bullet);
+					bulletPool.recyclePoolItem(bullet);
 				}
 				if (fixtureB.getBody().getUserData() instanceof Bullet) {
 					Bullet bullet = (Bullet) fixtureB.getBody().getUserData();
-					bullet.destroy(bullet);
+					bulletPool.recyclePoolItem(bullet);
 				}
 
 			}

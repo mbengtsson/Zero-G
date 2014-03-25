@@ -12,7 +12,7 @@ import org.andengine.extension.physics.box2d.PhysicsWorld;
 import se.bengtsson.thegame.bluetooth.BluetoothConnectionManager;
 import se.bengtsson.thegame.game.controller.Controller;
 import se.bengtsson.thegame.game.manager.ResourceManager;
-import se.bengtsson.thegame.game.objects.fighter.factories.BulletsFactory;
+import se.bengtsson.thegame.game.objects.pools.BulletPool;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -30,7 +30,9 @@ public class Fighter extends Entity {
 	private final float THRUST = 1.5f / PIXEL_TO_METER_RATIO_DEFAULT;
 	private final float ROTATION_MODIFIER = 0.15f;
 
-	private BulletsFactory bulletFactory;
+	// private BulletsFactory bulletFactory;
+	private BulletPool bulletPool;
+
 	private final float RATE_OF_FIRE = 5;
 	private long lastFired;
 	private boolean fireLeft;
@@ -51,9 +53,10 @@ public class Fighter extends Entity {
 	private Sprite rightThrust;
 	private Body fighterBody;
 
-	public Fighter(Controller controller, ResourceManager resources, float xPos, float yPos) {
+	public Fighter(Controller controller, BulletPool bulletPool, ResourceManager resources, float xPos, float yPos) {
 
 		this.controller = controller;
+		this.bulletPool = bulletPool;
 		this.WORLD_WIDTH = resources.camera.getWidth() / PIXEL_TO_METER_RATIO_DEFAULT;
 		this.WORLD_HEIGHT = resources.camera.getHeight() / PIXEL_TO_METER_RATIO_DEFAULT;
 
@@ -79,7 +82,7 @@ public class Fighter extends Entity {
 		leftThrust.setVisible(false);
 		rightThrust.setVisible(false);
 
-		bulletFactory = new BulletsFactory(this);
+		// bulletFactory = new BulletsFactory(this);
 		connectionManager = BluetoothConnectionManager.getInstance();
 	}
 
@@ -170,8 +173,9 @@ public class Fighter extends Entity {
 			float xPos = (float) (this.xPos + (Math.sin(rotation) * offsetX + Math.cos(rotation) * offsetY));
 			float yPos = (float) (this.yPos + (Math.sin(rotation) * offsetY - Math.cos(rotation) * offsetX));
 
-			Sprite bullet = bulletFactory.createBullet(xPos, yPos, rotation);
-			this.attachChild(bullet);
+			// Sprite bullet = bulletFactory.createBullet(xPos, yPos, rotation);
+			Sprite bullet = bulletPool.obtainPoolItem(xPos, yPos, rotation);
+			// this.attachChild(bullet);
 			lastFired = time;
 		}
 	}
