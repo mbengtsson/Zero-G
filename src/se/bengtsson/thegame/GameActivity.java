@@ -234,7 +234,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 				connectionManager.writeToSocket(FIRE_FLAG);
 			}
 
-			if ((System.currentTimeMillis() - time) > 600) {
+			if ((System.currentTimeMillis() - time) > 3000) {
 				time = System.currentTimeMillis();
 				byte[] rotationBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getRotation()).array();
 				connectionManager.writeToSocket(SYNC_ROTATION_FLAG);
@@ -242,7 +242,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 					connectionManager.writeToSocket(rotationBytes[i]);
 				}
 
-			} else if ((System.currentTimeMillis() - time) > 400) {
+				// } else if ((System.currentTimeMillis() - time) > 2000) {
 				byte[] xPosBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getXpos()).array();
 				byte[] yPosBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getYpos()).array();
 				connectionManager.writeToSocket(SYNC_POSITION_FLAG);
@@ -253,7 +253,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 					connectionManager.writeToSocket(yPosBytes[i]);
 				}
 
-			} else if ((System.currentTimeMillis() - time) > 200) {
+				// } else if ((System.currentTimeMillis() - time) > 1000) {
 				byte[] xVelBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getVelocityX()).array();
 				byte[] yVelBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getVelocityY()).array();
 				connectionManager.writeToSocket(SYNC_VELOCITY_FLAG);
@@ -359,6 +359,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		ContactListener contactListener = new ContactListener() {
 			@Override
 			public void beginContact(Contact contact) {
+
 				final Fixture fixtureA = contact.getFixtureA();
 				final Fixture fixtureB = contact.getFixtureB();
 
@@ -370,7 +371,6 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 					Bullet bullet = (Bullet) fixtureB.getBody().getUserData();
 					bulletPool.recyclePoolItem(bullet);
 				}
-
 			}
 
 			@Override

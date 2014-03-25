@@ -39,22 +39,28 @@ public class BulletPool extends GenericPool<Bullet> {
 	}
 
 	@Override
-	protected void onHandleRecycleItem(Bullet bullet) {
+	protected void onHandleRecycleItem(final Bullet bullet) {
 		super.onHandleRecycleItem(bullet);
 		Log.d("BulletPool", "start recycling");
+		resources.engine.runOnUpdateThread(new Runnable() {
 
-		bullet.body.setActive(false);
-		bullet.setVisible(false);
-		bullet.setIgnoreUpdate(true);
-		bullet.clearEntityModifiers();
-		bullet.clearUpdateHandlers();
-		// bullet.detachSelf();
+			@Override
+			public void run() {
+				bullet.body.setActive(false);
+				bullet.setVisible(false);
+				bullet.setIgnoreUpdate(true);
+				bullet.clearEntityModifiers();
+				bullet.clearUpdateHandlers();
+
+			}
+
+		});
 
 	}
 
 	public class Bullet extends Sprite {
 
-		private final float VELOCITY = 15f;
+		private final float VELOCITY = 20f;
 
 		private final float WORLD_WIDTH;
 		private final float WORLD_HEIGHT;
