@@ -15,8 +15,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class BulletPool extends GenericPool<Bullet> {
 
-	ResourceManager resources;
-	Entity spriteLayer;
+	private ResourceManager resources;
+	private Entity spriteLayer;
 
 	public BulletPool(Entity spriteLayer) {
 		this.resources = ResourceManager.getInstance();

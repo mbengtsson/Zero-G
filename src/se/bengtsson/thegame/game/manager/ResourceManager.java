@@ -6,9 +6,17 @@ import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.opengl.texture.ITexture;
+import org.andengine.opengl.texture.TextureOptions;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+import org.andengine.opengl.texture.atlas.bitmap.BuildableBitmapTextureAtlas;
+import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
+import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
+import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
+import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import se.bengtsson.thegame.GameActivity;
@@ -33,6 +41,8 @@ public class ResourceManager {
 	private ITexture triggerTexture;
 	private ITexture bulletTexture;
 
+	private BuildableBitmapTextureAtlas explosionTextureAtlas;
+
 	public ITextureRegion dummyTextureRegion;
 	public ITextureRegion backgroundTextureRegion;
 	public ITextureRegion redFighterTextureRegion;
@@ -42,6 +52,8 @@ public class ResourceManager {
 	public ITextureRegion fighterThrustTextureRegion;
 	public ITextureRegion triggerTextureRegion;
 	public ITextureRegion bulletTextureRegion;
+
+	public TiledTextureRegion explosionTextureRegion;
 
 	private ResourceManager() {
 
@@ -62,6 +74,7 @@ public class ResourceManager {
 		getInstance().activity = activity;
 		getInstance().camera = camera;
 		getInstance().vbom = vbom;
+
 	}
 
 	public void loadTextures() throws IOException {
@@ -105,6 +118,21 @@ public class ResourceManager {
 		bulletTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/bullet.png");
 		bulletTextureRegion = TextureRegionFactory.extractFromTexture(bulletTexture);
 		bulletTexture.load();
+
+		explosionTextureAtlas =
+				new BuildableBitmapTextureAtlas(activity.getTextureManager(), 1024, 1280, TextureOptions.NEAREST);
+
+		explosionTextureRegion =
+				BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(explosionTextureAtlas,
+						activity.getAssets(), "gfx/explosion.png", 4, 5);
+		try {
+			explosionTextureAtlas
+					.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 0, 0));
+			explosionTextureAtlas.load();
+		} catch (TextureAtlasBuilderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void loadFonts() {

@@ -15,22 +15,18 @@ import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.debugdraw.DebugRenderer;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
-import org.andengine.extension.physics.box2d.PhysicsConnector;
-import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.ui.activity.LayoutGameActivity;
 
 import se.bengtsson.thegame.bluetooth.BluetoothConnectionManager;
 import se.bengtsson.thegame.game.controller.ExternalController;
 import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.manager.ResourceManager;
+import se.bengtsson.thegame.game.manager.SceneManager;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
-import se.bengtsson.thegame.game.objects.pools.BulletPool;
 import se.bengtsson.thegame.game.objects.pools.BulletPool.Bullet;
 import android.os.Bundle;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -39,7 +35,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
-	private boolean debug = true;
+	private boolean debug = false;
 
 	public static final int CAMERA_WIDTH = 800;
 	public static final int CAMERA_HEIGHT = 450;
@@ -52,8 +48,8 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public static byte SYNC_POSITION_FLAG = 0x6;
 
 	private BluetoothConnectionManager connectionManager;
-	private boolean isServer;
-	private boolean isMultiplayerGame;
+	private boolean server;
+	private boolean multiplayerGame;
 
 	private Camera camera;
 	private FixedStepPhysicsWorld physicsWorld;
@@ -61,26 +57,22 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	private ExternalController externalController;
 
 	private ResourceManager resources;
+	private SceneManager sceneManager;
 
-	private Entity backgroundLayer;
 	private Entity spriteLayer;
 	private Entity foregroundLayer;
 
 	private Sprite background;
-
-	private Fighter playerFighter;
-	private Fighter externalFighter;
-	private BulletPool bulletPool;
 
 	private double time;
 
 	@Override
 	protected void onCreate(Bundle pSavedInstanceState) {
 		super.onCreate(pSavedInstanceState);
-		isMultiplayerGame = getIntent().getBooleanExtra("isMultiplayerGame", false);
-		if (isMultiplayerGame) {
+		multiplayerGame = getIntent().getBooleanExtra("isMultiplayerGame", false);
+		if (multiplayerGame) {
 			connectionManager = BluetoothConnectionManager.getInstance();
-			isServer = getIntent().getBooleanExtra("isServer", false);
+			server = getIntent().getBooleanExtra("isServer", false);
 		}
 	}
 
@@ -124,11 +116,9 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback) throws Exception {
 		final Scene scene = new Scene();
 
-		backgroundLayer = new Entity();
 		spriteLayer = new Entity();
 		foregroundLayer = new Entity();
 
-		scene.attachChild(backgroundLayer);
 		scene.attachChild(spriteLayer);
 		scene.attachChild(foregroundLayer);
 
@@ -137,7 +127,8 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
 
 		externalController = new ExternalController();
-		bulletPool = new BulletPool(spriteLayer);
+
+		sceneManager = new SceneManager(scene, spriteLayer);
 
 		playerController = new PlayerController();
 		foregroundLayer.attachChild(playerController.getLeftTrigger());
@@ -158,38 +149,11 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		background = new Sprite(0, 0, resources.backgroundTextureRegion, getVertexBufferObjectManager());
 		pScene.setBackground(new SpriteBackground(background));
 
-		if (!isMultiplayerGame) {
-			playerFighter =
-					new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, false);
-			spriteLayer.attachChild(playerFighter);
+		if (!multiplayerGame) {
+			sceneManager.setupSingleplayerScene(playerController);
 
-			Sprite aSprite = new Sprite(100, 100, resources.dummyTextureRegion, getVertexBufferObjectManager());
-			Body aBody =
-					PhysicsFactory.createCircleBody(physicsWorld, aSprite, BodyType.DynamicBody,
-							PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f));
-			physicsWorld.registerPhysicsConnector(new PhysicsConnector(aSprite, aBody, true, true));
-			spriteLayer.attachChild(aSprite);
-
-		} else if (isMultiplayerGame && isServer) {
-
-			playerFighter =
-					new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, false);
-			spriteLayer.attachChild(playerFighter);
-
-			externalFighter =
-					new Fighter(externalController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
-							CAMERA_HEIGHT / 2, true);
-			spriteLayer.attachChild(externalFighter);
-		} else if (isMultiplayerGame && !isServer) {
-
-			playerFighter =
-					new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
-							CAMERA_HEIGHT / 2, false);
-			spriteLayer.attachChild(playerFighter);
-
-			externalFighter =
-					new Fighter(externalController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, true);
-			spriteLayer.attachChild(externalFighter);
+		} else {
+			sceneManager.setupMultiplayerScene(playerController, externalController, server);
 		}
 
 		pOnPopulateSceneCallback.onPopulateSceneFinished();
@@ -209,7 +173,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	@Override
 	protected void onStop() {
-		if (isMultiplayerGame) {
+		if (multiplayerGame) {
 			connectionManager.destroy();
 		}
 		super.onStop();
@@ -228,7 +192,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
 
-		if (isMultiplayerGame) {
+		if (multiplayerGame) {
 
 			connectionManager.writeToSocket(ROTATION_FLAG);
 
@@ -243,32 +207,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 			}
 
 			if ((System.currentTimeMillis() - time) > 1000) {
-				time = System.currentTimeMillis();
-				byte[] rotationBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getRotation()).array();
-				connectionManager.writeToSocket(SYNC_ROTATION_FLAG);
-				for (int i = 0; i < rotationBytes.length; i++) {
-					connectionManager.writeToSocket(rotationBytes[i]);
-				}
-
-				byte[] xPosBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getXpos()).array();
-				byte[] yPosBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getYpos()).array();
-				connectionManager.writeToSocket(SYNC_POSITION_FLAG);
-				for (int i = 0; i < xPosBytes.length; i++) {
-					connectionManager.writeToSocket(xPosBytes[i]);
-				}
-				for (int i = 0; i < yPosBytes.length; i++) {
-					connectionManager.writeToSocket(yPosBytes[i]);
-				}
-
-				byte[] xVelBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getVelocityX()).array();
-				byte[] yVelBytes = ByteBuffer.allocate(4).putFloat(playerFighter.getVelocityY()).array();
-				connectionManager.writeToSocket(SYNC_VELOCITY_FLAG);
-				for (int i = 0; i < xVelBytes.length; i++) {
-					connectionManager.writeToSocket(xVelBytes[i]);
-				}
-				for (int i = 0; i < yVelBytes.length; i++) {
-					connectionManager.writeToSocket(yVelBytes[i]);
-				}
+				sendSync();
 			}
 
 			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == ROTATION_FLAG) {
@@ -294,63 +233,97 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 				externalController.setLeftTriggerPressed(false);
 			}
 
-			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_ROTATION_FLAG) {
-				connectionManager.readFromSocket();
-				byte[] rotationBytes = new byte[4];
-				for (int i = 0; i < rotationBytes.length; i++) {
-					Byte aByte = null;
-					while (aByte == null) {
-						aByte = connectionManager.readFromSocket();
-					}
-					rotationBytes[i] = aByte;
-				}
-				externalFighter.setRotation(ByteBuffer.wrap(rotationBytes).getFloat());
-			}
+			reciveSync();
 
-			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_POSITION_FLAG) {
-				connectionManager.readFromSocket();
-				byte[] xPosBytes = new byte[4];
-				byte[] yPosBytes = new byte[4];
-				for (int i = 0; i < xPosBytes.length; i++) {
-					Byte aByte = null;
-					while (aByte == null) {
-						aByte = connectionManager.readFromSocket();
-					}
-					xPosBytes[i] = aByte;
-				}
-				for (int i = 0; i < yPosBytes.length; i++) {
-					Byte aByte = null;
-					while (aByte == null) {
-						aByte = connectionManager.readFromSocket();
-					}
-					yPosBytes[i] = aByte;
-				}
-				externalFighter.setPosition(ByteBuffer.wrap(xPosBytes).getFloat(), ByteBuffer.wrap(yPosBytes)
-						.getFloat());
-			}
+		}
 
-			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_VELOCITY_FLAG) {
-				connectionManager.readFromSocket();
-				byte[] xVelBytes = new byte[4];
-				byte[] yVelBytes = new byte[4];
-				for (int i = 0; i < xVelBytes.length; i++) {
-					Byte aByte = null;
-					while (aByte == null) {
-						aByte = connectionManager.readFromSocket();
-					}
-					xVelBytes[i] = aByte;
-				}
-				for (int i = 0; i < yVelBytes.length; i++) {
-					Byte aByte = null;
-					while (aByte == null) {
-						aByte = connectionManager.readFromSocket();
-					}
-					yVelBytes[i] = aByte;
-				}
-				externalFighter.setVelocity(ByteBuffer.wrap(xVelBytes).getFloat(), ByteBuffer.wrap(yVelBytes)
-						.getFloat());
-			}
+	}
 
+	public void sendSync() {
+		time = System.currentTimeMillis();
+		byte[] rotationBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getRotation()).array();
+		connectionManager.writeToSocket(SYNC_ROTATION_FLAG);
+		for (int i = 0; i < rotationBytes.length; i++) {
+			connectionManager.writeToSocket(rotationBytes[i]);
+		}
+
+		byte[] xPosBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getXpos()).array();
+		byte[] yPosBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getYpos()).array();
+		connectionManager.writeToSocket(SYNC_POSITION_FLAG);
+		for (int i = 0; i < xPosBytes.length; i++) {
+			connectionManager.writeToSocket(xPosBytes[i]);
+		}
+		for (int i = 0; i < yPosBytes.length; i++) {
+			connectionManager.writeToSocket(yPosBytes[i]);
+		}
+
+		byte[] xVelBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getVelocityX()).array();
+		byte[] yVelBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getVelocityY()).array();
+		connectionManager.writeToSocket(SYNC_VELOCITY_FLAG);
+		for (int i = 0; i < xVelBytes.length; i++) {
+			connectionManager.writeToSocket(xVelBytes[i]);
+		}
+		for (int i = 0; i < yVelBytes.length; i++) {
+			connectionManager.writeToSocket(yVelBytes[i]);
+		}
+	}
+
+	public void reciveSync() {
+		if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_ROTATION_FLAG) {
+			connectionManager.readFromSocket();
+			byte[] rotationBytes = new byte[4];
+			for (int i = 0; i < rotationBytes.length; i++) {
+				Byte aByte = null;
+				while (aByte == null) {
+					aByte = connectionManager.readFromSocket();
+				}
+				rotationBytes[i] = aByte;
+			}
+			sceneManager.getEnemyFighter().setRotation(ByteBuffer.wrap(rotationBytes).getFloat());
+		}
+
+		if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_POSITION_FLAG) {
+			connectionManager.readFromSocket();
+			byte[] xPosBytes = new byte[4];
+			byte[] yPosBytes = new byte[4];
+			for (int i = 0; i < xPosBytes.length; i++) {
+				Byte aByte = null;
+				while (aByte == null) {
+					aByte = connectionManager.readFromSocket();
+				}
+				xPosBytes[i] = aByte;
+			}
+			for (int i = 0; i < yPosBytes.length; i++) {
+				Byte aByte = null;
+				while (aByte == null) {
+					aByte = connectionManager.readFromSocket();
+				}
+				yPosBytes[i] = aByte;
+			}
+			sceneManager.getEnemyFighter().setPosition(ByteBuffer.wrap(xPosBytes).getFloat(),
+					ByteBuffer.wrap(yPosBytes).getFloat());
+		}
+
+		if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_VELOCITY_FLAG) {
+			connectionManager.readFromSocket();
+			byte[] xVelBytes = new byte[4];
+			byte[] yVelBytes = new byte[4];
+			for (int i = 0; i < xVelBytes.length; i++) {
+				Byte aByte = null;
+				while (aByte == null) {
+					aByte = connectionManager.readFromSocket();
+				}
+				xVelBytes[i] = aByte;
+			}
+			for (int i = 0; i < yVelBytes.length; i++) {
+				Byte aByte = null;
+				while (aByte == null) {
+					aByte = connectionManager.readFromSocket();
+				}
+				yVelBytes[i] = aByte;
+			}
+			sceneManager.getEnemyFighter().setVelocity(ByteBuffer.wrap(xVelBytes).getFloat(),
+					ByteBuffer.wrap(yVelBytes).getFloat());
 		}
 
 	}
@@ -371,12 +344,22 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 				if (fixtureA.getBody().getUserData() instanceof Bullet) {
 					Bullet bullet = (Bullet) fixtureA.getBody().getUserData();
-					bulletPool.recyclePoolItem(bullet);
+					sceneManager.getBulletPool().recyclePoolItem(bullet);
+					if (fixtureB.getBody().getUserData() instanceof Fighter) {
+						Fighter fighter = (Fighter) fixtureB.getBody().getUserData();
+						fighter.explode();
+					}
+
 				}
 				if (fixtureB.getBody().getUserData() instanceof Bullet) {
 					Bullet bullet = (Bullet) fixtureB.getBody().getUserData();
-					bulletPool.recyclePoolItem(bullet);
+					sceneManager.getBulletPool().recyclePoolItem(bullet);
+					if (fixtureA.getBody().getUserData() instanceof Fighter) {
+						Fighter fighter = (Fighter) fixtureA.getBody().getUserData();
+						fighter.explode();
+					}
 				}
+
 			}
 
 			@Override

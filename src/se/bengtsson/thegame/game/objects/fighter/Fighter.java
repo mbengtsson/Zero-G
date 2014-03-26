@@ -4,6 +4,7 @@ import static org.andengine.extension.physics.box2d.util.constants.PhysicsConsta
 
 import org.andengine.entity.Entity;
 import org.andengine.entity.shape.IAreaShape;
+import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
@@ -23,6 +24,7 @@ public class Fighter extends Entity {
 
 	private Controller controller;
 	private BluetoothConnectionManager connectionManager;
+	private ResourceManager resources;
 
 	private final float WORLD_WIDTH;
 	private final float WORLD_HEIGHT;
@@ -30,7 +32,6 @@ public class Fighter extends Entity {
 	private final float THRUST = 1.5f / PIXEL_TO_METER_RATIO_DEFAULT;
 	private final float ROTATION_MODIFIER = 0.15f;
 
-	// private BulletsFactory bulletFactory;
 	private BulletPool bulletPool;
 
 	private final float RATE_OF_FIRE = 5;
@@ -51,10 +52,13 @@ public class Fighter extends Entity {
 	private Sprite mainThrust;
 	private Sprite leftThrust;
 	private Sprite rightThrust;
+	private AnimatedSprite explosion;
 	private Body fighterBody;
 
 	public Fighter(Controller controller, BulletPool bulletPool, ResourceManager resources, float xPos, float yPos,
 			boolean enemy) {
+
+		this.resources = resources;
 
 		this.controller = controller;
 		this.bulletPool = bulletPool;
@@ -70,25 +74,31 @@ public class Fighter extends Entity {
 		this.mainThrust = new Sprite(xPos, yPos, resources.fighterThrustTextureRegion, resources.vbom);
 		this.leftThrust = new Sprite(xPos, yPos, resources.fighterLeftTextureRegion, resources.vbom);
 		this.rightThrust = new Sprite(xPos, yPos, resources.fighterRightTextureRegion, resources.vbom);
+
+		this.explosion = new AnimatedSprite(xPos, yPos, resources.explosionTextureRegion, resources.vbom);
+
 		fighterBody =
 				createFighterBody(resources.physicsWorld, fighter, BodyType.DynamicBody,
-						PhysicsFactory.createFixtureDef(1.0f, 0.0f, 0.5f));
+						PhysicsFactory.createFixtureDef(2.0f, 0.1f, 0.5f));
+		fighterBody.setUserData(this);
 
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(fighter, fighterBody, true, true));
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(mainThrust, fighterBody, true, true));
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(leftThrust, fighterBody, true, true));
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(rightThrust, fighterBody, true, true));
+		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(explosion, fighterBody, true, false));
 
 		this.attachChild(fighter);
 		this.attachChild(mainThrust);
 		this.attachChild(leftThrust);
 		this.attachChild(rightThrust);
+		this.attachChild(explosion);
 
 		mainThrust.setVisible(false);
 		leftThrust.setVisible(false);
 		rightThrust.setVisible(false);
+		explosion.setVisible(false);
 
-		// bulletFactory = new BulletsFactory(this);
 		connectionManager = BluetoothConnectionManager.getInstance();
 	}
 
@@ -179,20 +189,58 @@ public class Fighter extends Entity {
 			float xPos = (float) (this.xPos + (Math.sin(rotation) * offsetX + Math.cos(rotation) * offsetY));
 			float yPos = (float) (this.yPos + (Math.sin(rotation) * offsetY - Math.cos(rotation) * offsetX));
 
-			// Sprite bullet = bulletFactory.createBullet(xPos, yPos, rotation);
-			Sprite bullet = bulletPool.obtainPoolItem(xPos, yPos, rotation);
-			// this.attachChild(bullet);
+			bulletPool.obtainPoolItem(xPos, yPos, rotation);
 			lastFired = time;
 		}
 	}
 
+	public void explode() {
+		explosion.setVisible(true);
+		fighter.setVisible(false);
+		explosion.animate(100, 0);
+	}
+
+	public void destroy() {
+
+		resources.engine.runOnUpdateThread(new Runnable() {
+
+			@Override
+			public void run() {
+				PhysicsConnector connector =
+						resources.physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(fighter);
+				resources.physicsWorld.unregisterPhysicsConnector(connector);
+				connector = resources.physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(leftThrust);
+				resources.physicsWorld.unregisterPhysicsConnector(connector);
+				connector = resources.physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(mainThrust);
+				resources.physicsWorld.unregisterPhysicsConnector(connector);
+				connector =
+						resources.physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(rightThrust);
+				resources.physicsWorld.unregisterPhysicsConnector(connector);
+				connector = resources.physicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(explosion);
+				resources.physicsWorld.unregisterPhysicsConnector(connector);
+				resources.physicsWorld.destroyBody(fighterBody);
+				detachChild(fighter);
+				detachChild(leftThrust);
+				detachChild(mainThrust);
+				detachChild(rightThrust);
+				detachSelf();
+
+			}
+
+		});
+
+	}
+
+	public void resetFighter() {
+		fighterBody.setTransform(1, 1, 0);
+
+	}
+
 	public float getXpos() {
-		// return xPos * PIXEL_TO_METER_RATIO_DEFAULT;
 		return xPos;
 	}
 
 	public float getYpos() {
-		// return yPos * PIXEL_TO_METER_RATIO_DEFAULT;
 		return yPos;
 	}
 
@@ -223,10 +271,7 @@ public class Fighter extends Entity {
 
 	public void setPosition(float xPos, float yPos) {
 
-		// xPos /= PIXEL_TO_METER_RATIO_DEFAULT;
-		// yPos /= PIXEL_TO_METER_RATIO_DEFAULT;
-
-		fighterBody.setTransform(xPos, yPos, rotation);
+		fighterBody.setTransform(xPos, yPos, rotation, true);
 	}
 
 	public void setVelocity(float velocityX, float velocityY) {
@@ -238,7 +283,8 @@ public class Fighter extends Entity {
 	}
 
 	public void setRotation(float rotation) {
-		fighterBody.setTransform(fighterBody.getPosition().x, fighterBody.getPosition().y, rotation);
+		this.rotation = rotation;
+		fighterBody.setTransform(fighterBody.getPosition().x, fighterBody.getPosition().y, rotation, true);
 	}
 
 	private Body createFighterBody(final PhysicsWorld physicsWorld, final IAreaShape areaShape,
