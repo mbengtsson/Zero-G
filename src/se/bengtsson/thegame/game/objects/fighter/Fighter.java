@@ -38,6 +38,10 @@ public class Fighter extends Entity {
 	private long lastFired;
 	private boolean fireLeft;
 
+	private boolean enemy;
+	private boolean alive = true;
+	private int health = 100;
+
 	private float xPos;
 	private float yPos;
 
@@ -64,6 +68,7 @@ public class Fighter extends Entity {
 		this.bulletPool = bulletPool;
 		this.WORLD_WIDTH = resources.camera.getWidth() / PIXEL_TO_METER_RATIO_DEFAULT;
 		this.WORLD_HEIGHT = resources.camera.getHeight() / PIXEL_TO_METER_RATIO_DEFAULT;
+		this.enemy = enemy;
 
 		if (enemy) {
 			this.fighter = new Sprite(xPos, yPos, resources.redFighterTextureRegion, resources.vbom);
@@ -138,6 +143,11 @@ public class Fighter extends Entity {
 			fighterBody.setTransform(xPos, 0, rotation);
 		}
 
+		if (health <= 0) {
+			alive = false;
+
+		}
+
 		super.onManagedUpdate(pSecondsElapsed);
 	}
 
@@ -194,6 +204,10 @@ public class Fighter extends Entity {
 		}
 	}
 
+	public void hit() {
+		health -= 10;
+	}
+
 	public void explode() {
 		explosion.setVisible(true);
 		fighter.setVisible(false);
@@ -231,11 +245,6 @@ public class Fighter extends Entity {
 
 	}
 
-	public void resetFighter() {
-		fighterBody.setTransform(1, 1, 0);
-
-	}
-
 	public float getXpos() {
 		return xPos;
 	}
@@ -267,6 +276,18 @@ public class Fighter extends Entity {
 
 	public boolean isAccelerating() {
 		return accelerating;
+	}
+
+	public int getHealth() {
+		return health;
+	}
+
+	public boolean isEnemy() {
+		return enemy;
+	}
+
+	public boolean isAlive() {
+		return alive;
 	}
 
 	public void setPosition(float xPos, float yPos) {

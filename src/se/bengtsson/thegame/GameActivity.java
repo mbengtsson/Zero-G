@@ -60,6 +60,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	private ResourceManager resources;
 	private SceneManager sceneManager;
 
+	PlayerHUD hud;
 	private Entity spriteLayer;
 	private Entity foregroundLayer;
 
@@ -131,13 +132,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 		externalController = new ExternalController();
 		playerController = new PlayerController();
-		PlayerHUD hud = new PlayerHUD(playerController);
-
-		// hud.attachChild(playerController.getLeftTrigger());
-		// hud.attachChild(playerController.getRightTrigger());
-		// scene.registerTouchArea(playerController.getLeftTrigger());
-		// scene.registerTouchArea(playerController.getRightTrigger());
-
+		hud = new PlayerHUD(playerController);
 		camera.setHUD(hud);
 
 		if (debug) {
@@ -351,7 +346,15 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 					sceneManager.getBulletPool().recyclePoolItem(bullet);
 					if (fixtureB.getBody().getUserData() instanceof Fighter) {
 						Fighter fighter = (Fighter) fixtureB.getBody().getUserData();
-						fighter.explode();
+						fighter.hit();
+						if (fighter.isEnemy()) {
+							hud.setEnemyHealth(fighter.getHealth());
+						} else {
+							hud.setPlayerHealth(fighter.getHealth());
+						}
+						if (fighter.getHealth() <= 0) {
+							fighter.explode();
+						}
 					}
 
 				}
@@ -360,7 +363,15 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 					sceneManager.getBulletPool().recyclePoolItem(bullet);
 					if (fixtureA.getBody().getUserData() instanceof Fighter) {
 						Fighter fighter = (Fighter) fixtureA.getBody().getUserData();
-						fighter.explode();
+						fighter.hit();
+						if (fighter.isEnemy()) {
+							hud.setEnemyHealth(fighter.getHealth());
+						} else {
+							hud.setPlayerHealth(fighter.getHealth());
+						}
+						if (fighter.getHealth() <= 0) {
+							fighter.explode();
+						}
 					}
 				}
 
