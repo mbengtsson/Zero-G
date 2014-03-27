@@ -10,7 +10,6 @@ import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 
-import se.bengtsson.thegame.bluetooth.BluetoothConnectionManager;
 import se.bengtsson.thegame.game.controller.Controller;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.objects.pools.BulletPool;
@@ -23,7 +22,6 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 public class Fighter extends Entity {
 
 	private Controller controller;
-	private BluetoothConnectionManager connectionManager;
 	private ResourceManager resources;
 
 	private final float WORLD_WIDTH;
@@ -103,8 +101,6 @@ public class Fighter extends Entity {
 		leftThrust.setVisible(false);
 		rightThrust.setVisible(false);
 		explosion.setVisible(false);
-
-		connectionManager = BluetoothConnectionManager.getInstance();
 	}
 
 	@Override
@@ -118,18 +114,20 @@ public class Fighter extends Entity {
 
 		rotation = fighterBody.getAngle();
 
-		if (controller.isRightTriggerPressed()) {
-			mainThrust.setVisible(true);
-			accelerate();
-		} else {
-			mainThrust.setVisible(false);
-		}
+		if (alive) {
+			if (controller.isRightTriggerPressed()) {
+				mainThrust.setVisible(true);
+				accelerate();
+			} else {
+				mainThrust.setVisible(false);
+			}
 
-		if (controller.isLeftTriggerPressed()) {
-			fire();
-		}
+			if (controller.isLeftTriggerPressed()) {
+				fire();
+			}
 
-		rotate(controller.getTilt() * ROTATION_MODIFIER);
+			rotate(controller.getTilt() * ROTATION_MODIFIER);
+		}
 
 		if (xPos < 0) {
 			fighterBody.setTransform(WORLD_WIDTH, yPos, rotation);
@@ -141,11 +139,6 @@ public class Fighter extends Entity {
 			fighterBody.setTransform(xPos, WORLD_HEIGHT, rotation);
 		} else if (yPos > WORLD_HEIGHT) {
 			fighterBody.setTransform(xPos, 0, rotation);
-		}
-
-		if (health <= 0) {
-			alive = false;
-
 		}
 
 		super.onManagedUpdate(pSecondsElapsed);
@@ -206,6 +199,10 @@ public class Fighter extends Entity {
 
 	public void hit() {
 		health -= 10;
+		if (health <= 0) {
+			alive = false;
+			explode();
+		}
 	}
 
 	public void explode() {

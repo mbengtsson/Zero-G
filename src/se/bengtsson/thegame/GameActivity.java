@@ -17,7 +17,8 @@ import org.andengine.extension.debugdraw.DebugRenderer;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.ui.activity.LayoutGameActivity;
 
-import se.bengtsson.thegame.bluetooth.BluetoothConnectionManager;
+import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService;
+import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService.LocalBinder;
 import se.bengtsson.thegame.game.controller.ExternalController;
 import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.hud.PlayerHUD;
@@ -25,7 +26,12 @@ import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.manager.SceneManager;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
 import se.bengtsson.thegame.game.objects.pools.BulletPool.Bullet;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -47,8 +53,11 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public static byte SYNC_ROTATION_FLAG = 0x4;
 	public static byte SYNC_VELOCITY_FLAG = 0x5;
 	public static byte SYNC_POSITION_FLAG = 0x6;
+	public static byte PLAYER_HIT_FLAG = 0x7;
+	public static byte OPONENT_HIT_FLAG = 0x8;
 
-	private BluetoothConnectionManager connectionManager;
+	private BluetoothCommunicationService communicationService;
+
 	private boolean server;
 	private boolean multiplayerGame;
 
@@ -68,13 +77,35 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	private double time;
 
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			LocalBinder binder = (LocalBinder) service;
+			communicationService = binder.getService();
+
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle pSavedInstanceState) {
 		super.onCreate(pSavedInstanceState);
 		multiplayerGame = getIntent().getBooleanExtra("isMultiplayerGame", false);
+		server = getIntent().getBooleanExtra("isServer", false);
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 		if (multiplayerGame) {
-			connectionManager = BluetoothConnectionManager.getInstance();
-			server = getIntent().getBooleanExtra("isServer", false);
+			Intent intent = new Intent(this, BluetoothCommunicationService.class);
+			bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 		}
 	}
 
@@ -172,10 +203,10 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	@Override
 	protected void onStop() {
-		if (multiplayerGame) {
-			connectionManager.destroy();
-		}
 		super.onStop();
+		if (multiplayerGame) {
+			unbindService(serviceConnection);
+		}
 	}
 
 	@Override
@@ -193,40 +224,58 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 		if (multiplayerGame) {
 
-			connectionManager.writeToSocket(ROTATION_FLAG);
+			communicationService.writeToSocket(ROTATION_FLAG);
 
-			connectionManager.writeToSocket(playerController.getTilt());
+			communicationService.writeToSocket(playerController.getTilt());
 
 			if (playerController.isRightTriggerPressed()) {
-				connectionManager.writeToSocket(THRUST_FLAG);
+				communicationService.writeToSocket(THRUST_FLAG);
 			}
 
 			if (playerController.isLeftTriggerPressed()) {
-				connectionManager.writeToSocket(FIRE_FLAG);
+				communicationService.writeToSocket(FIRE_FLAG);
 			}
 
 			if ((System.currentTimeMillis() - time) > 1000) {
 				sendSync();
 			}
 
-			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == ROTATION_FLAG) {
-				connectionManager.readFromSocket();
+			if (!server && communicationService.nextFromSocket() != null
+					&& communicationService.nextFromSocket() == OPONENT_HIT_FLAG) {
+				communicationService.readFromSocket();
+				Fighter fighter = sceneManager.getPlayerFighter();
+				fighter.hit();
+				hud.setPlayerHealth(fighter.getHealth());
+
+			}
+
+			if (!server && communicationService.nextFromSocket() != null
+					&& communicationService.nextFromSocket() == PLAYER_HIT_FLAG) {
+				communicationService.readFromSocket();
+				Fighter fighter = sceneManager.getEnemyFighter();
+				fighter.hit();
+				hud.setEnemyHealth(fighter.getHealth());
+
+			}
+
+			if (communicationService.nextFromSocket() != null && communicationService.nextFromSocket() == ROTATION_FLAG) {
+				communicationService.readFromSocket();
 				Byte tilt = null;
 				while (tilt == null) {
-					tilt = connectionManager.readFromSocket();
+					tilt = communicationService.readFromSocket();
 				}
 				externalController.setTilt(tilt);
 			}
 
-			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == THRUST_FLAG) {
-				connectionManager.readFromSocket();
+			if (communicationService.nextFromSocket() != null && communicationService.nextFromSocket() == THRUST_FLAG) {
+				communicationService.readFromSocket();
 				externalController.setRightTriggerPressed(true);
 			} else {
 				externalController.setRightTriggerPressed(false);
 			}
 
-			if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == FIRE_FLAG) {
-				connectionManager.readFromSocket();
+			if (communicationService.nextFromSocket() != null && communicationService.nextFromSocket() == FIRE_FLAG) {
+				communicationService.readFromSocket();
 				externalController.setLeftTriggerPressed(true);
 			} else {
 				externalController.setLeftTriggerPressed(false);
@@ -241,61 +290,63 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public void sendSync() {
 		time = System.currentTimeMillis();
 		byte[] rotationBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getRotation()).array();
-		connectionManager.writeToSocket(SYNC_ROTATION_FLAG);
+		communicationService.writeToSocket(SYNC_ROTATION_FLAG);
 		for (int i = 0; i < rotationBytes.length; i++) {
-			connectionManager.writeToSocket(rotationBytes[i]);
+			communicationService.writeToSocket(rotationBytes[i]);
 		}
 
 		byte[] xPosBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getXpos()).array();
 		byte[] yPosBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getYpos()).array();
-		connectionManager.writeToSocket(SYNC_POSITION_FLAG);
+		communicationService.writeToSocket(SYNC_POSITION_FLAG);
 		for (int i = 0; i < xPosBytes.length; i++) {
-			connectionManager.writeToSocket(xPosBytes[i]);
+			communicationService.writeToSocket(xPosBytes[i]);
 		}
 		for (int i = 0; i < yPosBytes.length; i++) {
-			connectionManager.writeToSocket(yPosBytes[i]);
+			communicationService.writeToSocket(yPosBytes[i]);
 		}
 
 		byte[] xVelBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getVelocityX()).array();
 		byte[] yVelBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getVelocityY()).array();
-		connectionManager.writeToSocket(SYNC_VELOCITY_FLAG);
+		communicationService.writeToSocket(SYNC_VELOCITY_FLAG);
 		for (int i = 0; i < xVelBytes.length; i++) {
-			connectionManager.writeToSocket(xVelBytes[i]);
+			communicationService.writeToSocket(xVelBytes[i]);
 		}
 		for (int i = 0; i < yVelBytes.length; i++) {
-			connectionManager.writeToSocket(yVelBytes[i]);
+			communicationService.writeToSocket(yVelBytes[i]);
 		}
 	}
 
 	public void reciveSync() {
-		if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_ROTATION_FLAG) {
-			connectionManager.readFromSocket();
+		if (communicationService.nextFromSocket() != null
+				&& communicationService.nextFromSocket() == SYNC_ROTATION_FLAG) {
+			communicationService.readFromSocket();
 			byte[] rotationBytes = new byte[4];
 			for (int i = 0; i < rotationBytes.length; i++) {
 				Byte aByte = null;
 				while (aByte == null) {
-					aByte = connectionManager.readFromSocket();
+					aByte = communicationService.readFromSocket();
 				}
 				rotationBytes[i] = aByte;
 			}
 			sceneManager.getEnemyFighter().setRotation(ByteBuffer.wrap(rotationBytes).getFloat());
 		}
 
-		if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_POSITION_FLAG) {
-			connectionManager.readFromSocket();
+		if (communicationService.nextFromSocket() != null
+				&& communicationService.nextFromSocket() == SYNC_POSITION_FLAG) {
+			communicationService.readFromSocket();
 			byte[] xPosBytes = new byte[4];
 			byte[] yPosBytes = new byte[4];
 			for (int i = 0; i < xPosBytes.length; i++) {
 				Byte aByte = null;
 				while (aByte == null) {
-					aByte = connectionManager.readFromSocket();
+					aByte = communicationService.readFromSocket();
 				}
 				xPosBytes[i] = aByte;
 			}
 			for (int i = 0; i < yPosBytes.length; i++) {
 				Byte aByte = null;
 				while (aByte == null) {
-					aByte = connectionManager.readFromSocket();
+					aByte = communicationService.readFromSocket();
 				}
 				yPosBytes[i] = aByte;
 			}
@@ -303,21 +354,22 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 					ByteBuffer.wrap(yPosBytes).getFloat());
 		}
 
-		if (connectionManager.nextFromSocket() != null && connectionManager.nextFromSocket() == SYNC_VELOCITY_FLAG) {
-			connectionManager.readFromSocket();
+		if (communicationService.nextFromSocket() != null
+				&& communicationService.nextFromSocket() == SYNC_VELOCITY_FLAG) {
+			communicationService.readFromSocket();
 			byte[] xVelBytes = new byte[4];
 			byte[] yVelBytes = new byte[4];
 			for (int i = 0; i < xVelBytes.length; i++) {
 				Byte aByte = null;
 				while (aByte == null) {
-					aByte = connectionManager.readFromSocket();
+					aByte = communicationService.readFromSocket();
 				}
 				xVelBytes[i] = aByte;
 			}
 			for (int i = 0; i < yVelBytes.length; i++) {
 				Byte aByte = null;
 				while (aByte == null) {
-					aByte = connectionManager.readFromSocket();
+					aByte = communicationService.readFromSocket();
 				}
 				yVelBytes[i] = aByte;
 			}
@@ -344,34 +396,34 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 				if (fixtureA.getBody().getUserData() instanceof Bullet) {
 					Bullet bullet = (Bullet) fixtureA.getBody().getUserData();
 					sceneManager.getBulletPool().recyclePoolItem(bullet);
-					if (fixtureB.getBody().getUserData() instanceof Fighter) {
+					if (fixtureB.getBody().getUserData() instanceof Fighter && server) {
 						Fighter fighter = (Fighter) fixtureB.getBody().getUserData();
 						fighter.hit();
 						if (fighter.isEnemy()) {
+							communicationService.writeToSocket(OPONENT_HIT_FLAG);
 							hud.setEnemyHealth(fighter.getHealth());
 						} else {
+							communicationService.writeToSocket(PLAYER_HIT_FLAG);
 							hud.setPlayerHealth(fighter.getHealth());
 						}
-						if (fighter.getHealth() <= 0) {
-							fighter.explode();
-						}
+
 					}
 
 				}
 				if (fixtureB.getBody().getUserData() instanceof Bullet) {
 					Bullet bullet = (Bullet) fixtureB.getBody().getUserData();
 					sceneManager.getBulletPool().recyclePoolItem(bullet);
-					if (fixtureA.getBody().getUserData() instanceof Fighter) {
+					if (fixtureA.getBody().getUserData() instanceof Fighter && server) {
 						Fighter fighter = (Fighter) fixtureA.getBody().getUserData();
 						fighter.hit();
 						if (fighter.isEnemy()) {
+							communicationService.writeToSocket(OPONENT_HIT_FLAG);
 							hud.setEnemyHealth(fighter.getHealth());
 						} else {
+							communicationService.writeToSocket(PLAYER_HIT_FLAG);
 							hud.setPlayerHealth(fighter.getHealth());
 						}
-						if (fighter.getHealth() <= 0) {
-							fighter.explode();
-						}
+
 					}
 				}
 

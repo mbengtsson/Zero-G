@@ -34,7 +34,7 @@
             android:text="@string/client_button"
             android:onClick="onClientClicked" />
 
-		</LinearLayout>
+	</LinearLayout>
 
 	<TextView
 	    android:id="@+id/paired_devices_title"

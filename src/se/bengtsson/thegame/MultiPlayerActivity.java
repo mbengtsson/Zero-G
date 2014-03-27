@@ -4,17 +4,21 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
-import se.bengtsson.thegame.bluetooth.BluetoothConnectionManager;
+import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService;
+import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService.LocalBinder;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -32,13 +36,14 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 	private final int MAC_ADDRESS_LENGTH = 17;
 
 	private boolean isServer;
+	private boolean bound = false;
 
 	private BluetoothAdapter bluetoothAdapter;
 
 	private ArrayAdapter<String> pairedDevicesAdapter;
 	private ArrayAdapter<String> newDevicesAdapter;
 
-	private BluetoothConnectionManager connectionManager;
+	private BluetoothCommunicationService communicationService;
 
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
@@ -60,6 +65,29 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 			}
 
 		}
+	};
+
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			LocalBinder binder = (LocalBinder) service;
+			communicationService = binder.getService();
+			bound = true;
+
+		}
+	};
+
+	protected void onStart() {
+		super.onStart();
+		Intent intent = new Intent(this, BluetoothCommunicationService.class);
+		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 	};
 
 	@Override
@@ -171,22 +199,23 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 	public void manageConnectedSocket(BluetoothSocket socket) {
 		Log.d("MultiPlayerActivity", "Have connection");
 
-		connectionManager = BluetoothConnectionManager.getInstance();
-		connectionManager.initiate(socket);
-
+		communicationService.initiate(socket);
 		Intent intent = new Intent(this, GameActivity.class);
 		intent.putExtra("isServer", isServer);
 		intent.putExtra("isMultiplayerGame", true);
 		startActivity(intent);
 
-		// connectionManager.destroy();
+	}
 
+	@Override
+	protected void onStop() {
+		super.onStop();
+		unbindService(serviceConnection);
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-
 		if (bluetoothAdapter != null) {
 			bluetoothAdapter.cancelDiscovery();
 		}

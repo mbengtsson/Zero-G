@@ -5,54 +5,54 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import android.app.Service;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
 import android.util.Log;
 
-public class BluetoothConnectionManager {
+public class BluetoothCommunicationService extends Service {
 
-	private static BluetoothConnectionManager INSTANCE;
+	private final IBinder binder = new LocalBinder();
 
-	private ConnectedThread connectedThread;
+	private BluetoothCommunicationThread communicationThread;
 
-	private BluetoothConnectionManager() {
-
-	}
-
-	public static BluetoothConnectionManager getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new BluetoothConnectionManager();
-		}
-		return INSTANCE;
+	@Override
+	public IBinder onBind(Intent intent) {
+		return binder;
 	}
 
 	public void initiate(BluetoothSocket socket) {
-		connectedThread = new ConnectedThread(socket);
-		connectedThread.start();
-		Log.d("BluetoothConnectionManager", "manager initiated");
+		communicationThread = new BluetoothCommunicationThread(socket);
+		communicationThread.start();
+		Log.d("BluetoothCommunicationService", "service initiated");
 	}
 
 	public void writeToSocket(byte aByte) {
-		connectedThread.writeByte(aByte);
+		communicationThread.writeByte(aByte);
 	}
 
 	public Byte readFromSocket() {
-		return connectedThread.readByte();
+		return communicationThread.readByte();
 	}
 
 	public Byte nextFromSocket() {
-		return connectedThread.nextByte();
+		return communicationThread.nextByte();
 	}
 
-	public void destroy() {
-		connectedThread.cancel();
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		communicationThread.cancel();
 		try {
-			connectedThread.join();
+			communicationThread.join();
 		} catch (InterruptedException e) {
-			Log.e("BluetoothConnectionManager", "Can't stop thread");
+			Log.e("BluetoothCommunicationService", "Can't stop BluetoothCommunicationThread");
 		}
 	}
 
-	private class ConnectedThread extends Thread {
+	private class BluetoothCommunicationThread extends Thread {
 
 		private final BluetoothSocket socket;
 		private final InputStream inputStream;
@@ -60,7 +60,7 @@ public class BluetoothConnectionManager {
 
 		private ConcurrentLinkedQueue<Byte> buffer = new ConcurrentLinkedQueue<Byte>();
 
-		public ConnectedThread(BluetoothSocket socket) {
+		public BluetoothCommunicationThread(BluetoothSocket socket) {
 			this.socket = socket;
 			InputStream tmpIn = null;
 			OutputStream tmpOut = null;
@@ -69,7 +69,7 @@ public class BluetoothConnectionManager {
 				tmpIn = socket.getInputStream();
 				tmpOut = socket.getOutputStream();
 			} catch (IOException e) {
-				Log.e("BluetoothConnectionManager", "Can't get streams from socket");
+				Log.e("BluetoothCommunicationThread", "Can't get streams from socket");
 			}
 
 			inputStream = tmpIn;
@@ -91,17 +91,15 @@ public class BluetoothConnectionManager {
 			try {
 				outputStream.write(aByte);
 			} catch (IOException e) {
-				Log.e("BluetoothConnectionManager", "Can't write to stream");
+				Log.e("BluetoothCommunicationThread", "Can't write to stream");
 			}
 		}
 
 		public Byte readByte() {
-
 			return buffer.poll();
 		}
 
 		public Byte nextByte() {
-
 			return buffer.peek();
 		}
 
@@ -109,10 +107,16 @@ public class BluetoothConnectionManager {
 			try {
 				socket.close();
 			} catch (IOException e) {
-				Log.e("BluetoothConnectionManager", "Can't close stream");
+				Log.e("BluetoothCommunicationThread", "Can't close stream");
 			}
 		}
 
+	}
+
+	public class LocalBinder extends Binder {
+		public BluetoothCommunicationService getService() {
+			return BluetoothCommunicationService.this;
+		}
 	}
 
 }
