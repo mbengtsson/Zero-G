@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.opengl.font.Font;
+import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
@@ -20,6 +22,7 @@ import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import se.bengtsson.thegame.GameActivity;
+import android.graphics.Color;
 
 public class ResourceManager {
 
@@ -41,8 +44,6 @@ public class ResourceManager {
 	private ITexture triggerTexture;
 	private ITexture bulletTexture;
 
-	private BuildableBitmapTextureAtlas explosionTextureAtlas;
-
 	public ITextureRegion dummyTextureRegion;
 	public ITextureRegion backgroundTextureRegion;
 	public ITextureRegion redFighterTextureRegion;
@@ -53,7 +54,11 @@ public class ResourceManager {
 	public ITextureRegion triggerTextureRegion;
 	public ITextureRegion bulletTextureRegion;
 
+	private BuildableBitmapTextureAtlas explosionTextureAtlas;
 	public TiledTextureRegion explosionTextureRegion;
+
+	private ITexture fontTexture;
+	public Font font;
 
 	private ResourceManager() {
 
@@ -136,6 +141,13 @@ public class ResourceManager {
 	}
 
 	public void loadFonts() {
+
+		fontTexture =
+				new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		font =
+				FontFactory.createFromAsset(activity.getFontManager(), fontTexture, activity.getAssets(),
+						"fonts/RationalInteger.ttf", 18, true, Color.WHITE);
+		font.load();
 
 	}
 

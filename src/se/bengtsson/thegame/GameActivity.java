@@ -20,6 +20,7 @@ import org.andengine.ui.activity.LayoutGameActivity;
 import se.bengtsson.thegame.bluetooth.BluetoothConnectionManager;
 import se.bengtsson.thegame.game.controller.ExternalController;
 import se.bengtsson.thegame.game.controller.PlayerController;
+import se.bengtsson.thegame.game.hud.PlayerHUD;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.manager.SceneManager;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
@@ -126,15 +127,18 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		scene.registerUpdateHandler(this);
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
 
-		externalController = new ExternalController();
-
 		sceneManager = new SceneManager(scene, spriteLayer);
 
+		externalController = new ExternalController();
 		playerController = new PlayerController();
-		foregroundLayer.attachChild(playerController.getLeftTrigger());
-		foregroundLayer.attachChild(playerController.getRightTrigger());
-		scene.registerTouchArea(playerController.getLeftTrigger());
-		scene.registerTouchArea(playerController.getRightTrigger());
+		PlayerHUD hud = new PlayerHUD(playerController);
+
+		// hud.attachChild(playerController.getLeftTrigger());
+		// hud.attachChild(playerController.getRightTrigger());
+		// scene.registerTouchArea(playerController.getLeftTrigger());
+		// scene.registerTouchArea(playerController.getRightTrigger());
+
+		camera.setHUD(hud);
 
 		if (debug) {
 			DebugRenderer debugRenderer = new DebugRenderer(physicsWorld, getVertexBufferObjectManager());
