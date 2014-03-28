@@ -25,7 +25,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        	<activity android:name="se.bengtsson.thegame.GameActivity" >
+        	<activity android:name="se.bengtsson.thegame.MultiplayerGameActivity" >
+        </activity>
+        	<activity android:name="se.bengtsson.thegame.SingleplayerGameActivity" >
         </activity>
         <activity
             android:name="se.bengtsson.thegame.MultiPlayerActivity"

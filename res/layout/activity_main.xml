@@ -4,21 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="?android:attr/dividerHorizontal"
     tools:context="se.bengtsson.thegame.MainActivity"
     tools:ignore="MergeRootFrame" >
-
+    
     <Button
         android:id="@+id/single_player_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/single_player_button" 
-        android:onClick="singlePlayerClick"/>
+        android:onClick="singlePlayerClick"
+        android:background="?android:attr/selectableItemBackground"
+        android:text="@string/single_player_button" />
 
     <Button
         android:id="@+id/multi_player_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/multi_player_button" 
-        android:onClick="multiPlayerClick"/>
+        android:onClick="multiPlayerClick"
+        android:background="?android:attr/selectableItemBackground"
+        android:text="@string/multi_player_button" />
+
+    <Button
+        android:id="@+id/statistics_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:text="@string/statistics_button" />
 
 </LinearLayout>

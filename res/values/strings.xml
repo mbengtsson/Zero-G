@@ -12,5 +12,6 @@
     <string name="server_client_text">Server or client</string>
     <string name="server_button">Server</string>
     <string name="client_button">Client</string>
+    <string name="statistics_button">Statistics</string>
 
 </resources>

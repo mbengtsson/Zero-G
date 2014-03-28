@@ -71,8 +71,7 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			// TODO Auto-generated method stub
-
+			bound = false;
 		}
 
 		@Override
@@ -200,9 +199,8 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		Log.d("MultiPlayerActivity", "Have connection");
 
 		communicationService.initiate(socket);
-		Intent intent = new Intent(this, GameActivity.class);
+		Intent intent = new Intent(this, MultiplayerGameActivity.class);
 		intent.putExtra("isServer", isServer);
-		intent.putExtra("isMultiplayerGame", true);
 		startActivity(intent);
 
 	}

@@ -44,11 +44,13 @@ public class BluetoothCommunicationService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		communicationThread.cancel();
-		try {
-			communicationThread.join();
-		} catch (InterruptedException e) {
-			Log.e("BluetoothCommunicationService", "Can't stop BluetoothCommunicationThread");
+		if (communicationThread != null) {
+			communicationThread.cancel();
+			try {
+				communicationThread.join();
+			} catch (InterruptedException e) {
+				Log.e("BluetoothCommunicationService", "Can't stop BluetoothCommunicationThread");
+			}
 		}
 	}
 

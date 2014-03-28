@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="se.bengtsson.thegame.MultiPlayerActivity"
+    android:background="?android:attr/dividerHorizontal"
     tools:ignore="MergeRootFrame" >
 
     <TextView
@@ -16,7 +17,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:background="?android:attr/dividerVertical" >
+        
 
         <Button
             android:id="@+id/server_button"
@@ -24,6 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/server_button"
+            android:background="?android:attr/selectableItemBackground"
             android:onClick="onServerClicked" />
 
         <Button
@@ -32,6 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/client_button"
+            android:background="?android:attr/selectableItemBackground"
             android:onClick="onClientClicked" />
 
 	</LinearLayout>
@@ -70,6 +75,7 @@
    	    android:layout_height="wrap_content"
    	    android:text="@string/scan_for_devices" 
    	    android:visibility="gone"
+   	    android:background="?android:attr/selectableItemBackground"
    	    android:onClick="onScanForDevicesClicked" />
 
 </LinearLayout>

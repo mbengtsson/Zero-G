@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void singlePlayerClick(View view) {
-		Intent intent = new Intent(this, GameActivity.class);
+		Intent intent = new Intent(this, SingleplayerGameActivity.class);
 		startActivity(intent);
 	}
 
