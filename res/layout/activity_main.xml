@@ -7,6 +7,13 @@
     android:background="?android:attr/dividerHorizontal"
     tools:context="se.bengtsson.thegame.MainActivity"
     tools:ignore="MergeRootFrame" >
+
+    <ImageView
+        android:id="@+id/title_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/title" 
+        android:contentDescription="@string/zero_g"/>
     
     <Button
         android:id="@+id/single_player_button"

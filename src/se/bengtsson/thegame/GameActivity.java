@@ -19,7 +19,7 @@ import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.hud.PlayerHUD;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.manager.SceneManager;
-import android.os.Bundle;
+import android.content.Intent;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -47,17 +47,17 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	private Sprite background;
 
-	@Override
-	protected void onCreate(Bundle pSavedInstanceState) {
-		super.onCreate(pSavedInstanceState);
-
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-
-	}
+	// @Override
+	// protected void onCreate(Bundle pSavedInstanceState) {
+	// super.onCreate(pSavedInstanceState);
+	//
+	// }
+	//
+	// @Override
+	// protected void onStart() {
+	// super.onStart();
+	//
+	// }
 
 	@Override
 	public Engine onCreateEngine(EngineOptions pEngineOptions) {
@@ -143,11 +143,11 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		this.disableAccelerationSensor();
 	}
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-
-	}
+	// @Override
+	// protected void onStop() {
+	// super.onStop();
+	//
+	// }
 
 	@Override
 	protected int getLayoutID() {
@@ -168,6 +168,12 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public void reset() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void onBackPressed() {
+		Intent intent = new Intent(this, MainActivity.class);
+		startActivity(intent);
 	}
 
 	protected ContactListener createContactListener() {

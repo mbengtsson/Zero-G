@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -33,12 +34,16 @@ public class MultiplayerGameActivity extends GameActivity {
 	public static byte PLAYER_HIT_FLAG = 0x7;
 	public static byte OPONENT_HIT_FLAG = 0x8;
 
-	private BluetoothCommunicationService communicationService;
+	Handler handler;
 
+	private BluetoothCommunicationService communicationService;
 	private ExternalController externalController;
 
 	private double time;
 	private boolean server;
+
+	boolean gameOver = false;
+	boolean winner = false;
 
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 
@@ -60,6 +65,7 @@ public class MultiplayerGameActivity extends GameActivity {
 	protected void onCreate(Bundle pSavedInstanceState) {
 		super.onCreate(pSavedInstanceState);
 		server = getIntent().getBooleanExtra("isServer", false);
+		handler = new Handler();
 	}
 
 	@Override
@@ -148,6 +154,10 @@ public class MultiplayerGameActivity extends GameActivity {
 		}
 
 		reciveSync();
+
+		if (!gameOver) {
+			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter());
+		}
 
 		super.onUpdate(pSecondsElapsed);
 	}
@@ -240,6 +250,28 @@ public class MultiplayerGameActivity extends GameActivity {
 			}
 			sceneManager.getEnemyFighter().setVelocity(ByteBuffer.wrap(xVelBytes).getFloat(),
 					ByteBuffer.wrap(yVelBytes).getFloat());
+		}
+
+	}
+
+	private void checkGameOver(Fighter player, Fighter enemy) {
+
+		if (!player.isAlive() || !enemy.isAlive()) {
+			if (player.isAlive()) {
+				winner = true;
+			}
+			gameOver = true;
+			hud.showMessage(winner);
+
+			handler.postDelayed(new Runnable() {
+
+				@Override
+				public void run() {
+					Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+					intent.putExtra("isWinner", winner);
+					startActivity(intent);
+				}
+			}, 10000);
 		}
 
 	}

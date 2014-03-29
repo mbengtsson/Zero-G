@@ -57,8 +57,11 @@ public class ResourceManager {
 	private BuildableBitmapTextureAtlas explosionTextureAtlas;
 	public TiledTextureRegion explosionTextureRegion;
 
-	private ITexture fontTexture;
-	public Font font;
+	private ITexture smallFontTexture;
+	private ITexture messageFontTexture;
+
+	public Font smallFont;
+	public Font messageFont;
 
 	private ResourceManager() {
 
@@ -142,12 +145,19 @@ public class ResourceManager {
 
 	public void loadFonts() {
 
-		fontTexture =
+		smallFontTexture =
 				new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		font =
-				FontFactory.createFromAsset(activity.getFontManager(), fontTexture, activity.getAssets(),
+		smallFont =
+				FontFactory.createFromAsset(activity.getFontManager(), smallFontTexture, activity.getAssets(),
 						"fonts/RationalInteger.ttf", 18, true, Color.WHITE);
-		font.load();
+		smallFont.load();
+
+		messageFontTexture =
+				new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		messageFont =
+				FontFactory.createFromAsset(activity.getFontManager(), smallFontTexture, activity.getAssets(),
+						"fonts/RationalInteger.ttf", 50, true, Color.YELLOW);
+		messageFont.load();
 
 	}
 

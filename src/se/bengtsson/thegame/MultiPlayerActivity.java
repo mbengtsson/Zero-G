@@ -83,12 +83,6 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		}
 	};
 
-	protected void onStart() {
-		super.onStart();
-		Intent intent = new Intent(this, BluetoothCommunicationService.class);
-		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-	};
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -109,6 +103,12 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 			}
 		}
 	}
+
+	protected void onStart() {
+		super.onStart();
+		Intent intent = new Intent(this, BluetoothCommunicationService.class);
+		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+	};
 
 	public void onClientClicked(View view) {
 		Log.d("MultiPlayerActivity", "onClientClicked() executing");

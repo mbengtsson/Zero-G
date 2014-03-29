@@ -11,6 +11,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		getActionBar().hide();
 	}
 
 	public void singlePlayerClick(View view) {
@@ -20,6 +21,13 @@ public class MainActivity extends Activity {
 
 	public void multiPlayerClick(View view) {
 		Intent intent = new Intent(this, MultiPlayerActivity.class);
+		startActivity(intent);
+	}
+
+	public void onBackPressed() {
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_MAIN);
+		intent.addCategory(Intent.CATEGORY_HOME);
 		startActivity(intent);
 	}
 

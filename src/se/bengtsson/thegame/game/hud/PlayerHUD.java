@@ -57,6 +57,20 @@ public class PlayerHUD extends HUD {
 		enemyHealthBar.setX(CAMERA_WIDTH - enemyHealthBar.getWidth() - 5);
 	}
 
+	public void showMessage(boolean winner) {
+
+		Text message;
+
+		if (winner) {
+			message = new Text(150, 100, resources.messageFont, "You Win!!", resources.vbom);
+		} else {
+			message = new Text(150, 100, resources.messageFont, "You Loose!!", resources.vbom);
+		}
+
+		attachChild(message);
+
+	}
+
 	private void attachController() {
 		attachChild(playerController.getLeftTrigger());
 		attachChild(playerController.getRightTrigger());
@@ -73,7 +87,7 @@ public class PlayerHUD extends HUD {
 		playerHealthBar.setVisible(true);
 		attachChild(playerHealthBar);
 
-		Text text = new Text(10, 10, resources.font, "Player health", resources.vbom);
+		Text text = new Text(10, 10, resources.smallFont, "Player health", resources.vbom);
 		text.setAlpha(0.5f);
 		attachChild(text);
 	}
@@ -87,7 +101,7 @@ public class PlayerHUD extends HUD {
 		enemyHealthBar.setVisible(true);
 		attachChild(enemyHealthBar);
 
-		Text text = new Text(CAMERA_WIDTH - 109, 10, resources.font, "Enemy health", resources.vbom);
+		Text text = new Text(CAMERA_WIDTH - 109, 10, resources.smallFont, "Enemy health", resources.vbom);
 		text.setAlpha(0.5f);
 		attachChild(text);
 	}

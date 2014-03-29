@@ -199,9 +199,9 @@ public class Fighter extends Entity {
 
 	public void hit() {
 		health -= 10;
-		if (health <= 0) {
-			alive = false;
+		if (alive && health <= 0) {
 			explode();
+			alive = false;
 		}
 	}
 
