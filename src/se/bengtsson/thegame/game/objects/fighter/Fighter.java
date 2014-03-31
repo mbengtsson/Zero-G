@@ -30,11 +30,15 @@ public class Fighter extends Entity {
 	private final float THRUST = 1.5f / PIXEL_TO_METER_RATIO_DEFAULT;
 	private final float ROTATION_MODIFIER = 0.15f;
 
-	private BulletPool bulletPool;
-
 	private final float RATE_OF_FIRE = 5;
+
 	private long lastFired;
 	private boolean fireLeft;
+
+	private int bulletsFired;
+	private int timesHit;
+
+	private BulletPool bulletPool;
 
 	private boolean enemy;
 	private boolean alive = true;
@@ -67,6 +71,9 @@ public class Fighter extends Entity {
 		this.WORLD_WIDTH = resources.camera.getWidth() / PIXEL_TO_METER_RATIO_DEFAULT;
 		this.WORLD_HEIGHT = resources.camera.getHeight() / PIXEL_TO_METER_RATIO_DEFAULT;
 		this.enemy = enemy;
+
+		bulletsFired = 0;
+		timesHit = 0;
 
 		if (enemy) {
 			this.fighter = new Sprite(xPos, yPos, resources.redFighterTextureRegion, resources.vbom);
@@ -194,14 +201,18 @@ public class Fighter extends Entity {
 
 			bulletPool.obtainPoolItem(xPos, yPos, rotation);
 			lastFired = time;
+			bulletsFired++;
 		}
 	}
 
 	public void hit() {
-		health -= 10;
-		if (alive && health <= 0) {
-			explode();
-			alive = false;
+		if (alive) {
+			health -= 10;
+			timesHit++;
+			if (health <= 0) {
+				explode();
+				alive = false;
+			}
 		}
 	}
 
@@ -277,6 +288,14 @@ public class Fighter extends Entity {
 
 	public int getHealth() {
 		return health;
+	}
+
+	public int getBulletsFired() {
+		return bulletsFired;
+	}
+
+	public int getTimesHit() {
+		return timesHit;
 	}
 
 	public boolean isEnemy() {

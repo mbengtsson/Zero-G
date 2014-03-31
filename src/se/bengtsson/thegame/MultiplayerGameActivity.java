@@ -91,6 +91,7 @@ public class MultiplayerGameActivity extends GameActivity {
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
 		sceneManager.setupMultiplayerScene(playerController, externalController, server);
+		time = System.currentTimeMillis();
 		super.onPopulateScene(pScene, pOnPopulateSceneCallback);
 	}
 
@@ -108,7 +109,7 @@ public class MultiplayerGameActivity extends GameActivity {
 			communicationService.writeToSocket(FIRE_FLAG);
 		}
 
-		if ((System.currentTimeMillis() - time) > 1000) {
+		if ((System.currentTimeMillis() - time) > 2000) {
 			sendSync();
 		}
 
@@ -267,11 +268,13 @@ public class MultiplayerGameActivity extends GameActivity {
 
 				@Override
 				public void run() {
-					Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+					Intent intent = new Intent(getApplicationContext(), PostFightActivity.class);
 					intent.putExtra("isWinner", winner);
+					intent.putExtra("bulletsFired", sceneManager.getPlayerFighter().getBulletsFired());
+					intent.putExtra("hits", sceneManager.getEnemyFighter().getTimesHit());
 					startActivity(intent);
 				}
-			}, 10000);
+			}, 3000);
 		}
 
 	}

@@ -5,7 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="single_player_button">Single-player</string>
     <string name="multi_player_button">Multi-player</string>
-    <string name="scan_for_devices">Scan for devices</string>
+    <string name="scan_for_devices">Scan for other aviable devices</string>
     <string name="other_available_devices">Other Available Devices</string>
     <string name="paired_devices">Paired Devices</string>
     <string name="title_activity_multi_player">Multi-playerActivity</string>
@@ -14,5 +14,18 @@
     <string name="client_button">Client</string>
     <string name="statistics_button">Statistics</string>
     <string name="zero_g">Zero-G</string>
+    <string name="title_activity_post_fight">PostFightActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="statistics_title">Statistics</string>
+    <string name="bullets_fired">"Bullets Fired: "</string>
+    <string name="hits">"Hits: "</string>
+    <string name="hit_ratio">"Hit/Miss Ratio: "</string>
+    <string name="total_statistics_title">Total Statistics</string>
+    <string name="total_wins">"Total Wins: "</string>
+    <string name="total_losses">"Total Losses: "</string>
+    <string name="win_ratio">"Win/Lose Ratio: "</string>
+    <string name="total_bullets_fired">"Total Bullets Fired: "</string>
+    <string name="total_hits">"Total Hits: "</string>
+    <string name="total_hit_ratio">"Total Hit/Miss Ratio: "</string>
 
 </resources>

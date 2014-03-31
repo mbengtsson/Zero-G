@@ -62,9 +62,9 @@ public class PlayerHUD extends HUD {
 		Text message;
 
 		if (winner) {
-			message = new Text(150, 100, resources.messageFont, "You Win!!", resources.vbom);
+			message = new Text(150, 100, resources.messageFont, "VICTORY!!", resources.vbom);
 		} else {
-			message = new Text(150, 100, resources.messageFont, "You Loose!!", resources.vbom);
+			message = new Text(150, 100, resources.messageFont, "DEFEAT!!", resources.vbom);
 		}
 
 		attachChild(message);

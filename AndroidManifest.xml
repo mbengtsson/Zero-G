@@ -25,16 +25,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        	<activity android:name="se.bengtsson.thegame.MultiplayerGameActivity" >
+        <activity android:name="se.bengtsson.thegame.MultiplayerGameActivity" >
         </activity>
-        	<activity android:name="se.bengtsson.thegame.SingleplayerGameActivity" >
+        <activity android:name="se.bengtsson.thegame.SingleplayerGameActivity" >
         </activity>
         <activity
             android:name="se.bengtsson.thegame.MultiPlayerActivity"
             android:label="@string/title_activity_multi_player" >
         </activity>
-        <service
-            android:name="se.bengtsson.thegame.bluetooth.BluetoothCommunicationService" />
+
+        <service android:name="se.bengtsson.thegame.bluetooth.BluetoothCommunicationService" />
+
+        <activity
+            android:name="se.bengtsson.thegame.PostFightActivity"
+            android:label="@string/title_activity_post_fight" >
+        </activity>
     </application>
 
 </manifest>

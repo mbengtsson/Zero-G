@@ -36,7 +36,6 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 	private final int MAC_ADDRESS_LENGTH = 17;
 
 	private boolean isServer;
-	private boolean bound = false;
 
 	private BluetoothAdapter bluetoothAdapter;
 
@@ -71,15 +70,12 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			bound = false;
 		}
 
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			LocalBinder binder = (LocalBinder) service;
 			communicationService = binder.getService();
-			bound = true;
-
 		}
 	};
 
@@ -132,7 +128,7 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		registerReceiver(broadcastReceiver, filter);
 
-		bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		// bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
 		Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 		if (pairedDevices.size() > 0) {
@@ -143,12 +139,6 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		} else {
 			pairedDevicesAdapter.add("No paired devices");
 		}
-	}
-
-	public void onScanForDevicesClicked(View view) {
-		Log.d("MultiPlayerActivity", "onScanForDevicesClicked() executing");
-
-		findBluetoothDevices();
 	}
 
 	public void onServerClicked(View view) {
@@ -164,6 +154,12 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		acceptConnectionThread.start();
 		Log.d("MultiPlayerActivity", "started AcceptConnectionThread ");
 
+	}
+
+	public void onScanForDevicesClicked(View view) {
+		Log.d("MultiPlayerActivity", "onScanForDevicesClicked() executing");
+
+		findBluetoothDevices();
 	}
 
 	private void findBluetoothDevices() {
@@ -259,7 +255,7 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 					try {
 						serverSocket.close();
 					} catch (IOException e) {
-
+						Log.d("MultiPlayerActivity.AcceptConnectionThread", "Can't close bluetooth server socket");
 					}
 					break;
 				}
@@ -270,7 +266,7 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 			try {
 				serverSocket.close();
 			} catch (IOException e) {
-
+				Log.d("MultiPlayerActivity.AcceptConnectionThread", "Can't close bluetooth server socket");
 			}
 		}
 	}
@@ -306,7 +302,7 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 				try {
 					socket.close();
 				} catch (IOException e1) {
-
+					Log.d("MultiPlayerActivity.ConnectToServerThread", "Can't close bluetooth socket");
 				}
 				return;
 			}
@@ -318,7 +314,7 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 			try {
 				socket.close();
 			} catch (IOException e) {
-
+				Log.d("MultiPlayerActivity.ConnectToServerThread", "Can't close bluetooth server socket");
 			}
 		}
 
