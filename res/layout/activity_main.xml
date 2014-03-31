@@ -10,10 +10,10 @@
 
     <ImageView
         android:id="@+id/title_image"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/title" 
-        android:contentDescription="@string/zero_g"/>
+        android:contentDescription="@string/zero_g"
+        android:src="@drawable/title" />
     
     <Button
         android:id="@+id/single_player_button"
@@ -37,5 +37,13 @@
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
         android:text="@string/statistics_button" />
+
+    <Button
+        android:id="@+id/share"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:onClick="shareClick"
+        android:text="@string/share" />
 
 </LinearLayout>

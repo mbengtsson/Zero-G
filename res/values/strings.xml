@@ -27,5 +27,7 @@
     <string name="total_bullets_fired">"Total Bullets Fired: "</string>
     <string name="total_hits">"Total Hits: "</string>
     <string name="total_hit_ratio">"Total Hit/Miss Ratio: "</string>
+    <string name="title_activity_share_with_contact">ShareWithContactActivity</string>
+    <string name="share">Share with a friend</string>
 
 </resources>

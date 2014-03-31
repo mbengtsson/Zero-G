@@ -10,6 +10,7 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
     <application
         android:allowBackup="true"
@@ -39,6 +40,10 @@
         <activity
             android:name="se.bengtsson.thegame.PostFightActivity"
             android:label="@string/title_activity_post_fight" >
+        </activity>
+        <activity
+            android:name="se.bengtsson.thegame.ShareWithContactActivity"
+            android:label="@string/title_activity_share_with_contact" >
         </activity>
     </application>
 

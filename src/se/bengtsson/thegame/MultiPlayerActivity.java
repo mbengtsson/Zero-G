@@ -128,8 +128,6 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 		filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		registerReceiver(broadcastReceiver, filter);
 
-		// bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
 		Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 		if (pairedDevices.size() > 0) {
 			findViewById(R.id.paired_devices_title).setVisibility(View.VISIBLE);
@@ -180,8 +178,8 @@ public class MultiPlayerActivity extends Activity implements OnItemClickListener
 
 		isServer = false;
 
-		String info = ((TextView) view).getText().toString();
-		String MACAddress = info.substring(info.length() - MAC_ADDRESS_LENGTH);
+		String item = ((TextView) view).getText().toString();
+		String MACAddress = item.substring(item.length() - MAC_ADDRESS_LENGTH);
 
 		BluetoothDevice device = bluetoothAdapter.getRemoteDevice(MACAddress);
 

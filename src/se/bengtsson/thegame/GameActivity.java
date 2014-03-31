@@ -47,18 +47,6 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	private Sprite background;
 
-	// @Override
-	// protected void onCreate(Bundle pSavedInstanceState) {
-	// super.onCreate(pSavedInstanceState);
-	//
-	// }
-	//
-	// @Override
-	// protected void onStart() {
-	// super.onStart();
-	//
-	// }
-
 	@Override
 	public Engine onCreateEngine(EngineOptions pEngineOptions) {
 
@@ -142,12 +130,6 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		super.onPauseGame();
 		this.disableAccelerationSensor();
 	}
-
-	// @Override
-	// protected void onStop() {
-	// super.onStop();
-	//
-	// }
 
 	@Override
 	protected int getLayoutID() {

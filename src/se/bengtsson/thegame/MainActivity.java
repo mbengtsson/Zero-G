@@ -24,6 +24,11 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 	}
 
+	public void shareClick(View view) {
+		Intent intent = new Intent(this, ShareWithContactActivity.class);
+		startActivity(intent);
+	}
+
 	public void onBackPressed() {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_MAIN);
