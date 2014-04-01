@@ -23,6 +23,7 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import se.bengtsson.thegame.GameActivity;
 import android.graphics.Color;
+import android.util.Log;
 
 public class ResourceManager {
 
@@ -138,8 +139,7 @@ public class ResourceManager {
 					.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 0, 0));
 			explosionTextureAtlas.load();
 		} catch (TextureAtlasBuilderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e("ResourceManager", "Failed building texture atlas");
 		}
 	}
 
@@ -155,7 +155,7 @@ public class ResourceManager {
 		messageFontTexture =
 				new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		messageFont =
-				FontFactory.createFromAsset(activity.getFontManager(), smallFontTexture, activity.getAssets(),
+				FontFactory.createFromAsset(activity.getFontManager(), messageFontTexture, activity.getAssets(),
 						"fonts/RationalInteger.ttf", 50, true, Color.YELLOW);
 		messageFont.load();
 
