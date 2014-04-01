@@ -5,9 +5,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?android:attr/dividerHorizontal"
-    tools:context="se.bengtsson.thegame.MainActivity"
+    tools:context="se.bengtsson.thegame.fragments.MainFragment"
     tools:ignore="MergeRootFrame" >
-<!--  
+
     <ImageView
         android:id="@+id/title_image"
         android:layout_width="wrap_content"
@@ -39,18 +39,11 @@
         android:text="@string/statistics_button" />
 
     <Button
-        android:id="@+id/share"
+        android:id="@+id/share_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
         android:onClick="shareClick"
         android:text="@string/share" />
--->
-
-    <fragment
-        android:id="@+id/main_fragment_container"
-        android:name="se.bengtsson.thegame.fragments.MainFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </LinearLayout>

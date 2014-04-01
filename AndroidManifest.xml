@@ -34,9 +34,6 @@
             android:name="se.bengtsson.thegame.MultiPlayerActivity"
             android:label="@string/title_activity_multi_player" >
         </activity>
-
-        <service android:name="se.bengtsson.thegame.bluetooth.BluetoothCommunicationService" />
-
         <activity
             android:name="se.bengtsson.thegame.PostFightActivity"
             android:label="@string/title_activity_post_fight" >
@@ -45,6 +42,9 @@
             android:name="se.bengtsson.thegame.ShareWithContactActivity"
             android:label="@string/title_activity_share_with_contact" >
         </activity>
+
+        <service android:name="se.bengtsson.thegame.bluetooth.BluetoothCommunicationService" />
+        
     </application>
 
 </manifest>
