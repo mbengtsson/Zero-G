@@ -2,6 +2,7 @@ package se.bengtsson.thegame;
 
 import se.bengtsson.thegame.fragments.LogoFragment;
 import se.bengtsson.thegame.fragments.MainFragment;
+import se.bengtsson.thegame.fragments.MultiPlayerFragment;
 import se.bengtsson.thegame.fragments.ShareWithContactFragment;
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -13,6 +14,7 @@ import android.view.View;
 public class MainActivity extends Activity {
 
 	private FragmentManager fragmentManager;
+	private boolean tablet = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +25,8 @@ public class MainActivity extends Activity {
 		fragmentManager = getFragmentManager();
 
 		if (findViewById(R.id.side_fragment_container) != null) {
+			tablet = true;
+
 			if (savedInstanceState != null) {
 				return;
 			}
@@ -43,23 +47,33 @@ public class MainActivity extends Activity {
 	}
 
 	public void multiPlayerClick(View view) {
-		Intent intent = new Intent(this, MultiPlayerActivity.class);
-		startActivity(intent);
+
+		if (tablet) {
+			MultiPlayerFragment multiplayerFragment = new MultiPlayerFragment();
+
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+			transaction.replace(R.id.side_fragment_container, multiplayerFragment);
+			transaction.addToBackStack(null);
+			transaction.commit();
+		} else {
+			Intent intent = new Intent(this, MultiPlayerActivity.class);
+			startActivity(intent);
+		}
 	}
 
 	public void shareClick(View view) {
 
-		if (findViewById(R.id.side_fragment_container) == null) {
-
-			Intent intent = new Intent(this, ShareWithContactActivity.class);
-			startActivity(intent);
-		} else {
+		if (tablet) {
 			ShareWithContactFragment shareFragment = new ShareWithContactFragment();
 
 			FragmentTransaction transaction = fragmentManager.beginTransaction();
 			transaction.replace(R.id.side_fragment_container, shareFragment);
 			transaction.addToBackStack(null);
 			transaction.commit();
+
+		} else {
+			Intent intent = new Intent(this, ShareWithContactActivity.class);
+			startActivity(intent);
 		}
 	}
 
