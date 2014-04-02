@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
+import se.bengtsson.thegame.MainActivity;
 import se.bengtsson.thegame.MultiplayerGameActivity;
 import se.bengtsson.thegame.R;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService.LocalBinder;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -16,6 +18,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -178,6 +181,9 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 		isServer = true;
 
+		disbaleButtons();
+		showConnectingDialog("Waiting for client to connect...");
+
 		Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 		discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
 		startActivity(discoverableIntent);
@@ -215,6 +221,9 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 		isServer = false;
 
+		disbaleButtons();
+		showConnectingDialog("Connecting to server...");
+
 		String item = ((TextView) view).getText().toString();
 		String MACAddress = item.substring(item.length() - MAC_ADDRESS_LENGTH);
 
@@ -233,6 +242,33 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		Intent intent = new Intent(getActivity(), MultiplayerGameActivity.class);
 		intent.putExtra("isServer", isServer);
 		startActivity(intent);
+
+	}
+
+	public void disbaleButtons() {
+		view.findViewById(R.id.server_button).setEnabled(false);
+		view.findViewById(R.id.client_button).setEnabled(false);
+		view.findViewById(R.id.scan_button).setEnabled(false);
+		view.findViewById(R.id.paired_devices_list).setEnabled(false);
+		view.findViewById(R.id.paired_devices_list).setAlpha(0.5f);
+		view.findViewById(R.id.new_devices_list).setEnabled(false);
+		view.findViewById(R.id.new_devices_list).setAlpha(0.5f);
+	}
+
+	public void showConnectingDialog(String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle("Connecting...").setMessage(message);
+		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Intent intent = new Intent(getActivity(), MainActivity.class);
+				startActivity(intent);
+			}
+		});
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
 
 	}
 
