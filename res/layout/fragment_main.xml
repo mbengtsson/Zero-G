@@ -4,46 +4,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?android:attr/dividerHorizontal"
+    
     tools:context="se.bengtsson.thegame.fragments.MainFragment"
     tools:ignore="MergeRootFrame" >
 
     <ImageView
         android:id="@+id/title_image"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:contentDescription="@string/zero_g"
-        android:src="@drawable/title" />
-    
-    <Button
-        android:id="@+id/single_player_button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="singlePlayerClick"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="@string/single_player_button" />
+        android:src="@drawable/title_sm" />
 
-    <Button
-        android:id="@+id/multi_player_button"
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="multiPlayerClick"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="@string/multi_player_button" />
+        style="?android:attr/buttonBarStyle"
+        android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/statistics_button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="@string/statistics_button" />
+        <Button
+            android:id="@+id/single_player_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/buttonBarButtonStyle"
+            android:onClick="singlePlayerClick"
+            android:text="@string/single_player_button" />
 
-    <Button
-        android:id="@+id/share_button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:onClick="shareClick"
-        android:text="@string/share" />
+        <Button
+            android:id="@+id/multi_player_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/buttonBarButtonStyle"
+            android:onClick="multiPlayerClick"
+            android:text="@string/multi_player_button" />
+
+        <Button
+            android:id="@+id/statistics_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@string/statistics_button" />
+
+        <Button
+            android:id="@+id/share_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/buttonBarButtonStyle"
+            android:onClick="shareClick"
+            android:text="@string/share" />
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -9,6 +9,7 @@ public class ShareWithContactActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_share_with_contact);
+		getActionBar().hide();
 
 	}
 

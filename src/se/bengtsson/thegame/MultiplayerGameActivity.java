@@ -73,6 +73,7 @@ public class MultiplayerGameActivity extends GameActivity {
 		super.onStart();
 		Intent intent = new Intent(this, BluetoothCommunicationService.class);
 		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+		time = System.currentTimeMillis();
 	}
 
 	@Override
@@ -91,7 +92,6 @@ public class MultiplayerGameActivity extends GameActivity {
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
 		sceneManager.setupMultiplayerScene(playerController, externalController, server);
-		time = System.currentTimeMillis();
 		super.onPopulateScene(pScene, pOnPopulateSceneCallback);
 	}
 
@@ -109,7 +109,7 @@ public class MultiplayerGameActivity extends GameActivity {
 			communicationService.writeToSocket(FIRE_FLAG);
 		}
 
-		if ((System.currentTimeMillis() - time) > 2000) {
+		if ((System.currentTimeMillis() - time) > 5000) {
 			sendSync();
 		}
 

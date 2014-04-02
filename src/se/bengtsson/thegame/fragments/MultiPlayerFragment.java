@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,7 +63,12 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 					newDevicesAdapter.add(device.getName() + "\n" + device.getAddress());
 				}
 			} else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
-				getActivity().setProgressBarIndeterminateVisibility(false);
+
+				Button button = (Button) view.findViewById(R.id.scan_button);
+				button.setText(getActivity().getText(R.string.scan_for_devices));
+
+				view.findViewById(R.id.scan_progress).setVisibility(View.GONE);
+
 				getActivity().setTitle("Select device to connect");
 				if (newDevicesAdapter.getCount() == 0) {
 					newDevicesAdapter.add("No devices found");
@@ -93,8 +99,6 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		view.findViewById(R.id.client_button).setOnClickListener(this);
 		view.findViewById(R.id.server_button).setOnClickListener(this);
 		view.findViewById(R.id.scan_button).setOnClickListener(this);
-
-		getActivity().setTitle("Multi-player setup");
 
 		bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (bluetoothAdapter == null) {
@@ -191,8 +195,11 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 	}
 
 	private void findBluetoothDevices() {
-		getActivity().setProgressBarIndeterminateVisibility(true);
-		getActivity().setTitle("Finding devices");
+
+		Button button = (Button) view.findViewById(R.id.scan_button);
+		button.setText("Scanning for devices...");
+
+		view.findViewById(R.id.scan_progress).setVisibility(View.VISIBLE);
 
 		getActivity().findViewById(R.id.new_devices_title).setVisibility(View.VISIBLE);
 

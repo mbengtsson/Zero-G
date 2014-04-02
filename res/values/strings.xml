@@ -9,7 +9,7 @@
     <string name="other_available_devices">Other Available Devices</string>
     <string name="paired_devices">Paired Devices</string>
     <string name="title_activity_multi_player">Multi-playerActivity</string>
-    <string name="server_client_text">Server or client</string>
+    <string name="server_client_text">Start as server or client?</string>
     <string name="server_button">Server</string>
     <string name="client_button">Client</string>
     <string name="statistics_button">Statistics</string>
@@ -28,5 +28,6 @@
     <string name="total_hit_ratio">"Total Hit/Miss Ratio: "</string>
     <string name="title_activity_share_with_contact">ShareWithContactActivity</string>
     <string name="share">Share with a friend</string>
+    <string name="share_text">Share with a friend</string>
 
 </resources>
