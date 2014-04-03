@@ -156,6 +156,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public void onBackPressed() {
 		Intent intent = new Intent(this, MainActivity.class);
 		startActivity(intent);
+		finish();
 	}
 
 	protected ContactListener createContactListener() {

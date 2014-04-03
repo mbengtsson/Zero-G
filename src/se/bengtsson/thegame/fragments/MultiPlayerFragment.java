@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
-import se.bengtsson.thegame.MainActivity;
 import se.bengtsson.thegame.MultiplayerGameActivity;
 import se.bengtsson.thegame.R;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService;
@@ -53,6 +52,9 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 	private ArrayAdapter<String> newDevicesAdapter;
 
 	private BluetoothCommunicationService communicationService;
+
+	private AcceptConnectionThread acceptConnectionThread;
+	private ConnectToServerThread connectToServerThread;
 
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 
@@ -184,11 +186,13 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		disbaleButtons();
 		showConnectingDialog("Waiting for client to connect...");
 
-		Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-		discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-		startActivity(discoverableIntent);
+		if (bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+			Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+			discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+			startActivity(discoverableIntent);
+		}
 
-		AcceptConnectionThread acceptConnectionThread = new AcceptConnectionThread();
+		acceptConnectionThread = new AcceptConnectionThread();
 		acceptConnectionThread.start();
 		Log.d("MultiPlayerActivity", "started AcceptConnectionThread ");
 
@@ -207,7 +211,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 		view.findViewById(R.id.scan_progress).setVisibility(View.VISIBLE);
 
-		getActivity().findViewById(R.id.new_devices_title).setVisibility(View.VISIBLE);
+		view.findViewById(R.id.new_devices_title).setVisibility(View.VISIBLE);
 
 		if (bluetoothAdapter.isDiscovering()) {
 			bluetoothAdapter.cancelDiscovery();
@@ -229,7 +233,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 		BluetoothDevice device = bluetoothAdapter.getRemoteDevice(MACAddress);
 
-		ConnectToServerThread connectToServerThread = new ConnectToServerThread(device);
+		connectToServerThread = new ConnectToServerThread(device);
 		connectToServerThread.start();
 		Log.d("MultiPlayerActivity", "started ConnectToServerThread ");
 
@@ -255,6 +259,16 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		view.findViewById(R.id.new_devices_list).setAlpha(0.5f);
 	}
 
+	public void enableButtons() {
+		view.findViewById(R.id.server_button).setEnabled(true);
+		view.findViewById(R.id.client_button).setEnabled(true);
+		view.findViewById(R.id.scan_button).setEnabled(true);
+		view.findViewById(R.id.paired_devices_list).setEnabled(true);
+		view.findViewById(R.id.paired_devices_list).setAlpha(1.0f);
+		view.findViewById(R.id.new_devices_list).setEnabled(true);
+		view.findViewById(R.id.new_devices_list).setAlpha(1.0f);
+	}
+
 	public void showConnectingDialog(String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle("Connecting...").setMessage(message);
@@ -262,8 +276,15 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				Intent intent = new Intent(getActivity(), MainActivity.class);
-				startActivity(intent);
+
+				if (acceptConnectionThread != null) {
+					acceptConnectionThread.cancel();
+				}
+				if (connectToServerThread != null) {
+					connectToServerThread.cancel();
+				}
+
+				enableButtons();
 			}
 		});
 
@@ -276,6 +297,23 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 	public void onStop() {
 		super.onStop();
 		getActivity().unbindService(serviceConnection);
+
+		if (acceptConnectionThread != null) {
+			try {
+				acceptConnectionThread.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (connectToServerThread != null) {
+			try {
+				connectToServerThread.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
