@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="se.bengtsson.thegame.ShareWithContactActivity" >
+    tools:context="se.bengtsson.thegame.activities.ShareWithContactActivity" >
 
     <item
         android:id="@+id/action_settings"

@@ -1,5 +1,9 @@
-package se.bengtsson.thegame;
+package se.bengtsson.thegame.activities;
 
+import se.bengtsson.thegame.R;
+import se.bengtsson.thegame.R.id;
+import se.bengtsson.thegame.R.layout;
+import se.bengtsson.thegame.activities.game.SingleplayerGameActivity;
 import se.bengtsson.thegame.fragments.LogoFragment;
 import se.bengtsson.thegame.fragments.MainFragment;
 import se.bengtsson.thegame.fragments.MultiPlayerFragment;

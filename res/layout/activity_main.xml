@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?android:attr/dividerHorizontal"
-    tools:context="se.bengtsson.thegame.MainActivity"
+    tools:context="se.bengtsson.thegame.activities.MainActivity"
     tools:ignore="MergeRootFrame" >
 
     <fragment

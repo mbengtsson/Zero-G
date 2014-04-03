@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
-import se.bengtsson.thegame.MultiplayerGameActivity;
 import se.bengtsson.thegame.R;
+import se.bengtsson.thegame.activities.game.MultiplayerGameActivity;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService.LocalBinder;
 import android.app.AlertDialog;

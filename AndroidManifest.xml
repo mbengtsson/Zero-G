@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="se.bengtsson.thegame.MainActivity"
+            android:name="se.bengtsson.thegame.activities.MainActivity"
             android:screenOrientation="landscape"
             android:label="@string/app_name" >
             <intent-filter>
@@ -28,25 +28,25 @@
             </intent-filter>
         </activity>
         <activity 
-            android:name="se.bengtsson.thegame.MultiplayerGameActivity"
+            android:name="se.bengtsson.thegame.activities.game.MultiplayerGameActivity"
             android:screenOrientation="landscape" >
         </activity>
         <activity 
-            android:name="se.bengtsson.thegame.SingleplayerGameActivity"
+            android:name="se.bengtsson.thegame.activities.game.SingleplayerGameActivity"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="se.bengtsson.thegame.MultiPlayerActivity"
+            android:name="se.bengtsson.thegame.activities.MultiPlayerActivity"
             android:screenOrientation="landscape"
             android:label="@string/title_activity_multi_player" >
         </activity>
         <activity
-            android:name="se.bengtsson.thegame.PostFightActivity"
+    		android:name="se.bengtsson.thegame.activities.StatisticsActivity"
             android:screenOrientation="landscape"
             android:label="@string/title_activity_post_fight" >
         </activity>
         <activity
-            android:name="se.bengtsson.thegame.ShareWithContactActivity"
+            android:name="se.bengtsson.thegame.activities.ShareWithContactActivity"
             android:screenOrientation="landscape"
             android:label="@string/title_activity_share_with_contact" >
         </activity>

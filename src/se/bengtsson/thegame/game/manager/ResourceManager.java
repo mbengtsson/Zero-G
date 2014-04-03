@@ -21,7 +21,7 @@ import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-import se.bengtsson.thegame.GameActivity;
+import se.bengtsson.thegame.activities.game.GameActivity;
 import android.graphics.Color;
 import android.util.Log;
 

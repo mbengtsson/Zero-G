@@ -1,9 +1,10 @@
-package se.bengtsson.thegame;
+package se.bengtsson.thegame.activities.game;
 
 import java.nio.ByteBuffer;
 
 import org.andengine.entity.scene.Scene;
 
+import se.bengtsson.thegame.activities.StatisticsActivity;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService.LocalBinder;
 import se.bengtsson.thegame.game.controller.ExternalController;
@@ -109,7 +110,7 @@ public class MultiplayerGameActivity extends GameActivity {
 			communicationService.writeToSocket(FIRE_FLAG);
 		}
 
-		if ((System.currentTimeMillis() - time) > 5000) {
+		if ((System.currentTimeMillis() - time) > 3000) {
 			sendSync();
 		}
 
@@ -268,7 +269,7 @@ public class MultiplayerGameActivity extends GameActivity {
 
 				@Override
 				public void run() {
-					Intent intent = new Intent(getApplicationContext(), PostFightActivity.class);
+					Intent intent = new Intent(getApplicationContext(), StatisticsActivity.class);
 					intent.putExtra("isWinner", winner);
 					intent.putExtra("bulletsFired", sceneManager.getPlayerFighter().getBulletsFired());
 					intent.putExtra("hits", sceneManager.getEnemyFighter().getTimesHit());

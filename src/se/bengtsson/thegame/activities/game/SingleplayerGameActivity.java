@@ -1,4 +1,4 @@
-package se.bengtsson.thegame;
+package se.bengtsson.thegame.activities.game;
 
 import org.andengine.entity.scene.Scene;
 

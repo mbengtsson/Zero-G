@@ -1,4 +1,4 @@
-package se.bengtsson.thegame;
+package se.bengtsson.thegame.activities.game;
 
 import org.andengine.engine.Engine;
 import org.andengine.engine.FixedStepEngine;
@@ -15,6 +15,10 @@ import org.andengine.extension.debugdraw.DebugRenderer;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.ui.activity.LayoutGameActivity;
 
+import se.bengtsson.thegame.R;
+import se.bengtsson.thegame.R.id;
+import se.bengtsson.thegame.R.layout;
+import se.bengtsson.thegame.activities.MainActivity;
 import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.hud.PlayerHUD;
 import se.bengtsson.thegame.game.manager.ResourceManager;

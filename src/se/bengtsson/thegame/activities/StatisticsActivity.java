@@ -1,12 +1,16 @@
-package se.bengtsson.thegame;
+package se.bengtsson.thegame.activities;
 
+import se.bengtsson.thegame.R;
+import se.bengtsson.thegame.R.id;
+import se.bengtsson.thegame.R.layout;
+import se.bengtsson.thegame.R.string;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.TextView;
 
-public class PostFightActivity extends Activity {
+public class StatisticsActivity extends Activity {
 
 	SharedPreferences statistics;
 
@@ -25,7 +29,7 @@ public class PostFightActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_post_fight);
+		setContentView(R.layout.activity_statistics);
 		getActionBar().hide();
 
 		statistics = this.getPreferences(MODE_PRIVATE);

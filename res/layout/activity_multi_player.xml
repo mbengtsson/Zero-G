@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="se.bengtsson.thegame.MultiPlayerActivity"
+    tools:context="se.bengtsson.thegame.activities.MultiPlayerActivity"
     android:background="?android:attr/dividerHorizontal"
     tools:ignore="MergeRootFrame" >
 
