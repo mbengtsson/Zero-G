@@ -3,56 +3,64 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_left"
     android:orientation="vertical"
-    
     tools:context="se.bengtsson.thegame.fragments.MainFragment"
     tools:ignore="MergeRootFrame" >
 
-    <ImageView
-        android:id="@+id/title_image"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/zero_g"
-        android:src="@drawable/title_sm" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:id="@+id/title_button"
         style="?android:attr/buttonBarStyle"
-        android:orientation="vertical" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/title_sm" 
+        android:onClick="titleClick"
+        android:contentDescription="@string/zero_g"/>
 
-        <Button
-            android:id="@+id/single_player_button"
-            android:layout_width="fill_parent"
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="?android:attr/buttonBarButtonStyle"
-            android:onClick="singlePlayerClick"
-            android:text="@string/single_player_button" />
+            android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/multi_player_button"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            style="?android:attr/buttonBarButtonStyle"
-            android:onClick="multiPlayerClick"
-            android:text="@string/multi_player_button" />
+            <Button
+                android:id="@+id/single_player_button"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:onClick="singlePlayerClick"
+                android:text="@string/single_player_button" />
 
-        <Button
-            android:id="@+id/statistics_button"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            style="?android:attr/buttonBarButtonStyle"
-            android:onClick="statisticsClick"
-            android:text="@string/statistics_button" />
+            <Button
+                android:id="@+id/multi_player_button"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:onClick="multiPlayerClick"
+                android:text="@string/multi_player_button" />
 
-        <Button
-            android:id="@+id/share_button"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            style="?android:attr/buttonBarButtonStyle"
-            android:onClick="shareClick"
-            android:text="@string/share" />
+            <Button
+                android:id="@+id/statistics_button"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:onClick="statisticsClick"
+                android:text="@string/statistics_button" />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/share_button"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:onClick="shareClick"
+                android:text="@string/share" />
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

@@ -7,12 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class LogoFragment extends Fragment {
+public class TitleFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.fragment_logo, container, false);
+		View view = inflater.inflate(R.layout.fragment_title, container, false);
 
 		return view;
 	}

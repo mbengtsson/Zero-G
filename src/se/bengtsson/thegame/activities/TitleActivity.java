@@ -4,12 +4,12 @@ import se.bengtsson.thegame.R;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class ShareWithContactActivity extends Activity {
+public class TitleActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_share_with_contact);
+		setContentView(R.layout.activity_title);
 
 	}
 

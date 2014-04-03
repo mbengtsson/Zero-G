@@ -29,5 +29,7 @@
     <string name="title_activity_share_with_contact">ShareWithContactActivity</string>
     <string name="share">Share with a friend</string>
     <string name="share_text">Share with a friend</string>
+    <string name="title_activity_title">TitleActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

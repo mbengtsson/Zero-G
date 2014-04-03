@@ -2,11 +2,11 @@ package se.bengtsson.thegame.activities;
 
 import se.bengtsson.thegame.R;
 import se.bengtsson.thegame.activities.game.SingleplayerGameActivity;
-import se.bengtsson.thegame.fragments.LogoFragment;
 import se.bengtsson.thegame.fragments.MainFragment;
 import se.bengtsson.thegame.fragments.MultiPlayerFragment;
 import se.bengtsson.thegame.fragments.ShareWithContactFragment;
 import se.bengtsson.thegame.fragments.StatisticsFragment;
+import se.bengtsson.thegame.fragments.TitleFragment;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -23,7 +23,6 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		getActionBar().hide();
 
 		fragmentManager = getFragmentManager();
 
@@ -34,7 +33,7 @@ public class MainActivity extends Activity {
 				return;
 			}
 			MainFragment mainFragment = new MainFragment();
-			LogoFragment logoFragment = new LogoFragment();
+			TitleFragment logoFragment = new TitleFragment();
 
 			FragmentTransaction transaction = fragmentManager.beginTransaction();
 			transaction.add(R.id.menu_fragment_container, mainFragment);
@@ -42,6 +41,19 @@ public class MainActivity extends Activity {
 			transaction.commit();
 		}
 
+	}
+
+	public void titleClick(View view) {
+		TitleFragment titleFragment = new TitleFragment();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		if (tablet) {
+			transaction.replace(R.id.side_fragment_container, titleFragment);
+			transaction.addToBackStack(null);
+			transaction.commit();
+		} else {
+			Intent intent = new Intent(this, TitleActivity.class);
+			startActivity(intent);
+		}
 	}
 
 	public void singlePlayerClick(View view) {
