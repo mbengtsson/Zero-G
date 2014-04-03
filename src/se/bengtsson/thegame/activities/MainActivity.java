@@ -1,13 +1,12 @@
 package se.bengtsson.thegame.activities;
 
 import se.bengtsson.thegame.R;
-import se.bengtsson.thegame.R.id;
-import se.bengtsson.thegame.R.layout;
 import se.bengtsson.thegame.activities.game.SingleplayerGameActivity;
 import se.bengtsson.thegame.fragments.LogoFragment;
 import se.bengtsson.thegame.fragments.MainFragment;
 import se.bengtsson.thegame.fragments.MultiPlayerFragment;
 import se.bengtsson.thegame.fragments.ShareWithContactFragment;
+import se.bengtsson.thegame.fragments.StatisticsFragment;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -61,6 +60,21 @@ public class MainActivity extends Activity {
 			transaction.commit();
 		} else {
 			Intent intent = new Intent(this, MultiPlayerActivity.class);
+			startActivity(intent);
+		}
+	}
+
+	public void statisticsClick(View view) {
+
+		if (tablet) {
+			StatisticsFragment statFragmet = new StatisticsFragment();
+
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+			transaction.replace(R.id.side_fragment_container, statFragmet);
+			transaction.addToBackStack(null);
+			transaction.commit();
+		} else {
+			Intent intent = new Intent(this, StatisticsActivity.class);
 			startActivity(intent);
 		}
 	}

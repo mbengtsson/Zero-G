@@ -18,14 +18,14 @@
     <string name="statistics_title">Statistics</string>
     <string name="bullets_fired">"Bullets Fired: "</string>
     <string name="hits">"Hits: "</string>
-    <string name="hit_ratio">"Hit/Miss Ratio: "</string>
+    <string name="hit_ratio">"Hit Ratio: "</string>
     <string name="total_statistics_title">Total Statistics</string>
     <string name="total_wins">"Total Wins: "</string>
     <string name="total_losses">"Total Losses: "</string>
-    <string name="win_ratio">"Win/Lose Ratio: "</string>
+    <string name="win_ratio">"Win Ratio: "</string>
     <string name="total_bullets_fired">"Total Bullets Fired: "</string>
     <string name="total_hits">"Total Hits: "</string>
-    <string name="total_hit_ratio">"Total Hit/Miss Ratio: "</string>
+    <string name="total_hit_ratio">"Total Hit Ratio: "</string>
     <string name="title_activity_share_with_contact">ShareWithContactActivity</string>
     <string name="share">Share with a friend</string>
     <string name="share_text">Share with a friend</string>

@@ -1,7 +1,6 @@
 package se.bengtsson.thegame.activities;
 
 import se.bengtsson.thegame.R;
-import se.bengtsson.thegame.R.layout;
 import android.app.Activity;
 import android.os.Bundle;
 
