@@ -16,8 +16,6 @@ import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.ui.activity.LayoutGameActivity;
 
 import se.bengtsson.thegame.R;
-import se.bengtsson.thegame.R.id;
-import se.bengtsson.thegame.R.layout;
 import se.bengtsson.thegame.activities.MainActivity;
 import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.hud.PlayerHUD;
@@ -54,7 +52,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	@Override
 	public Engine onCreateEngine(EngineOptions pEngineOptions) {
 
-		return new FixedStepEngine(pEngineOptions, 30);
+		return new FixedStepEngine(pEngineOptions, 60);
 
 	}
 
@@ -73,7 +71,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	@Override
 	public void onCreateResources(OnCreateResourcesCallback pOnCreateResourcesCallback) throws Exception {
 
-		physicsWorld = new FixedStepPhysicsWorld(30, new Vector2(0, 0), false, 8, 3);
+		physicsWorld = new FixedStepPhysicsWorld(60, new Vector2(0, 0), false, 8, 3);
 
 		physicsWorld.setContactListener(createContactListener());
 

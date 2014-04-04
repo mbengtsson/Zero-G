@@ -26,6 +26,8 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class MultiplayerGameActivity extends GameActivity {
 
+	public static byte SYNC_TICK_FLAG = -0x1;
+
 	public static byte ROTATION_FLAG = 0x1;
 	public static byte THRUST_FLAG = 0x2;
 	public static byte FIRE_FLAG = 0x3;
@@ -40,11 +42,13 @@ public class MultiplayerGameActivity extends GameActivity {
 	private BluetoothCommunicationService communicationService;
 	private ExternalController externalController;
 
-	private double time;
+	private int syncTimer = 0;
+
 	private boolean server;
 
-	boolean gameOver = false;
-	boolean winner = false;
+	private boolean running = false;
+	private boolean gameOver = false;
+	private boolean winner = false;
 
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 
@@ -74,7 +78,6 @@ public class MultiplayerGameActivity extends GameActivity {
 		super.onStart();
 		Intent intent = new Intent(this, BluetoothCommunicationService.class);
 		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-		time = System.currentTimeMillis();
 	}
 
 	@Override
@@ -98,6 +101,12 @@ public class MultiplayerGameActivity extends GameActivity {
 
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
+
+		if (!running) {
+			syncStart();
+		}
+
+		syncTimer++;
 		communicationService.writeToSocket(ROTATION_FLAG);
 
 		communicationService.writeToSocket(playerController.getTilt());
@@ -110,8 +119,9 @@ public class MultiplayerGameActivity extends GameActivity {
 			communicationService.writeToSocket(FIRE_FLAG);
 		}
 
-		if ((System.currentTimeMillis() - time) > 3000) {
+		if (syncTimer > 5) {
 			sendSync();
+			syncTimer = 0;
 		}
 
 		if (!server && communicationService.nextFromSocket() != null
@@ -159,13 +169,13 @@ public class MultiplayerGameActivity extends GameActivity {
 
 		if (!gameOver) {
 			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter());
+			syncTick();
 		}
 
 		super.onUpdate(pSecondsElapsed);
 	}
 
 	public void sendSync() {
-		time = System.currentTimeMillis();
 		byte[] rotationBytes = ByteBuffer.allocate(4).putFloat(sceneManager.getPlayerFighter().getRotation()).array();
 		communicationService.writeToSocket(SYNC_ROTATION_FLAG);
 		for (int i = 0; i < rotationBytes.length; i++) {
@@ -263,7 +273,9 @@ public class MultiplayerGameActivity extends GameActivity {
 				winner = true;
 			}
 			gameOver = true;
+
 			hud.showMessage(winner);
+			communicationService.writeToSocket(SYNC_TICK_FLAG);
 
 			handler.postDelayed(new Runnable() {
 
@@ -280,6 +292,50 @@ public class MultiplayerGameActivity extends GameActivity {
 			}, 3000);
 		}
 
+	}
+
+	private void syncStart() {
+
+		if (server) {
+			communicationService.writeToSocket(SYNC_TICK_FLAG);
+			while (!running) {
+				Byte startByte = communicationService.readFromSocket();
+				if (startByte != null && startByte == SYNC_TICK_FLAG) {
+					running = true;
+				}
+			}
+		} else {
+			while (!running) {
+				Byte startByte = communicationService.readFromSocket();
+				if (startByte != null && startByte == SYNC_TICK_FLAG) {
+					communicationService.writeToSocket(SYNC_TICK_FLAG);
+					running = true;
+				}
+			}
+		}
+
+	}
+
+	private void syncTick() {
+		if (server) {
+			communicationService.writeToSocket(SYNC_TICK_FLAG);
+			boolean hold = true;
+			while (hold) {
+				Byte holdByte = communicationService.readFromSocket();
+				if (holdByte != null && holdByte == SYNC_TICK_FLAG) {
+					hold = false;
+				}
+			}
+		} else {
+			boolean hold = true;
+			while (hold) {
+				Byte holdByte = communicationService.readFromSocket();
+				if (holdByte != null && holdByte == SYNC_TICK_FLAG) {
+					communicationService.writeToSocket(SYNC_TICK_FLAG);
+					hold = false;
+				}
+			}
+		}
 	}
 
 	@Override

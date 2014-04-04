@@ -276,6 +276,17 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+				Log.d("MultiPlayerFragment", "Dialog cancel pressed");
+
+				// Handled by OnDismissListener on dialog
+			}
+		});
+		AlertDialog dialog = builder.create();
+		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				Log.d("MultiPlayerFragment", "Dialog dismissed");
 
 				if (acceptConnectionThread != null) {
 					acceptConnectionThread.cancel();
@@ -285,10 +296,9 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 				}
 
 				enableButtons();
+
 			}
 		});
-
-		AlertDialog dialog = builder.create();
 		dialog.show();
 
 	}
