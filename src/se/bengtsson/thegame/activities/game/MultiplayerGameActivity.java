@@ -17,6 +17,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -46,7 +47,9 @@ public class MultiplayerGameActivity extends GameActivity {
 
 	private boolean server;
 
-	private boolean running = false;
+	private boolean playerHit = false;
+	private boolean oponentHit = false;
+
 	private boolean gameOver = false;
 	private boolean winner = false;
 
@@ -96,17 +99,23 @@ public class MultiplayerGameActivity extends GameActivity {
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
 		sceneManager.setupMultiplayerScene(playerController, externalController, server);
+		syncTick();
 		super.onPopulateScene(pScene, pOnPopulateSceneCallback);
 	}
 
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
 
-		if (!running) {
-			syncStart();
+		if (playerHit) {
+			communicationService.writeToSocket(PLAYER_HIT_FLAG);
+			playerHit = false;
 		}
 
-		syncTimer++;
+		if (oponentHit) {
+			communicationService.writeToSocket(OPONENT_HIT_FLAG);
+			oponentHit = false;
+		}
+
 		communicationService.writeToSocket(ROTATION_FLAG);
 
 		communicationService.writeToSocket(playerController.getTilt());
@@ -119,7 +128,9 @@ public class MultiplayerGameActivity extends GameActivity {
 			communicationService.writeToSocket(FIRE_FLAG);
 		}
 
-		if (syncTimer > 5) {
+		syncTimer++;
+
+		if (syncTimer > 10) {
 			sendSync();
 			syncTimer = 0;
 		}
@@ -170,6 +181,7 @@ public class MultiplayerGameActivity extends GameActivity {
 		if (!gameOver) {
 			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter());
 			syncTick();
+
 		}
 
 		super.onUpdate(pSecondsElapsed);
@@ -294,29 +306,10 @@ public class MultiplayerGameActivity extends GameActivity {
 
 	}
 
-	private void syncStart() {
-
-		if (server) {
-			communicationService.writeToSocket(SYNC_TICK_FLAG);
-			while (!running) {
-				Byte startByte = communicationService.readFromSocket();
-				if (startByte != null && startByte == SYNC_TICK_FLAG) {
-					running = true;
-				}
-			}
-		} else {
-			while (!running) {
-				Byte startByte = communicationService.readFromSocket();
-				if (startByte != null && startByte == SYNC_TICK_FLAG) {
-					communicationService.writeToSocket(SYNC_TICK_FLAG);
-					running = true;
-				}
-			}
-		}
-
-	}
-
 	private void syncTick() {
+
+		double timer = System.currentTimeMillis();
+
 		if (server) {
 			communicationService.writeToSocket(SYNC_TICK_FLAG);
 			boolean hold = true;
@@ -324,6 +317,23 @@ public class MultiplayerGameActivity extends GameActivity {
 				Byte holdByte = communicationService.readFromSocket();
 				if (holdByte != null && holdByte == SYNC_TICK_FLAG) {
 					hold = false;
+				} else {
+					double now = System.currentTimeMillis();
+					if (now - timer > 3000) {
+						gameOver = true;
+						runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								Toast.makeText(getApplication(), "Sorry!\nLost connection with the client...",
+										Toast.LENGTH_LONG).show();
+
+							}
+						});
+
+						onBackPressed();
+						break;
+					}
 				}
 			}
 		} else {
@@ -333,6 +343,22 @@ public class MultiplayerGameActivity extends GameActivity {
 				if (holdByte != null && holdByte == SYNC_TICK_FLAG) {
 					communicationService.writeToSocket(SYNC_TICK_FLAG);
 					hold = false;
+				} else {
+					double now = System.currentTimeMillis();
+					if (now - timer > 3000) {
+						gameOver = true;
+						runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								Toast.makeText(getApplication(), "Sorry!\nLost connection with the server...",
+										Toast.LENGTH_LONG).show();
+
+							}
+						});
+						onBackPressed();
+						break;
+					}
 				}
 			}
 		}
@@ -354,10 +380,10 @@ public class MultiplayerGameActivity extends GameActivity {
 						Fighter fighter = (Fighter) fixtureB.getBody().getUserData();
 						fighter.hit();
 						if (fighter.isEnemy()) {
-							communicationService.writeToSocket(OPONENT_HIT_FLAG);
+							oponentHit = true;
 							hud.setEnemyHealth(fighter.getHealth());
 						} else {
-							communicationService.writeToSocket(PLAYER_HIT_FLAG);
+							playerHit = true;
 							hud.setPlayerHealth(fighter.getHealth());
 						}
 
@@ -371,10 +397,10 @@ public class MultiplayerGameActivity extends GameActivity {
 						Fighter fighter = (Fighter) fixtureA.getBody().getUserData();
 						fighter.hit();
 						if (fighter.isEnemy()) {
-							communicationService.writeToSocket(OPONENT_HIT_FLAG);
+							oponentHit = true;
 							hud.setEnemyHealth(fighter.getHealth());
 						} else {
-							communicationService.writeToSocket(PLAYER_HIT_FLAG);
+							playerHit = true;
 							hud.setPlayerHealth(fighter.getHealth());
 						}
 
@@ -399,5 +425,10 @@ public class MultiplayerGameActivity extends GameActivity {
 			}
 		};
 		return contactListener;
+	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
 	}
 }
