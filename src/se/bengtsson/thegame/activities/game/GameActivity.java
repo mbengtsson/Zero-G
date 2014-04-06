@@ -52,7 +52,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	@Override
 	public Engine onCreateEngine(EngineOptions pEngineOptions) {
 
-		return new FixedStepEngine(pEngineOptions, 30);
+		return new FixedStepEngine(pEngineOptions, 60);
 
 	}
 
@@ -71,7 +71,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	@Override
 	public void onCreateResources(OnCreateResourcesCallback pOnCreateResourcesCallback) throws Exception {
 
-		physicsWorld = new FixedStepPhysicsWorld(30, new Vector2(0, 0), false, 8, 3);
+		physicsWorld = new FixedStepPhysicsWorld(60, new Vector2(0, 0), false, 8, 3);
 
 		physicsWorld.setContactListener(createContactListener());
 

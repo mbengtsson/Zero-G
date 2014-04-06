@@ -69,14 +69,14 @@ public class PlayerController implements Controller, IAccelerationListener {
 
 	private class Trigger extends Sprite {
 
+		private boolean isDown = false;
+
 		public Trigger(final float pX, final float pY, final ITextureRegion pTextureRegion,
 				final VertexBufferObjectManager pVertexBufferObjectManager) {
 
 			super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
 
 		}
-
-		private boolean isDown = false;
 
 		@Override
 		public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX,
@@ -85,6 +85,7 @@ public class PlayerController implements Controller, IAccelerationListener {
 			if (pSceneTouchEvent.isActionDown()) {
 				Log.d("Trigger", "pressed");
 				isDown = true;
+
 			}
 			if (pSceneTouchEvent.isActionUp()) {
 				Log.d("Trigger", "released");

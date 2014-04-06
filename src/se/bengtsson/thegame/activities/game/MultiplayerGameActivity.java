@@ -25,7 +25,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -49,6 +48,9 @@ public class MultiplayerGameActivity extends GameActivity {
 
 	private boolean gameOver = false;
 	private boolean winner = false;
+
+	private boolean lastThrustState = false;;
+	private boolean lastFireState = false;
 
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 
@@ -104,48 +106,46 @@ public class MultiplayerGameActivity extends GameActivity {
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
 
+		if (playerHit) {
+			communicationService.sendMessage(new PlayerHitMessage());
+			playerHit = false;
+		}
+
+		if (oponentHit) {
+			communicationService.sendMessage(new OponentHitMessage());
+			oponentHit = false;
+		}
+
+		if (playerController.isRightTriggerPressed() != lastThrustState) {
+			communicationService.sendMessage(new ThrustMessage());
+			lastThrustState = playerController.isRightTriggerPressed();
+		}
+
+		if (playerController.isLeftTriggerPressed() != lastFireState) {
+			communicationService.sendMessage(new FireMessage());
+			lastFireState = playerController.isLeftTriggerPressed();
+		}
+
+		communicationService.sendMessage(new RotationMessage(playerController.getTilt()));
+
+		syncTimer++;
+
+		if (syncTimer == 10) {
+			communicationService.sendMessage(new SyncRotationMessage(sceneManager.getPlayerFighter().getRotation()));
+
+			float[] velocity = new float[2];
+			velocity[0] = sceneManager.getPlayerFighter().getVelocityX();
+			velocity[1] = sceneManager.getPlayerFighter().getVelocityY();
+			communicationService.sendMessage(new SyncVelocityMessage(velocity));
+
+			float[] position = new float[2];
+			position[0] = sceneManager.getPlayerFighter().getXpos();
+			position[1] = sceneManager.getPlayerFighter().getYpos();
+			communicationService.sendMessage(new SyncPositionMessage(position));
+
+			syncTimer = 0;
+		}
 		if (!gameOver) {
-
-			if (playerHit) {
-				communicationService.sendMessage(new PlayerHitMessage());
-				playerHit = false;
-			}
-
-			if (oponentHit) {
-				communicationService.sendMessage(new OponentHitMessage());
-				oponentHit = false;
-			}
-
-			if (playerController.isRightTriggerPressed()) {
-				Log.d("MultiplayerGameActivity", "sending thrust message");
-				communicationService.sendMessage(new ThrustMessage());
-			}
-
-			if (playerController.isLeftTriggerPressed()) {
-				communicationService.sendMessage(new FireMessage());
-			}
-
-			communicationService.sendMessage(new RotationMessage(playerController.getTilt()));
-
-			syncTimer++;
-
-			if (syncTimer == 10) {
-				communicationService
-						.sendMessage(new SyncRotationMessage(sceneManager.getPlayerFighter().getRotation()));
-
-				float[] velocity = new float[2];
-				velocity[0] = sceneManager.getPlayerFighter().getVelocityX();
-				velocity[0] = sceneManager.getPlayerFighter().getVelocityY();
-				communicationService.sendMessage(new SyncVelocityMessage(velocity));
-
-				float[] position = new float[2];
-				position[0] = sceneManager.getPlayerFighter().getXpos();
-				position[1] = sceneManager.getPlayerFighter().getYpos();
-				communicationService.sendMessage(new SyncPositionMessage(position));
-
-				syncTimer = 0;
-			}
-
 			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter());
 
 		}
@@ -269,11 +269,11 @@ public class MultiplayerGameActivity extends GameActivity {
 			}
 
 			if (message instanceof ThrustMessage) {
-				externalController.setRightTriggerPressed(true);
+				externalController.setRightTriggerPressed(!externalController.isRightTriggerPressed());
 			}
 
 			if (message instanceof FireMessage) {
-				externalController.setLeftTriggerPressed(true);
+				externalController.setLeftTriggerPressed(!externalController.isLeftTriggerPressed());
 			}
 
 			if (message instanceof SyncRotationMessage) {
