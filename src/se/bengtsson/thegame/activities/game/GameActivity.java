@@ -37,7 +37,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public static final int CAMERA_HEIGHT = 450;
 
 	private Camera camera;
-	private FixedStepPhysicsWorld physicsWorld;
+	protected FixedStepPhysicsWorld physicsWorld;
 	protected PlayerController playerController;
 
 	protected ResourceManager resources;

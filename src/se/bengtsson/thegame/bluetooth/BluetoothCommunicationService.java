@@ -1,10 +1,23 @@
 package se.bengtsson.thegame.bluetooth;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.HashSet;
+import java.util.Set;
 
+import se.bengtsson.thegame.bluetooth.message.BluetoothMessage;
+import se.bengtsson.thegame.bluetooth.message.FireMessage;
+import se.bengtsson.thegame.bluetooth.message.OponentHitMessage;
+import se.bengtsson.thegame.bluetooth.message.PlayerHitMessage;
+import se.bengtsson.thegame.bluetooth.message.RotationMessage;
+import se.bengtsson.thegame.bluetooth.message.SyncPositionMessage;
+import se.bengtsson.thegame.bluetooth.message.SyncRotationMessage;
+import se.bengtsson.thegame.bluetooth.message.SyncVelocityMessage;
+import se.bengtsson.thegame.bluetooth.message.SyncedStartMessage;
+import se.bengtsson.thegame.bluetooth.message.ThrustMessage;
 import android.app.Service;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
@@ -16,7 +29,20 @@ public class BluetoothCommunicationService extends Service {
 
 	private final IBinder binder = new LocalBinder();
 
+	public static final byte SYNCED_START_FLAG = -0x1;
+
+	public static final byte ROTATION_FLAG = 0x1;
+	public static final byte THRUST_FLAG = 0x2;
+	public static final byte FIRE_FLAG = 0x3;
+	public static final byte SYNC_ROTATION_FLAG = 0x4;
+	public static final byte SYNC_VELOCITY_FLAG = 0x5;
+	public static final byte SYNC_POSITION_FLAG = 0x6;
+	public static final byte PLAYER_HIT_FLAG = 0x7;
+	public static final byte OPONENT_HIT_FLAG = 0x8;
+
 	private BluetoothCommunicationThread communicationThread;
+
+	private Set<BluetoothCommunicationListener> listeners = new HashSet<BluetoothCommunicationListener>();
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -29,16 +55,103 @@ public class BluetoothCommunicationService extends Service {
 		Log.d("BluetoothCommunicationService", "service initiated");
 	}
 
-	public void writeToSocket(byte aByte) {
-		communicationThread.writeByte(aByte);
+	public void addBluetoothCommunicationListener(BluetoothCommunicationListener listener) {
+		listeners.add(listener);
 	}
 
-	public Byte readFromSocket() {
-		return communicationThread.readByte();
+	public void removeBluetoothCommunicationListener(BluetoothCommunicationListener listener) {
+		listeners.remove(listener);
 	}
 
-	public Byte nextFromSocket() {
-		return communicationThread.nextByte();
+	public void updateListernes(BluetoothMessage message) {
+		for (BluetoothCommunicationListener listener : listeners) {
+			listener.onDataRecived(message);
+		}
+	}
+
+	public void sendMessage(BluetoothMessage message) {
+		switch (message.getFlag()) {
+
+			case SYNCED_START_FLAG:
+				sendSyncedStartMessage((SyncedStartMessage) message);
+				break;
+			case ROTATION_FLAG:
+				sendRotationMessage((RotationMessage) message);
+				break;
+			case THRUST_FLAG:
+				sendThrustMessage((ThrustMessage) message);
+				break;
+			case FIRE_FLAG:
+				sendFireMessage((FireMessage) message);
+				break;
+			case SYNC_ROTATION_FLAG:
+				sendSyncRotationMessage((SyncRotationMessage) message);
+				break;
+			case SYNC_VELOCITY_FLAG:
+				sendSyncVelocityMessage((SyncVelocityMessage) message);
+				break;
+			case SYNC_POSITION_FLAG:
+				sendSyncPositionMessage((SyncPositionMessage) message);
+				break;
+			case PLAYER_HIT_FLAG:
+				sendPlayerHitMessage((PlayerHitMessage) message);
+				break;
+			case OPONENT_HIT_FLAG:
+				sendOponentHitMessage((OponentHitMessage) message);
+				break;
+			default:
+				Log.w("BluetoothCommunicationService", "Unknown message type");
+				break;
+		}
+	}
+
+	private void sendSyncedStartMessage(SyncedStartMessage message) {
+		communicationThread.writeByte(message.getFlag());
+
+	}
+
+	private void sendRotationMessage(RotationMessage message) {
+		communicationThread.writeByte(message.getFlag());
+		communicationThread.writeByte(message.getPayload());
+
+	}
+
+	private void sendThrustMessage(ThrustMessage message) {
+		communicationThread.writeByte(message.getFlag());
+
+	}
+
+	private void sendFireMessage(FireMessage message) {
+		communicationThread.writeByte(message.getFlag());
+
+	}
+
+	private void sendSyncRotationMessage(SyncRotationMessage message) {
+		communicationThread.writeByte(message.getFlag());
+		communicationThread.writeFloat(message.getPayload());
+
+	}
+
+	private void sendSyncVelocityMessage(SyncVelocityMessage message) {
+		communicationThread.writeByte(message.getFlag());
+		communicationThread.writeFloatArray(message.getPayload());
+
+	}
+
+	private void sendSyncPositionMessage(SyncPositionMessage message) {
+		communicationThread.writeByte(message.getFlag());
+		communicationThread.writeFloatArray(message.getPayload());
+
+	}
+
+	private void sendPlayerHitMessage(PlayerHitMessage message) {
+		communicationThread.writeByte(message.getFlag());
+
+	}
+
+	private void sendOponentHitMessage(OponentHitMessage message) {
+		communicationThread.writeByte(message.getFlag());
+
 	}
 
 	@Override
@@ -57,10 +170,8 @@ public class BluetoothCommunicationService extends Service {
 	private class BluetoothCommunicationThread extends Thread {
 
 		private final BluetoothSocket socket;
-		private final InputStream inputStream;
-		private final OutputStream outputStream;
-
-		private ConcurrentLinkedQueue<Byte> buffer = new ConcurrentLinkedQueue<Byte>();
+		private final DataInputStream inputStream;
+		private final DataOutputStream outputStream;
 
 		public BluetoothCommunicationThread(BluetoothSocket socket) {
 			this.socket = socket;
@@ -74,35 +185,152 @@ public class BluetoothCommunicationService extends Service {
 				Log.e("BluetoothCommunicationThread", "Can't get streams from socket");
 			}
 
-			inputStream = tmpIn;
-			outputStream = tmpOut;
+			inputStream = new DataInputStream(tmpIn);
+			outputStream = new DataOutputStream(tmpOut);
 		}
 
 		public void run() {
 
 			while (true) {
+
+				byte flag = 0x0;
 				try {
-					buffer.offer((byte) inputStream.read());
+					flag = inputStream.readByte();
 				} catch (IOException e) {
 					break;
 				}
+
+				switch (flag) {
+					case SYNCED_START_FLAG:
+						updateListernes(reciveSyncedStartMessage());
+						break;
+					case ROTATION_FLAG:
+						updateListernes(reciveRotationMessage());
+						break;
+					case THRUST_FLAG:
+						updateListernes(reciveThrustMessage());
+						break;
+					case FIRE_FLAG:
+						updateListernes(reciveFireMessage());
+						break;
+					case SYNC_ROTATION_FLAG:
+						updateListernes(reciveSyncRotationMessage());
+						break;
+					case SYNC_VELOCITY_FLAG:
+						updateListernes(reciveSyncVelocityMessage());
+						break;
+					case SYNC_POSITION_FLAG:
+						updateListernes(reciveSyncPositionMessage());
+						break;
+					case PLAYER_HIT_FLAG:
+						updateListernes(recivePlayerHitMessage());
+						break;
+					case OPONENT_HIT_FLAG:
+						updateListernes(reciveOponentHitMessage());
+						break;
+					default:
+						Log.w("BluetoothCommunicationThread", "Unknown flag type");
+						break;
+				}
 			}
+
 		}
 
-		public void writeByte(byte aByte) {
+		private BluetoothMessage reciveSyncedStartMessage() {
+
+			return new SyncedStartMessage();
+		}
+
+		private BluetoothMessage reciveRotationMessage() {
+
+			byte rotation = 0x0;
 			try {
-				outputStream.write(aByte);
+				rotation = inputStream.readByte();
+			} catch (IOException e) {
+				Log.e("BluetoothCommunicationThread", "Failed reading rotation (byte)");
+			}
+
+			return new RotationMessage(rotation);
+		}
+
+		private BluetoothMessage reciveThrustMessage() {
+
+			return new ThrustMessage();
+		}
+
+		private BluetoothMessage reciveFireMessage() {
+
+			return new FireMessage();
+		}
+
+		private BluetoothMessage reciveSyncRotationMessage() {
+			float rotation = 0.0f;
+			try {
+				rotation = inputStream.readFloat();
+			} catch (IOException e) {
+				Log.e("BluetoothCommunicationThread", "Failed reading rotation (float)");
+			}
+			return new SyncRotationMessage(rotation);
+		}
+
+		private BluetoothMessage reciveSyncVelocityMessage() {
+			float[] velocity = new float[2];
+			try {
+				for (int i = 0; i < velocity.length; i++) {
+					velocity[i] = inputStream.readFloat();
+				}
+			} catch (IOException e) {
+				Log.e("BluetoothCommunicationThread", "Failed reading velocity (float[])");
+			}
+			return new SyncVelocityMessage(velocity);
+		}
+
+		private BluetoothMessage reciveSyncPositionMessage() {
+			float[] position = new float[2];
+			try {
+				for (int i = 0; i < position.length; i++) {
+					position[i] = inputStream.readFloat();
+				}
+			} catch (IOException e) {
+				Log.e("BluetoothCommunicationThread", "Failed reading position (float[])");
+			}
+			return new SyncPositionMessage(position);
+		}
+
+		private BluetoothMessage recivePlayerHitMessage() {
+
+			return new PlayerHitMessage();
+		}
+
+		private BluetoothMessage reciveOponentHitMessage() {
+
+			return new OponentHitMessage();
+		}
+
+		public void writeByte(byte data) {
+			try {
+				outputStream.writeByte(data);
 			} catch (IOException e) {
 				Log.e("BluetoothCommunicationThread", "Can't write to stream");
 			}
 		}
 
-		public Byte readByte() {
-			return buffer.poll();
+		public void writeFloat(float data) {
+			try {
+				outputStream.writeFloat(data);
+			} catch (IOException e) {
+				Log.e("BluetoothCommunicationThread", "Can't write to stream");
+			}
 		}
 
-		public Byte nextByte() {
-			return buffer.peek();
+		public void writeFloatArray(float[] data) {
+			try {
+				for (int i = 0; i < data.length; i++) {
+					outputStream.writeFloat(data[i]);
+				}
+			} catch (IOException e) {
+				Log.e("BluetoothCommunicationThread", "Can't write to stream");
+			}
 		}
 
 		public void cancel() {
