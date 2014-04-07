@@ -35,7 +35,6 @@ public class ResourceManager {
 	public Camera camera;
 	public VertexBufferObjectManager vbom;
 
-	public ITextureRegion dummyTextureRegion;
 	public ITextureRegion backgroundTextureRegion;
 	public ITextureRegion redFighterTextureRegion;
 	public ITextureRegion blueFighterTextureRegion;
@@ -48,7 +47,6 @@ public class ResourceManager {
 	public Font smallFont;
 	public Font messageFont;
 
-	private ITexture dummyTexture;
 	private ITexture backgroundTexture;
 	private ITexture redFighterTexture;
 	private ITexture blueFighterTexture;
@@ -84,9 +82,6 @@ public class ResourceManager {
 	}
 
 	public void loadTextures() throws IOException {
-		dummyTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/dummy.png");
-		dummyTextureRegion = TextureRegionFactory.extractFromTexture(dummyTexture);
-		dummyTexture.load();
 
 		backgroundTexture =
 				new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/background.png");
