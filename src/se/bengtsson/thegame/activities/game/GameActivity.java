@@ -117,7 +117,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		scene.registerUpdateHandler(this);
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
 
-		sceneManager = new SceneManager(scene, spriteLayer);
+		sceneManager = new SceneManager(spriteLayer);
 
 		playerController = new PlayerController();
 		externalController = new ExternalController();
@@ -149,7 +149,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 			}
 			gameOver = true;
 
-			hud.showMessage(winner);
+			hud.showGameOverMessage(winner);
 
 			handler.postDelayed(new Runnable() {
 

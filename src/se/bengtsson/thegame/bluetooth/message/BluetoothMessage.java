@@ -11,5 +11,4 @@ public abstract class BluetoothMessage {
 	public void setFlag(byte flag) {
 		this.flag = flag;
 	}
-
 }

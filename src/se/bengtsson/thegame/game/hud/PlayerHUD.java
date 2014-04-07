@@ -5,6 +5,7 @@ import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.text.Text;
 import org.andengine.util.color.Color;
 
+import se.bengtsson.thegame.R;
 import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 
@@ -57,18 +58,14 @@ public class PlayerHUD extends HUD {
 		enemyHealthBar.setX(CAMERA_WIDTH - enemyHealthBar.getWidth() - 5);
 	}
 
-	public void showMessage(boolean winner) {
+	public void showGameOverMessage(boolean winner) {
 
-		Text message;
+		String message =
+				winner ? resources.activity.getString(R.string.victory_message) : resources.activity
+						.getString(R.string.defeat_message);
 
-		if (winner) {
-			message = new Text(150, 100, resources.messageFont, "VICTORY!!", resources.vbom);
-		} else {
-			message = new Text(150, 100, resources.messageFont, "DEFEAT!!", resources.vbom);
-		}
-
-		attachChild(message);
-
+		attachChild(new Text((CAMERA_WIDTH / 2) - 100, (CAMERA_HEIGHT / 2) - 25, resources.messageFont, message,
+				resources.vbom));
 	}
 
 	private void attachController() {
@@ -87,7 +84,9 @@ public class PlayerHUD extends HUD {
 		playerHealthBar.setVisible(true);
 		attachChild(playerHealthBar);
 
-		Text text = new Text(10, 10, resources.smallFont, "Player health", resources.vbom);
+		Text text =
+				new Text(10, 10, resources.smallFont, resources.activity.getString(R.string.player_health),
+						resources.vbom);
 		text.setAlpha(0.5f);
 		attachChild(text);
 	}
@@ -101,7 +100,9 @@ public class PlayerHUD extends HUD {
 		enemyHealthBar.setVisible(true);
 		attachChild(enemyHealthBar);
 
-		Text text = new Text(CAMERA_WIDTH - 109, 10, resources.smallFont, "Enemy health", resources.vbom);
+		Text text =
+				new Text(CAMERA_WIDTH - 109, 10, resources.smallFont,
+						resources.activity.getString(R.string.enemy_health), resources.vbom);
 		text.setAlpha(0.5f);
 		attachChild(text);
 	}

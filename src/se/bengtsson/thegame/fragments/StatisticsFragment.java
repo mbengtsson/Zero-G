@@ -154,7 +154,8 @@ public class StatisticsFragment extends Fragment {
 		TextView hitRatioText = (TextView) view.findViewById(R.id.hit_ratio);
 
 		if (debriefing) {
-			greetingText.setText(winner ? "VICTORY" : "DEFEAT");
+			greetingText.setText(winner ? getActivity().getString(R.string.victory_message) : getActivity().getString(
+					R.string.defeat_message));
 			bulletsFiredText.setText(String.format("%s%d", getText(R.string.bullets_fired), bulletsFired));
 			hitsText.setText(String.format("%s%d", getText(R.string.hits), hits));
 			hitRatioText.setText(String.format("%s%.1f%%", getText(R.string.hit_ratio), hitRatio));

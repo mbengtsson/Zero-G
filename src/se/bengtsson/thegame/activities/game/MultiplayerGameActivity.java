@@ -7,7 +7,7 @@ import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService.LocalBinder;
 import se.bengtsson.thegame.bluetooth.message.BluetoothMessage;
 import se.bengtsson.thegame.bluetooth.message.FireMessage;
-import se.bengtsson.thegame.bluetooth.message.OponentHitMessage;
+import se.bengtsson.thegame.bluetooth.message.OpponentHitMessage;
 import se.bengtsson.thegame.bluetooth.message.PlayerHitMessage;
 import se.bengtsson.thegame.bluetooth.message.RotationMessage;
 import se.bengtsson.thegame.bluetooth.message.SyncPositionMessage;
@@ -38,7 +38,7 @@ public class MultiplayerGameActivity extends GameActivity {
 	private boolean server;
 
 	private boolean playerHit = false;
-	private boolean oponentHit = false;
+	private boolean opponentHit = false;
 	private boolean lastThrustState = false;;
 	private boolean lastFireState = false;
 
@@ -46,7 +46,6 @@ public class MultiplayerGameActivity extends GameActivity {
 
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			// TODO Auto-generated method stub
 
 		}
 
@@ -63,7 +62,6 @@ public class MultiplayerGameActivity extends GameActivity {
 	protected void onCreate(Bundle pSavedInstanceState) {
 		super.onCreate(pSavedInstanceState);
 		server = getIntent().getBooleanExtra("isServer", false);
-		// handler = new Handler();
 	}
 
 	@Override
@@ -82,7 +80,7 @@ public class MultiplayerGameActivity extends GameActivity {
 
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
-		sceneManager.setupMultiplayerScene(playerController, externalController, server);
+		sceneManager.setupMultiPlayerScene(playerController, externalController, server);
 		super.onPopulateScene(pScene, pOnPopulateSceneCallback);
 	}
 
@@ -104,9 +102,9 @@ public class MultiplayerGameActivity extends GameActivity {
 			playerHit = false;
 		}
 
-		if (oponentHit) {
-			communicationService.sendMessage(new OponentHitMessage());
-			oponentHit = false;
+		if (opponentHit) {
+			communicationService.sendMessage(new OpponentHitMessage());
+			opponentHit = false;
 		}
 
 		if (playerController.isRightTriggerPressed() != lastThrustState) {
@@ -156,15 +154,13 @@ public class MultiplayerGameActivity extends GameActivity {
 						Fighter fighter = (Fighter) fixtureB.getBody().getUserData();
 						fighter.hit();
 						if (fighter.isEnemy()) {
-							oponentHit = true;
+							opponentHit = true;
 							hud.setEnemyHealth(fighter.getHealth());
 						} else {
 							playerHit = true;
 							hud.setPlayerHealth(fighter.getHealth());
 						}
-
 					}
-
 				}
 				if (fixtureB.getBody().getUserData() instanceof Bullet) {
 					Bullet bullet = (Bullet) fixtureB.getBody().getUserData();
@@ -173,16 +169,14 @@ public class MultiplayerGameActivity extends GameActivity {
 						Fighter fighter = (Fighter) fixtureA.getBody().getUserData();
 						fighter.hit();
 						if (fighter.isEnemy()) {
-							oponentHit = true;
+							opponentHit = true;
 							hud.setEnemyHealth(fighter.getHealth());
 						} else {
 							playerHit = true;
 							hud.setPlayerHealth(fighter.getHealth());
 						}
-
 					}
 				}
-
 			}
 
 			@Override
@@ -213,7 +207,7 @@ public class MultiplayerGameActivity extends GameActivity {
 				hud.setEnemyHealth(sceneManager.getEnemyFighter().getHealth());
 			}
 
-			if (message instanceof OponentHitMessage) {
+			if (message instanceof OpponentHitMessage) {
 				sceneManager.getPlayerFighter().hit();
 				hud.setPlayerHealth(sceneManager.getPlayerFighter().getHealth());
 			}
@@ -257,7 +251,6 @@ public class MultiplayerGameActivity extends GameActivity {
 
 					}
 				});
-
 			}
 
 			if (message instanceof SyncPositionMessage) {
@@ -271,9 +264,7 @@ public class MultiplayerGameActivity extends GameActivity {
 
 					}
 				});
-
 			}
-
 		}
 	}
 }

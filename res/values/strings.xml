@@ -30,7 +30,18 @@
     <string name="share">Share with a friend</string>
     <string name="share_text">Share with a friend</string>
     <string name="title_activity_title">TitleActivity</string>
-    <string name="hello_world">Hello world!</string>
     <string name="total_statistics_sp_title">Total Statistics (Single-Player)</string>
+    <string name="victory_message">VICTORY</string>
+    <string name="defeat_message">DEFEAT</string>
+    <string name="player_health">Player health</string>
+    <string name="enemy_health">Enemy health</string>
+    <string name="no_devices_found">No devices found</string>
+    <string name="no_paired_devices_found">No paired devices found</string>
+    <string name="bluetooth_not_suported">Your device does not support bluetooth</string>
+    <string name="waiting_for_client">Waiting for client to connect...</string>
+    <string name="scanning_for_devices">Scanning for devices...</string>
+    <string name="connecting_to_server">Connecting to server...</string>
+   	<string name="connecting">Connecting...</string>
+   	<string name="cancel">Cancel</string>
 
 </resources>

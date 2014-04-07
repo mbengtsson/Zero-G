@@ -10,13 +10,12 @@ import java.util.Set;
 
 import se.bengtsson.thegame.bluetooth.message.BluetoothMessage;
 import se.bengtsson.thegame.bluetooth.message.FireMessage;
-import se.bengtsson.thegame.bluetooth.message.OponentHitMessage;
+import se.bengtsson.thegame.bluetooth.message.OpponentHitMessage;
 import se.bengtsson.thegame.bluetooth.message.PlayerHitMessage;
 import se.bengtsson.thegame.bluetooth.message.RotationMessage;
 import se.bengtsson.thegame.bluetooth.message.SyncPositionMessage;
 import se.bengtsson.thegame.bluetooth.message.SyncRotationMessage;
 import se.bengtsson.thegame.bluetooth.message.SyncVelocityMessage;
-import se.bengtsson.thegame.bluetooth.message.SyncedStartMessage;
 import se.bengtsson.thegame.bluetooth.message.ThrustMessage;
 import android.app.Service;
 import android.bluetooth.BluetoothSocket;
@@ -29,8 +28,6 @@ public class BluetoothCommunicationService extends Service {
 
 	private final IBinder binder = new LocalBinder();
 
-	public static final byte SYNCED_START_FLAG = -0x1;
-
 	public static final byte ROTATION_FLAG = 0x1;
 	public static final byte THRUST_FLAG = 0x2;
 	public static final byte FIRE_FLAG = 0x3;
@@ -38,7 +35,7 @@ public class BluetoothCommunicationService extends Service {
 	public static final byte SYNC_VELOCITY_FLAG = 0x5;
 	public static final byte SYNC_POSITION_FLAG = 0x6;
 	public static final byte PLAYER_HIT_FLAG = 0x7;
-	public static final byte OPONENT_HIT_FLAG = 0x8;
+	public static final byte OPPONENT_HIT_FLAG = 0x8;
 
 	private BluetoothCommunicationThread communicationThread;
 
@@ -72,9 +69,6 @@ public class BluetoothCommunicationService extends Service {
 	public void sendMessage(BluetoothMessage message) {
 		switch (message.getFlag()) {
 
-			case SYNCED_START_FLAG:
-				sendSyncedStartMessage((SyncedStartMessage) message);
-				break;
 			case ROTATION_FLAG:
 				sendRotationMessage((RotationMessage) message);
 				break;
@@ -96,18 +90,13 @@ public class BluetoothCommunicationService extends Service {
 			case PLAYER_HIT_FLAG:
 				sendPlayerHitMessage((PlayerHitMessage) message);
 				break;
-			case OPONENT_HIT_FLAG:
-				sendOponentHitMessage((OponentHitMessage) message);
+			case OPPONENT_HIT_FLAG:
+				sendOpponentHitMessage((OpponentHitMessage) message);
 				break;
 			default:
 				Log.w("BluetoothCommunicationService", "Unknown message type");
 				break;
 		}
-	}
-
-	private void sendSyncedStartMessage(SyncedStartMessage message) {
-		communicationThread.writeByte(message.getFlag());
-
 	}
 
 	private void sendRotationMessage(RotationMessage message) {
@@ -149,7 +138,7 @@ public class BluetoothCommunicationService extends Service {
 
 	}
 
-	private void sendOponentHitMessage(OponentHitMessage message) {
+	private void sendOpponentHitMessage(OpponentHitMessage message) {
 		communicationThread.writeByte(message.getFlag());
 
 	}
@@ -201,9 +190,7 @@ public class BluetoothCommunicationService extends Service {
 				}
 
 				switch (flag) {
-					case SYNCED_START_FLAG:
-						updateListernes(reciveSyncedStartMessage());
-						break;
+
 					case ROTATION_FLAG:
 						updateListernes(reciveRotationMessage());
 						break;
@@ -225,8 +212,8 @@ public class BluetoothCommunicationService extends Service {
 					case PLAYER_HIT_FLAG:
 						updateListernes(recivePlayerHitMessage());
 						break;
-					case OPONENT_HIT_FLAG:
-						updateListernes(reciveOponentHitMessage());
+					case OPPONENT_HIT_FLAG:
+						updateListernes(reciveOpponentHitMessage());
 						break;
 					default:
 						Log.w("BluetoothCommunicationThread", "Unknown flag type");
@@ -234,11 +221,6 @@ public class BluetoothCommunicationService extends Service {
 				}
 			}
 
-		}
-
-		private BluetoothMessage reciveSyncedStartMessage() {
-
-			return new SyncedStartMessage();
 		}
 
 		private BluetoothMessage reciveRotationMessage() {
@@ -302,9 +284,9 @@ public class BluetoothCommunicationService extends Service {
 			return new PlayerHitMessage();
 		}
 
-		private BluetoothMessage reciveOponentHitMessage() {
+		private BluetoothMessage reciveOpponentHitMessage() {
 
-			return new OponentHitMessage();
+			return new OpponentHitMessage();
 		}
 
 		public void writeByte(byte data) {

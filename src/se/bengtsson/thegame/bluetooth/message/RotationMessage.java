@@ -22,5 +22,4 @@ public class RotationMessage extends BluetoothMessage {
 	public void setPayload(byte payload) {
 		this.payload = payload;
 	}
-
 }

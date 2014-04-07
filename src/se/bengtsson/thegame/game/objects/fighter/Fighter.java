@@ -44,14 +44,6 @@ public class Fighter extends Entity {
 	private boolean alive = true;
 	private int health = 100;
 
-	private float xPos;
-	private float yPos;
-
-	private float velocityX;
-	private float velocityY;
-
-	private float rotation;
-
 	private Sprite fighter;
 	private Sprite mainThrust;
 	private Sprite leftThrust;
@@ -112,14 +104,6 @@ public class Fighter extends Entity {
 	@Override
 	protected void onManagedUpdate(float pSecondsElapsed) {
 
-		xPos = fighterBody.getPosition().x;
-		yPos = fighterBody.getPosition().y;
-
-		velocityX = fighterBody.getLinearVelocity().x;
-		velocityY = fighterBody.getLinearVelocity().y;
-
-		rotation = fighterBody.getAngle();
-
 		if (alive) {
 			if (controller.isRightTriggerPressed()) {
 				mainThrust.setVisible(true);
@@ -135,16 +119,16 @@ public class Fighter extends Entity {
 			rotate(controller.getTilt() * ROTATION_MODIFIER);
 		}
 
-		if (xPos < 0) {
-			fighterBody.setTransform(WORLD_WIDTH, yPos, rotation);
-		} else if (xPos > WORLD_WIDTH) {
-			fighterBody.setTransform(0, yPos, rotation);
+		if (fighterBody.getPosition().x < 0) {
+			fighterBody.setTransform(WORLD_WIDTH, fighterBody.getPosition().y, fighterBody.getAngle());
+		} else if (fighterBody.getPosition().x > WORLD_WIDTH) {
+			fighterBody.setTransform(0, fighterBody.getPosition().y, fighterBody.getAngle());
 		}
 
-		if (yPos < 0) {
-			fighterBody.setTransform(xPos, WORLD_HEIGHT, rotation);
-		} else if (yPos > WORLD_HEIGHT) {
-			fighterBody.setTransform(xPos, 0, rotation);
+		if (fighterBody.getPosition().y < 0) {
+			fighterBody.setTransform(fighterBody.getPosition().x, WORLD_HEIGHT, fighterBody.getAngle());
+		} else if (fighterBody.getPosition().y > WORLD_HEIGHT) {
+			fighterBody.setTransform(fighterBody.getPosition().x, 0, fighterBody.getAngle());
 		}
 
 		super.onManagedUpdate(pSecondsElapsed);
@@ -174,8 +158,8 @@ public class Fighter extends Entity {
 
 	public void accelerate() {
 
-		velocityX += (float) (Math.sin(rotation) * THRUST);
-		velocityY -= (float) (Math.cos(rotation) * THRUST);
+		float velocityX = (float) (fighterBody.getLinearVelocity().x + (Math.sin(fighterBody.getAngle()) * THRUST));
+		float velocityY = (float) (fighterBody.getLinearVelocity().y - (Math.cos(fighterBody.getAngle()) * THRUST));
 
 		fighterBody.setLinearVelocity(velocityX, velocityY);
 	}
@@ -195,10 +179,14 @@ public class Fighter extends Entity {
 				fireLeft = true;
 			}
 
-			float xPos = (float) (this.xPos + (Math.sin(rotation) * offsetX + Math.cos(rotation) * offsetY));
-			float yPos = (float) (this.yPos + (Math.sin(rotation) * offsetY - Math.cos(rotation) * offsetX));
+			float xPos =
+					(float) (fighterBody.getPosition().x + (Math.sin(fighterBody.getAngle()) * offsetX + Math
+							.cos(fighterBody.getAngle()) * offsetY));
+			float yPos =
+					(float) (fighterBody.getPosition().y + (Math.sin(fighterBody.getAngle()) * offsetY - Math
+							.cos(fighterBody.getAngle()) * offsetX));
 
-			bulletPool.obtainPoolItem(xPos, yPos, rotation);
+			bulletPool.obtainPoolItem(xPos, yPos, fighterBody.getAngle());
 			lastFired = time;
 			bulletsFired++;
 		}
@@ -221,7 +209,7 @@ public class Fighter extends Entity {
 		mainThrust.setVisible(false);
 		leftThrust.setVisible(false);
 		rightThrust.setVisible(false);
-		setVelocity(velocityX / 10, velocityY / 10);
+		setVelocity(fighterBody.getLinearVelocity().x / 10, fighterBody.getLinearVelocity().y / 10);
 		explosion.animate(100, 0);
 	}
 
@@ -257,19 +245,19 @@ public class Fighter extends Entity {
 	}
 
 	public float getXpos() {
-		return xPos;
+		return fighterBody.getPosition().x;
 	}
 
 	public float getYpos() {
-		return yPos;
+		return fighterBody.getPosition().y;
 	}
 
 	public float getVelocityX() {
-		return velocityX;
+		return fighterBody.getLinearVelocity().x;
 	}
 
 	public float getVelocityY() {
-		return velocityY;
+		return fighterBody.getLinearVelocity().y;
 	}
 
 	public float getWidth() {
@@ -282,7 +270,7 @@ public class Fighter extends Entity {
 
 	@Override
 	public float getRotation() {
-		return rotation;
+		return fighterBody.getAngle();
 	}
 
 	public int getHealth() {
@@ -307,7 +295,7 @@ public class Fighter extends Entity {
 
 	public void setPosition(float xPos, float yPos) {
 
-		fighterBody.setTransform(xPos, yPos, rotation, true);
+		fighterBody.setTransform(xPos, yPos, fighterBody.getAngle(), true);
 	}
 
 	public void setVelocity(float velocityX, float velocityY) {
@@ -315,23 +303,22 @@ public class Fighter extends Entity {
 	}
 
 	public void setRotation(float rotation) {
-		this.rotation = rotation;
 		fighterBody.setTransform(fighterBody.getPosition().x, fighterBody.getPosition().y, rotation, true);
 	}
 
-	private Body createFighterBody(final PhysicsWorld physicsWorld, final IAreaShape areaShape,
-			final BodyType bodyType, final FixtureDef fixtureDef) {
+	private Body createFighterBody(PhysicsWorld physicsWorld, IAreaShape areaShape, BodyType bodyType,
+			FixtureDef fixtureDef) {
 
-		final float halfWidth = areaShape.getWidthScaled() * 0.5f / PIXEL_TO_METER_RATIO_DEFAULT;
-		final float halfHeight = areaShape.getHeightScaled() * 0.5f / PIXEL_TO_METER_RATIO_DEFAULT;
+		float halfWidth = areaShape.getWidthScaled() * 0.5f / PIXEL_TO_METER_RATIO_DEFAULT;
+		float halfHeight = areaShape.getHeightScaled() * 0.5f / PIXEL_TO_METER_RATIO_DEFAULT;
 
-		final float top = -halfHeight;
-		final float bottom = halfHeight;
-		final float left = -halfHeight;
-		final float centerX = 0;
-		final float right = halfWidth;
+		float top = -halfHeight;
+		float bottom = halfHeight;
+		float left = -halfHeight;
+		float centerX = 0;
+		float right = halfWidth;
 
-		final Vector2[] vertices = { new Vector2(centerX, top), new Vector2(right, bottom), new Vector2(left, bottom) };
+		Vector2[] vertices = { new Vector2(centerX, top), new Vector2(right, bottom), new Vector2(left, bottom) };
 
 		return PhysicsFactory.createPolygonBody(physicsWorld, areaShape, vertices, bodyType, fixtureDef);
 	}

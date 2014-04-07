@@ -66,8 +66,6 @@ public class BulletPool extends GenericPool<Bullet> {
 		private final float WORLD_HEIGHT;
 
 		private Body body;
-		private float velocityX;
-		private float velocityY;
 
 		public Bullet(float pX, float pY, float rotation) {
 			super(pX, pY, resources.bulletTextureRegion, resources.vbom);
@@ -87,9 +85,9 @@ public class BulletPool extends GenericPool<Bullet> {
 
 		}
 
-		public void activate(float pX, float pY, float rotation) {
-			velocityX = (float) (Math.sin(rotation) * VELOCITY);
-			velocityY = (float) -(Math.cos(rotation) * VELOCITY);
+		private void activate(float pX, float pY, float rotation) {
+			float velocityX = (float) (Math.sin(rotation) * VELOCITY);
+			float velocityY = (float) -(Math.cos(rotation) * VELOCITY);
 			body.setLinearVelocity(velocityX, velocityY);
 			body.setAngularVelocity(0f);
 			body.setTransform(pX, pY, rotation);

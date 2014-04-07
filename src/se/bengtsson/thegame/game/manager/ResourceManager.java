@@ -35,16 +35,6 @@ public class ResourceManager {
 	public Camera camera;
 	public VertexBufferObjectManager vbom;
 
-	private ITexture dummyTexture;
-	private ITexture backgroundTexture;
-	private ITexture redFighterTexture;
-	private ITexture blueFighterTexture;
-	private ITexture fighterLeftTexture;
-	private ITexture fighterRightTexture;
-	private ITexture fighterThrustTexture;
-	private ITexture triggerTexture;
-	private ITexture bulletTexture;
-
 	public ITextureRegion dummyTextureRegion;
 	public ITextureRegion backgroundTextureRegion;
 	public ITextureRegion redFighterTextureRegion;
@@ -54,15 +44,22 @@ public class ResourceManager {
 	public ITextureRegion fighterThrustTextureRegion;
 	public ITextureRegion triggerTextureRegion;
 	public ITextureRegion bulletTextureRegion;
-
-	private BuildableBitmapTextureAtlas explosionTextureAtlas;
 	public TiledTextureRegion explosionTextureRegion;
-
-	private ITexture smallFontTexture;
-	private ITexture messageFontTexture;
-
 	public Font smallFont;
 	public Font messageFont;
+
+	private ITexture dummyTexture;
+	private ITexture backgroundTexture;
+	private ITexture redFighterTexture;
+	private ITexture blueFighterTexture;
+	private ITexture fighterLeftTexture;
+	private ITexture fighterRightTexture;
+	private ITexture fighterThrustTexture;
+	private ITexture triggerTexture;
+	private ITexture bulletTexture;
+	private BuildableBitmapTextureAtlas explosionTextureAtlas;
+	private ITexture smallFontTexture;
+	private ITexture messageFontTexture;
 
 	private ResourceManager() {
 

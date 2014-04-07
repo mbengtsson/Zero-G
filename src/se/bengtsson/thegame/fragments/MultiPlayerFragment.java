@@ -42,7 +42,6 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 	private final UUID MY_UUID = UUID.fromString("F91829ED-DC57-42F0-98A5-F4A695AD64DD");
 	private final int REQUEST_ENABLE_BT = 1;
-	private final int MAC_ADDRESS_LENGTH = 17;
 
 	private boolean isServer;
 
@@ -74,12 +73,10 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 				view.findViewById(R.id.scan_progress).setVisibility(View.GONE);
 
-				getActivity().setTitle("Select device to connect");
 				if (newDevicesAdapter.getCount() == 0) {
-					newDevicesAdapter.add("No devices found");
+					newDevicesAdapter.add(getActivity().getString(R.string.no_devices_found));
 				}
 			}
-
 		}
 	};
 
@@ -107,7 +104,8 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 		bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (bluetoothAdapter == null) {
-			Toast.makeText(getActivity(), "Your device does not support bluetooth", Toast.LENGTH_LONG).show();
+			Toast.makeText(getActivity(), getActivity().getString(R.string.bluetooth_not_suported), Toast.LENGTH_LONG)
+					.show();
 			getActivity().finish();
 			return view;
 		} else {
@@ -117,10 +115,10 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 			}
 		}
-
 		return view;
 	}
 
+	@Override
 	public void onStart() {
 		super.onStart();
 		Intent intent = new Intent(getActivity(), BluetoothCommunicationService.class);
@@ -140,12 +138,12 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 				onScanForDevicesClicked();
 				break;
 			default:
-				Log.w("MultiPlayerFragment", "Unimplemented button pressed");
+				Log.wtf("MultiPlayerFragment", "Where did that button come from???");
 		}
 
 	}
 
-	public void onClientClicked() {
+	private void onClientClicked() {
 		Log.d("MultiPlayerActivity", "onClientClicked() executing");
 
 		view.findViewById(R.id.scan_button).setVisibility(View.VISIBLE);
@@ -174,17 +172,17 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 				pairedDevicesAdapter.add(device.getName() + "\n" + device.getAddress());
 			}
 		} else {
-			pairedDevicesAdapter.add("No paired devices");
+			pairedDevicesAdapter.add(getActivity().getString(R.string.no_paired_devices_found));
 		}
 	}
 
-	public void onServerClicked() {
+	private void onServerClicked() {
 		Log.d("MultiPlayerActivity", "onServerClicked() executing");
 
 		isServer = true;
 
 		disbaleButtons();
-		showConnectingDialog("Waiting for client to connect...");
+		showConnectingDialog(getActivity().getString(R.string.waiting_for_client));
 
 		if (bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
 			Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
@@ -198,7 +196,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 	}
 
-	public void onScanForDevicesClicked() {
+	private void onScanForDevicesClicked() {
 		Log.d("MultiPlayerActivity", "onScanForDevicesClicked() executing");
 
 		findBluetoothDevices();
@@ -207,7 +205,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 	private void findBluetoothDevices() {
 
 		Button button = (Button) view.findViewById(R.id.scan_button);
-		button.setText("Scanning for devices...");
+		button.setText(getActivity().getString(R.string.scanning_for_devices));
 
 		view.findViewById(R.id.scan_progress).setVisibility(View.VISIBLE);
 
@@ -226,10 +224,10 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		isServer = false;
 
 		disbaleButtons();
-		showConnectingDialog("Connecting to server...");
+		showConnectingDialog(getActivity().getString(R.string.connecting_to_server));
 
 		String item = ((TextView) view).getText().toString();
-		String MACAddress = item.substring(item.length() - MAC_ADDRESS_LENGTH);
+		String MACAddress = item.substring(item.indexOf('\n') + 1);
 
 		BluetoothDevice device = bluetoothAdapter.getRemoteDevice(MACAddress);
 
@@ -239,7 +237,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 	}
 
-	public void manageConnectedSocket(BluetoothSocket socket) {
+	private void manageConnectedSocket(BluetoothSocket socket) {
 		Log.d("MultiPlayerActivity", "Have connection");
 
 		communicationService.initiate(socket);
@@ -249,7 +247,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 	}
 
-	public void disbaleButtons() {
+	private void disbaleButtons() {
 		view.findViewById(R.id.server_button).setEnabled(false);
 		view.findViewById(R.id.client_button).setEnabled(false);
 		view.findViewById(R.id.scan_button).setEnabled(false);
@@ -259,7 +257,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		view.findViewById(R.id.new_devices_list).setAlpha(0.5f);
 	}
 
-	public void enableButtons() {
+	private void enableButtons() {
 		view.findViewById(R.id.server_button).setEnabled(true);
 		view.findViewById(R.id.client_button).setEnabled(true);
 		view.findViewById(R.id.scan_button).setEnabled(true);
@@ -269,10 +267,10 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		view.findViewById(R.id.new_devices_list).setAlpha(1.0f);
 	}
 
-	public void showConnectingDialog(String message) {
+	private void showConnectingDialog(String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle("Connecting...").setMessage(message);
-		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		builder.setTitle(getActivity().getString(R.string.connecting)).setMessage(message);
+		builder.setNegativeButton(getActivity().getString(R.string.cancel), new DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -312,16 +310,14 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 			try {
 				acceptConnectionThread.join();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e("MultiPlayerFragment", "Can't join acceptConnectionThread");
 			}
 		}
 		if (connectToServerThread != null) {
 			try {
 				connectToServerThread.join();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e("MultiPlayerFragment", "Can't join onnectToServerThread");
 			}
 		}
 	}
@@ -336,7 +332,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		try {
 			getActivity().unregisterReceiver(broadcastReceiver);
 		} catch (RuntimeException e) {
-			Log.d("MultiPlayerActivity", "No reciver registred");
+			Log.e("MultiPlayerActivity", "Can't unregister brodcastReciver");
 		}
 	}
 
@@ -348,7 +344,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 			BluetoothServerSocket tmp = null;
 			try {
-				tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord("The Game", MY_UUID);
+				tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord("Zero-G", MY_UUID);
 			} catch (IOException e) {
 
 			}
@@ -374,7 +370,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 					try {
 						serverSocket.close();
 					} catch (IOException e) {
-						Log.d("MultiPlayerActivity.AcceptConnectionThread", "Can't close bluetooth server socket");
+						Log.e("MultiPlayerActivity.AcceptConnectionThread", "Can't close bluetooth server socket");
 					}
 					break;
 				}
@@ -385,7 +381,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 			try {
 				serverSocket.close();
 			} catch (IOException e) {
-				Log.d("MultiPlayerActivity.AcceptConnectionThread", "Can't close bluetooth server socket");
+				Log.e("MultiPlayerActivity.AcceptConnectionThread", "Can't close bluetooth server socket");
 			}
 		}
 	}
@@ -421,7 +417,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 				try {
 					socket.close();
 				} catch (IOException e1) {
-					Log.d("MultiPlayerActivity.ConnectToServerThread", "Can't close bluetooth socket");
+					Log.e("MultiPlayerActivity.ConnectToServerThread", "Can't close bluetooth socket");
 				}
 				return;
 			}
@@ -433,7 +429,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 			try {
 				socket.close();
 			} catch (IOException e) {
-				Log.d("MultiPlayerActivity.ConnectToServerThread", "Can't close bluetooth server socket");
+				Log.e("MultiPlayerActivity.ConnectToServerThread", "Can't close bluetooth server socket");
 			}
 		}
 
