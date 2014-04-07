@@ -106,6 +106,7 @@ public class Fighter extends Entity {
 		leftThrust.setVisible(false);
 		rightThrust.setVisible(false);
 		explosion.setVisible(false);
+
 	}
 
 	@Override
@@ -155,13 +156,13 @@ public class Fighter extends Entity {
 			leftThrust.setVisible(true);
 			rightThrust.setVisible(false);
 			if (velocity > -1) {
-				leftThrust.setAlpha(Math.abs(velocity));
+				leftThrust.setAlpha(Math.abs(velocity / 2));
 			}
 		} else if (velocity > 0) {
 			leftThrust.setVisible(false);
 			rightThrust.setVisible(true);
 			if (velocity < 1) {
-				rightThrust.setAlpha(velocity);
+				rightThrust.setAlpha(velocity / 2);
 			}
 		} else {
 			leftThrust.setVisible(false);
@@ -217,6 +218,10 @@ public class Fighter extends Entity {
 	public void explode() {
 		explosion.setVisible(true);
 		fighter.setVisible(false);
+		mainThrust.setVisible(false);
+		leftThrust.setVisible(false);
+		rightThrust.setVisible(false);
+		setVelocity(velocityX / 10, velocityY / 10);
 		explosion.animate(100, 0);
 	}
 

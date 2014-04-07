@@ -2,13 +2,8 @@ package se.bengtsson.thegame.activities.game;
 
 import org.andengine.entity.scene.Scene;
 
-import se.bengtsson.thegame.activities.StatisticsActivity;
-import se.bengtsson.thegame.game.controller.ExternalController;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
 import se.bengtsson.thegame.game.objects.pools.BulletPool.Bullet;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -18,19 +13,6 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class SingleplayerGameActivity extends GameActivity {
 
-	private Handler handler;
-
-	private ExternalController externalController;
-
-	private boolean winner = false;
-	private boolean gameOver = false;
-
-	@Override
-	protected void onCreate(Bundle pSavedInstanceState) {
-		super.onCreate(pSavedInstanceState);
-		handler = new Handler();
-	}
-
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
 		sceneManager.setupSingleplayerScene(playerController, externalController);
@@ -38,15 +20,19 @@ public class SingleplayerGameActivity extends GameActivity {
 	}
 
 	@Override
-	public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback) throws Exception {
-		externalController = new ExternalController();
-		super.onCreateScene(pOnCreateSceneCallback);
-
-	}
-
-	@Override
 	public void onUpdate(float pSecondsElapsed) {
 
+		updateAi();
+
+		if (!gameOver) {
+			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter(), false);
+
+		}
+
+		super.onUpdate(pSecondsElapsed);
+	}
+
+	private void updateAi() {
 		float playerX = sceneManager.getPlayerFighter().getXpos();
 		float playerY = sceneManager.getPlayerFighter().getYpos();
 		float enemyX = sceneManager.getEnemyFighter().getXpos();
@@ -57,7 +43,7 @@ public class SingleplayerGameActivity extends GameActivity {
 		float xDiff = playerX - enemyX;
 		float yDiff = playerY - enemyY;
 
-		double rotation = (float) (sceneManager.getEnemyFighter().getRotation() % (Math.PI * 2));
+		double rotation = (sceneManager.getEnemyFighter().getRotation() % (Math.PI * 2));
 
 		double angle = (Math.atan2(yDiff, xDiff) - (rotation) + (Math.PI / 2)) % (Math.PI * 2);
 		if (angle > Math.PI) {
@@ -79,7 +65,7 @@ public class SingleplayerGameActivity extends GameActivity {
 		}
 
 		if (velocity < 8) {
-			externalController.setTilt((byte) (angle * 10));
+			externalController.setTilt((byte) (angle > 0 ? (angle * 10) + 2 : (angle * 10) - 2));
 
 			if ((angle < 0.7 && angle > 0.2 || angle > -0.7 && angle < -0.2) && distance > 6) {
 				externalController.setRightTriggerPressed(true);
@@ -87,7 +73,7 @@ public class SingleplayerGameActivity extends GameActivity {
 				externalController.setRightTriggerPressed(false);
 			}
 		} else {
-			externalController.setTilt((byte) (heading * 12));
+			externalController.setTilt((byte) (heading > 0 ? (heading * 12) + 2 : (heading * 12) - 2));
 
 			if ((angle - heading < 0.7 && angle - heading > -0.7)) {
 				externalController.setRightTriggerPressed(true);
@@ -101,41 +87,6 @@ public class SingleplayerGameActivity extends GameActivity {
 		} else {
 			externalController.setLeftTriggerPressed(false);
 		}
-
-		if (!gameOver) {
-			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter());
-
-		}
-
-		super.onUpdate(pSecondsElapsed);
-	}
-
-	private void checkGameOver(Fighter player, Fighter enemy) {
-
-		if (!player.isAlive() || !enemy.isAlive()) {
-			if (player.isAlive()) {
-				winner = true;
-			}
-			gameOver = true;
-
-			hud.showMessage(winner);
-
-			handler.postDelayed(new Runnable() {
-
-				@Override
-				public void run() {
-					Intent intent = new Intent(getApplicationContext(), StatisticsActivity.class);
-					intent.putExtra("isWinner", winner);
-					intent.putExtra("bulletsFired", sceneManager.getPlayerFighter().getBulletsFired());
-					intent.putExtra("hits", sceneManager.getEnemyFighter().getTimesHit());
-					intent.putExtra("debriefing", true);
-					intent.putExtra("multiPlayer", false);
-					startActivity(intent);
-					finish();
-				}
-			}, 3000);
-		}
-
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package se.bengtsson.thegame.activities.game;
 
 import org.andengine.entity.scene.Scene;
 
-import se.bengtsson.thegame.activities.StatisticsActivity;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationListener;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService;
 import se.bengtsson.thegame.bluetooth.BluetoothCommunicationService.LocalBinder;
@@ -15,7 +14,6 @@ import se.bengtsson.thegame.bluetooth.message.SyncPositionMessage;
 import se.bengtsson.thegame.bluetooth.message.SyncRotationMessage;
 import se.bengtsson.thegame.bluetooth.message.SyncVelocityMessage;
 import se.bengtsson.thegame.bluetooth.message.ThrustMessage;
-import se.bengtsson.thegame.game.controller.ExternalController;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
 import se.bengtsson.thegame.game.objects.pools.BulletPool.Bullet;
 import android.content.ComponentName;
@@ -23,7 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -34,10 +31,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class MultiplayerGameActivity extends GameActivity {
 
-	private Handler handler;
-
 	private BluetoothCommunicationService communicationService;
-	private ExternalController externalController;
 
 	private int syncTimer = 0;
 
@@ -45,10 +39,6 @@ public class MultiplayerGameActivity extends GameActivity {
 
 	private boolean playerHit = false;
 	private boolean oponentHit = false;
-
-	private boolean gameOver = false;
-	private boolean winner = false;
-
 	private boolean lastThrustState = false;;
 	private boolean lastFireState = false;
 
@@ -73,7 +63,7 @@ public class MultiplayerGameActivity extends GameActivity {
 	protected void onCreate(Bundle pSavedInstanceState) {
 		super.onCreate(pSavedInstanceState);
 		server = getIntent().getBooleanExtra("isServer", false);
-		handler = new Handler();
+		// handler = new Handler();
 	}
 
 	@Override
@@ -91,13 +81,6 @@ public class MultiplayerGameActivity extends GameActivity {
 	}
 
 	@Override
-	public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback) throws Exception {
-		externalController = new ExternalController();
-		super.onCreateScene(pOnCreateSceneCallback);
-
-	}
-
-	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
 		sceneManager.setupMultiplayerScene(playerController, externalController, server);
 		super.onPopulateScene(pScene, pOnPopulateSceneCallback);
@@ -106,6 +89,16 @@ public class MultiplayerGameActivity extends GameActivity {
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
 
+		sendBluetoothMessages();
+
+		if (!gameOver) {
+			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter(), true);
+		}
+
+		super.onUpdate(pSecondsElapsed);
+	}
+
+	private void sendBluetoothMessages() {
 		if (playerHit) {
 			communicationService.sendMessage(new PlayerHitMessage());
 			playerHit = false;
@@ -145,40 +138,6 @@ public class MultiplayerGameActivity extends GameActivity {
 
 			syncTimer = 0;
 		}
-		if (!gameOver) {
-			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter());
-
-		}
-
-		super.onUpdate(pSecondsElapsed);
-	}
-
-	private void checkGameOver(Fighter player, Fighter enemy) {
-
-		if (!player.isAlive() || !enemy.isAlive()) {
-			if (player.isAlive()) {
-				winner = true;
-			}
-			gameOver = true;
-
-			hud.showMessage(winner);
-
-			handler.postDelayed(new Runnable() {
-
-				@Override
-				public void run() {
-					Intent intent = new Intent(getApplicationContext(), StatisticsActivity.class);
-					intent.putExtra("isWinner", winner);
-					intent.putExtra("bulletsFired", sceneManager.getPlayerFighter().getBulletsFired());
-					intent.putExtra("hits", sceneManager.getEnemyFighter().getTimesHit());
-					intent.putExtra("debriefing", true);
-					intent.putExtra("multiPlayer", true);
-					startActivity(intent);
-					finish();
-				}
-			}, 3000);
-		}
-
 	}
 
 	@Override
@@ -242,11 +201,6 @@ public class MultiplayerGameActivity extends GameActivity {
 			}
 		};
 		return contactListener;
-	}
-
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
 	}
 
 	private class CommunicationListener implements BluetoothCommunicationListener {

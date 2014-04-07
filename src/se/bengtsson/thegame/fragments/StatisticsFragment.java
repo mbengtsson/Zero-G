@@ -74,21 +74,21 @@ public class StatisticsFragment extends Fragment {
 		return view;
 	}
 
-	public void readMultiPlayerStatisticsFromSharedPreferences() {
+	private void readMultiPlayerStatisticsFromSharedPreferences() {
 		totalWinsMp = statistics.getInt("totalWinsMp", 0);
 		totalLossesMp = statistics.getInt("totalLossesMp", 0);
 		totalBulletsFiredMp = statistics.getInt("totalBulletsFiredMp", 0);
 		totalHitsMp = statistics.getInt("totalHitsMp", 0);
 	}
 
-	public void readSinglePlayerStatisticsFromSharedPreferences() {
+	private void readSinglePlayerStatisticsFromSharedPreferences() {
 		totalWinsSp = statistics.getInt("totalWinsSp", 0);
 		totalLossesSp = statistics.getInt("totalLossesSp", 0);
 		totalBulletsFiredSp = statistics.getInt("totalBulletsFiredSp", 0);
 		totalHitsSp = statistics.getInt("totalHitsSp", 0);
 	}
 
-	public void writeMultiPlayerStatisticsToSharedPreferences() {
+	private void writeMultiPlayerStatisticsToSharedPreferences() {
 		SharedPreferences.Editor editor = statistics.edit();
 		editor.putInt("totalWinsMp", totalWinsMp);
 		editor.putInt("totalLossesMp", totalLossesMp);
@@ -97,7 +97,7 @@ public class StatisticsFragment extends Fragment {
 		editor.commit();
 	}
 
-	public void writeSinglePlayerStatisticsToSharedPreferences() {
+	private void writeSinglePlayerStatisticsToSharedPreferences() {
 		SharedPreferences.Editor editor = statistics.edit();
 		editor.putInt("totalWinsSp", totalWinsSp);
 		editor.putInt("totalLossesSp", totalLossesSp);
@@ -106,7 +106,7 @@ public class StatisticsFragment extends Fragment {
 		editor.commit();
 	}
 
-	public void updateMultiPlayerStatistics() {
+	private void updateMultiPlayerStatistics() {
 		if (winner) {
 			totalWinsMp++;
 		} else {
@@ -117,7 +117,7 @@ public class StatisticsFragment extends Fragment {
 		totalHitsMp += hits;
 	}
 
-	public void updateSinglePlayerStatistics() {
+	private void updateSinglePlayerStatistics() {
 		if (winner) {
 			totalWinsSp++;
 		} else {
@@ -128,17 +128,17 @@ public class StatisticsFragment extends Fragment {
 		totalHitsSp += hits;
 	}
 
-	public void calculateMultiPlayerRatios() {
+	private void calculateMultiPlayerRatios() {
 		winRatioMp = calculateRatio(totalWinsMp, totalLossesMp + totalWinsMp);
 		totalHitRatioMp = calculateRatio(totalHitsMp, totalBulletsFiredMp);
 	}
 
-	public void calculateSinglePlayerRatios() {
+	private void calculateSinglePlayerRatios() {
 		winRatioSp = calculateRatio(totalWinsSp, totalLossesSp + totalWinsSp);
 		totalHitRatioSp = calculateRatio(totalHitsSp, totalBulletsFiredSp);
 	}
 
-	public float calculateRatio(int firstValue, int secondValue) {
+	private float calculateRatio(int firstValue, int secondValue) {
 		if (secondValue > 0) {
 			return (float) 100 * firstValue / secondValue;
 		} else {
@@ -146,7 +146,7 @@ public class StatisticsFragment extends Fragment {
 		}
 	}
 
-	public void displayStatistics() {
+	private void displayStatistics() {
 
 		TextView greetingText = (TextView) view.findViewById(R.id.post_fight_greeting);
 		TextView bulletsFiredText = (TextView) view.findViewById(R.id.bullets_fired);
@@ -178,7 +178,7 @@ public class StatisticsFragment extends Fragment {
 
 	}
 
-	public void displayMultiPlayerStatistics() {
+	private void displayMultiPlayerStatistics() {
 		TextView totalWinsTextMp = (TextView) view.findViewById(R.id.total_winns_mp);
 		TextView totalLossesTextMp = (TextView) view.findViewById(R.id.total_losses_mp);
 		TextView winRatioTextMp = (TextView) view.findViewById(R.id.win_ratio_mp);
@@ -205,7 +205,7 @@ public class StatisticsFragment extends Fragment {
 		}
 	}
 
-	public void displaySinglePlayerStatistics() {
+	private void displaySinglePlayerStatistics() {
 		TextView totalWinsTextSp = (TextView) view.findViewById(R.id.total_winns_sp);
 		TextView totalLossesTextSp = (TextView) view.findViewById(R.id.total_losses_sp);
 		TextView winRatioTextSp = (TextView) view.findViewById(R.id.win_ratio_sp);

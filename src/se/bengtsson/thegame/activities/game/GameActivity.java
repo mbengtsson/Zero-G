@@ -17,11 +17,16 @@ import org.andengine.ui.activity.LayoutGameActivity;
 
 import se.bengtsson.thegame.R;
 import se.bengtsson.thegame.activities.MainActivity;
+import se.bengtsson.thegame.activities.StatisticsActivity;
+import se.bengtsson.thegame.game.controller.ExternalController;
 import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.hud.PlayerHUD;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.manager.SceneManager;
+import se.bengtsson.thegame.game.objects.fighter.Fighter;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -31,10 +36,12 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
+	protected Handler handler;
+
 	private boolean debug = false;
 
-	public static final int CAMERA_WIDTH = 800;
-	public static final int CAMERA_HEIGHT = 450;
+	private final int CAMERA_WIDTH = 800;
+	private final int CAMERA_HEIGHT = 450;
 
 	private Camera camera;
 	protected FixedStepPhysicsWorld physicsWorld;
@@ -48,6 +55,17 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	private Entity foregroundLayer;
 
 	private Sprite background;
+
+	protected ExternalController externalController;
+
+	protected boolean gameOver = false;
+	protected boolean winner = false;
+
+	@Override
+	protected void onCreate(Bundle pSavedInstanceState) {
+		super.onCreate(pSavedInstanceState);
+		handler = new Handler();
+	}
 
 	@Override
 	public Engine onCreateEngine(EngineOptions pEngineOptions) {
@@ -102,6 +120,8 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		sceneManager = new SceneManager(scene, spriteLayer);
 
 		playerController = new PlayerController();
+		externalController = new ExternalController();
+
 		hud = new PlayerHUD(playerController);
 		camera.setHUD(hud);
 
@@ -119,6 +139,34 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		pScene.setBackground(new SpriteBackground(background));
 
 		pOnPopulateSceneCallback.onPopulateSceneFinished();
+	}
+
+	protected void checkGameOver(Fighter player, Fighter enemy, final boolean multiPlayer) {
+
+		if (!player.isAlive() || !enemy.isAlive()) {
+			if (player.isAlive()) {
+				winner = true;
+			}
+			gameOver = true;
+
+			hud.showMessage(winner);
+
+			handler.postDelayed(new Runnable() {
+
+				@Override
+				public void run() {
+					Intent intent = new Intent(getApplicationContext(), StatisticsActivity.class);
+					intent.putExtra("isWinner", winner);
+					intent.putExtra("bulletsFired", sceneManager.getPlayerFighter().getBulletsFired());
+					intent.putExtra("hits", sceneManager.getEnemyFighter().getTimesHit());
+					intent.putExtra("debriefing", true);
+					intent.putExtra("multiPlayer", multiPlayer);
+					startActivity(intent);
+					finish();
+				}
+			}, 3000);
+		}
+
 	}
 
 	@Override
