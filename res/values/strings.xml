@@ -19,7 +19,7 @@
     <string name="bullets_fired">"Bullets Fired: "</string>
     <string name="hits">"Hits: "</string>
     <string name="hit_ratio">"Hit Ratio: "</string>
-    <string name="total_statistics_title">Total Statistics</string>
+    <string name="total_statistics_mp_title">Total Statistics (Multi-Player)</string>
     <string name="total_wins">"Total Wins: "</string>
     <string name="total_losses">"Total Losses: "</string>
     <string name="win_ratio">"Win Ratio: "</string>
@@ -31,5 +31,6 @@
     <string name="share_text">Share with a friend</string>
     <string name="title_activity_title">TitleActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="total_statistics_sp_title">Total Statistics (Single-Player)</string>
 
 </resources>

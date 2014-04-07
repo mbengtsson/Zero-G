@@ -172,6 +172,7 @@ public class MultiplayerGameActivity extends GameActivity {
 					intent.putExtra("bulletsFired", sceneManager.getPlayerFighter().getBulletsFired());
 					intent.putExtra("hits", sceneManager.getEnemyFighter().getTimesHit());
 					intent.putExtra("debriefing", true);
+					intent.putExtra("multiPlayer", true);
 					startActivity(intent);
 					finish();
 				}

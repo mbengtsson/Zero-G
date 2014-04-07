@@ -2,8 +2,13 @@ package se.bengtsson.thegame.activities.game;
 
 import org.andengine.entity.scene.Scene;
 
+import se.bengtsson.thegame.activities.StatisticsActivity;
 import se.bengtsson.thegame.game.controller.ExternalController;
+import se.bengtsson.thegame.game.objects.fighter.Fighter;
 import se.bengtsson.thegame.game.objects.pools.BulletPool.Bullet;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -13,7 +18,18 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class SingleplayerGameActivity extends GameActivity {
 
+	private Handler handler;
+
 	private ExternalController externalController;
+
+	private boolean winner = false;
+	private boolean gameOver = false;
+
+	@Override
+	protected void onCreate(Bundle pSavedInstanceState) {
+		super.onCreate(pSavedInstanceState);
+		handler = new Handler();
+	}
 
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
@@ -62,8 +78,8 @@ public class SingleplayerGameActivity extends GameActivity {
 			heading = (Math.PI * 2) + heading;
 		}
 
-		if (velocity < 10) {
-			externalController.setTilt((byte) (1 + angle * 8));
+		if (velocity < 8) {
+			externalController.setTilt((byte) (angle * 10));
 
 			if ((angle < 0.7 && angle > 0.2 || angle > -0.7 && angle < -0.2) && distance > 6) {
 				externalController.setRightTriggerPressed(true);
@@ -71,9 +87,9 @@ public class SingleplayerGameActivity extends GameActivity {
 				externalController.setRightTriggerPressed(false);
 			}
 		} else {
-			externalController.setTilt((byte) (1 + heading * 12));
+			externalController.setTilt((byte) (heading * 12));
 
-			if ((angle - heading < 0.7 && angle - heading > 0.2 || angle - heading > -0.7 && angle - heading < -0.2)) {
+			if ((angle - heading < 0.7 && angle - heading > -0.7)) {
 				externalController.setRightTriggerPressed(true);
 			} else {
 				externalController.setRightTriggerPressed(false);
@@ -86,7 +102,40 @@ public class SingleplayerGameActivity extends GameActivity {
 			externalController.setLeftTriggerPressed(false);
 		}
 
+		if (!gameOver) {
+			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter());
+
+		}
+
 		super.onUpdate(pSecondsElapsed);
+	}
+
+	private void checkGameOver(Fighter player, Fighter enemy) {
+
+		if (!player.isAlive() || !enemy.isAlive()) {
+			if (player.isAlive()) {
+				winner = true;
+			}
+			gameOver = true;
+
+			hud.showMessage(winner);
+
+			handler.postDelayed(new Runnable() {
+
+				@Override
+				public void run() {
+					Intent intent = new Intent(getApplicationContext(), StatisticsActivity.class);
+					intent.putExtra("isWinner", winner);
+					intent.putExtra("bulletsFired", sceneManager.getPlayerFighter().getBulletsFired());
+					intent.putExtra("hits", sceneManager.getEnemyFighter().getTimesHit());
+					intent.putExtra("debriefing", true);
+					intent.putExtra("multiPlayer", false);
+					startActivity(intent);
+					finish();
+				}
+			}, 3000);
+		}
+
 	}
 
 	@Override
@@ -101,12 +150,35 @@ public class SingleplayerGameActivity extends GameActivity {
 				if (fixtureA.getBody().getUserData() instanceof Bullet) {
 					Bullet bullet = (Bullet) fixtureA.getBody().getUserData();
 					sceneManager.getBulletPool().recyclePoolItem(bullet);
-				}
+					if (fixtureB.getBody().getUserData() instanceof Fighter) {
+						Fighter fighter = (Fighter) fixtureB.getBody().getUserData();
+						fighter.hit();
+						if (fighter.isEnemy()) {
 
+							hud.setEnemyHealth(fighter.getHealth());
+						} else {
+
+							hud.setPlayerHealth(fighter.getHealth());
+						}
+
+					}
+
+				}
 				if (fixtureB.getBody().getUserData() instanceof Bullet) {
 					Bullet bullet = (Bullet) fixtureB.getBody().getUserData();
 					sceneManager.getBulletPool().recyclePoolItem(bullet);
+					if (fixtureA.getBody().getUserData() instanceof Fighter) {
+						Fighter fighter = (Fighter) fixtureA.getBody().getUserData();
+						fighter.hit();
+						if (fighter.isEnemy()) {
 
+							hud.setEnemyHealth(fighter.getHealth());
+						} else {
+
+							hud.setPlayerHealth(fighter.getHealth());
+						}
+
+					}
 				}
 
 			}

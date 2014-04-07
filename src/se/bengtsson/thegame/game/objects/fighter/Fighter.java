@@ -57,7 +57,7 @@ public class Fighter extends Entity {
 	private Sprite leftThrust;
 	private Sprite rightThrust;
 	private AnimatedSprite explosion;
-	protected Body fighterBody;
+	private Body fighterBody;
 
 	public Fighter(Controller controller, BulletPool bulletPool, ResourceManager resources, float xPos, float yPos,
 			boolean enemy) {

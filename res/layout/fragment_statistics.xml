@@ -45,49 +45,98 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/total_statistics_title"
+        android:id="@+id/total_statistics_mp_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/total_statistics_title"
+        android:text="@string/total_statistics_mp_title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
-        android:id="@+id/total_winns"
+        android:id="@+id/total_winns_mp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/total_wins"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/total_losses"
+        android:id="@+id/total_losses_mp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/total_losses"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/win_ratio"
+        android:id="@+id/win_ratio_mp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/win_ratio"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/total_bullets_fired"
+        android:id="@+id/total_bullets_fired_mp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/total_bullets_fired"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/total_hits"
+        android:id="@+id/total_hits_mp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/total_hits"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
-        android:id="@+id/total_hit_ratio"
+        android:id="@+id/total_hit_ratio_mp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/total_hit_ratio"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/total_statistics_sp_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/total_statistics_sp_title"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/total_winns_sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/total_wins"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/total_losses_sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/total_losses"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/win_ratio_sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/win_ratio"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/total_bullets_fired_sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/total_bullets_fired"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/total_hits_sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/total_hits"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/total_hit_ratio_sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/total_hit_ratio"
