@@ -2,17 +2,11 @@ package se.bengtsson.thegame.game.manager;
 
 import org.andengine.entity.Entity;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.sprite.Sprite;
-import org.andengine.extension.physics.box2d.PhysicsConnector;
-import org.andengine.extension.physics.box2d.PhysicsFactory;
 
 import se.bengtsson.thegame.game.controller.ExternalController;
 import se.bengtsson.thegame.game.controller.PlayerController;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
 import se.bengtsson.thegame.game.objects.pools.BulletPool;
-
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class SceneManager {
 
@@ -71,20 +65,29 @@ public class SceneManager {
 		}
 	}
 
-	public void setupSingleplayerScene(PlayerController playerController) {
+	public void setupSingleplayerScene(PlayerController playerController, ExternalController externalController) {
 
 		this.playerController = playerController;
+		this.externalController = externalController;
 
 		playerFighter =
 				new Fighter(this.playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, false);
 		spriteLayer.attachChild(playerFighter);
 
-		Sprite aSprite = new Sprite(100, 100, resources.dummyTextureRegion, resources.vbom);
-		Body aBody =
-				PhysicsFactory.createCircleBody(resources.physicsWorld, aSprite, BodyType.DynamicBody,
-						PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f));
-		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(aSprite, aBody, true, true));
-		spriteLayer.attachChild(aSprite);
+		enemyFighter =
+				new Fighter(this.externalController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
+						CAMERA_HEIGHT / 2, true);
+		spriteLayer.attachChild(enemyFighter);
+
+		// Sprite aSprite = new Sprite(100, 100, resources.dummyTextureRegion,
+		// resources.vbom);
+		// Body aBody =
+		// PhysicsFactory.createCircleBody(resources.physicsWorld, aSprite,
+		// BodyType.DynamicBody,
+		// PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f));
+		// resources.physicsWorld.registerPhysicsConnector(new
+		// PhysicsConnector(aSprite, aBody, true, true));
+		// spriteLayer.attachChild(aSprite);
 	}
 
 	public BulletPool getBulletPool() {

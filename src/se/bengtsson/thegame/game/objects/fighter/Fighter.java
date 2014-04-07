@@ -50,8 +50,6 @@ public class Fighter extends Entity {
 	private float velocityX;
 	private float velocityY;
 
-	private boolean accelerating = false;
-
 	private float rotation;
 
 	private Sprite fighter;
@@ -59,7 +57,7 @@ public class Fighter extends Entity {
 	private Sprite leftThrust;
 	private Sprite rightThrust;
 	private AnimatedSprite explosion;
-	private Body fighterBody;
+	protected Body fighterBody;
 
 	public Fighter(Controller controller, BulletPool bulletPool, ResourceManager resources, float xPos, float yPos,
 			boolean enemy) {
@@ -282,10 +280,6 @@ public class Fighter extends Entity {
 		return rotation;
 	}
 
-	public boolean isAccelerating() {
-		return accelerating;
-	}
-
 	public int getHealth() {
 		return health;
 	}
@@ -313,10 +307,6 @@ public class Fighter extends Entity {
 
 	public void setVelocity(float velocityX, float velocityY) {
 		fighterBody.setLinearVelocity(velocityX, velocityY);
-	}
-
-	public void setAccelerating(boolean accelerating) {
-		this.accelerating = accelerating;
 	}
 
 	public void setRotation(float rotation) {
