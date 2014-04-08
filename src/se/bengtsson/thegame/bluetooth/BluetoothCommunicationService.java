@@ -54,11 +54,11 @@ public class BluetoothCommunicationService extends Service {
 	@Override
 	public void onCreate() {
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		if (wifi.isWifiEnabled()) {
-			originalWifiState = true;
-			wifi.setWifiEnabled(false);
-			Log.d("BluetoothCommunicationService", "Wifi status disabled");
-		}
+
+		originalWifiState = wifi.isWifiEnabled();
+		wifi.setWifiEnabled(false);
+		Log.d("BluetoothCommunicationService", "Wifi status disabled");
+
 		super.onCreate();
 	}
 

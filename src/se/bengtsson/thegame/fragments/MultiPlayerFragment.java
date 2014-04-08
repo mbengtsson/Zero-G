@@ -331,7 +331,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		try {
 			getActivity().unregisterReceiver(broadcastReceiver);
 		} catch (RuntimeException e) {
-			Log.e("MultiPlayerActivity", "Can't unregister brodcastReciver");
+			Log.w("MultiPlayerActivity", "Can't unregister brodcastReciver");
 		}
 	}
 

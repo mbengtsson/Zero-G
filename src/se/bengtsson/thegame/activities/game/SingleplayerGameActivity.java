@@ -33,15 +33,10 @@ public class SingleplayerGameActivity extends GameActivity {
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
 
-		tick++;
-
-		if (tick > 90) {
-			ai.updateAi();
-		}
+		ai.updateAi();
 
 		if (!gameOver) {
 			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter(), false);
-
 		}
 
 		super.onUpdate(pSecondsElapsed);
@@ -112,11 +107,15 @@ public class SingleplayerGameActivity extends GameActivity {
 
 	private class Ai {
 
+		private final int DELAYED_START = 90;
+
 		private final int BASE_ROTATION = 2;
 		private final int ROTATION_MODIFIER = 10;
 		private final int SPEED_LIMIT_HIGH = 12;
 		private final int SPEED_LIMIT_LOW = 8;
 		private final int MIN_THRUST_DISTANCE = 5;
+
+		private int tick;
 
 		private float playerX;
 		private float playerY;
@@ -133,10 +132,16 @@ public class SingleplayerGameActivity extends GameActivity {
 		private double breakHeading;
 
 		public Ai() {
+			tick = 0;
 			breakingVelocity = SPEED_LIMIT_HIGH;
 		}
 
 		public void updateAi() {
+
+			tick++;
+			if (tick < DELAYED_START) {
+				return;
+			}
 
 			playerX = sceneManager.getPlayerFighter().getXpos();
 			playerY = sceneManager.getPlayerFighter().getYpos();
