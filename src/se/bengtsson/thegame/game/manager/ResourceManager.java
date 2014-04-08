@@ -2,6 +2,10 @@ package se.bengtsson.thegame.game.manager;
 
 import java.io.IOException;
 
+import org.andengine.audio.music.Music;
+import org.andengine.audio.music.MusicFactory;
+import org.andengine.audio.sound.Sound;
+import org.andengine.audio.sound.SoundFactory;
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
@@ -44,8 +48,16 @@ public class ResourceManager {
 	public ITextureRegion triggerTextureRegion;
 	public ITextureRegion bulletTextureRegion;
 	public TiledTextureRegion explosionTextureRegion;
+
 	public Font smallFont;
 	public Font messageFont;
+
+	public Sound engineSound;
+	public Sound firingSound;
+	public Sound hitSound;
+	public Sound explosionSound;
+
+	public Music backgroundLoop;
 
 	private ITexture backgroundTexture;
 	private ITexture redFighterTexture;
@@ -56,6 +68,7 @@ public class ResourceManager {
 	private ITexture triggerTexture;
 	private ITexture bulletTexture;
 	private BuildableBitmapTextureAtlas explosionTextureAtlas;
+
 	private ITexture smallFontTexture;
 	private ITexture messageFontTexture;
 
@@ -154,7 +167,38 @@ public class ResourceManager {
 	}
 
 	public void loadSounds() {
+		try {
+			engineSound = SoundFactory.createSoundFromAsset(engine.getSoundManager(), activity, "snd/rocket.ogg");
+			engineSound.setLooping(true);
+		} catch (IOException e) {
+			Log.e("ResourceManager", "Failed loading rocket sound");
+		}
 
+		try {
+			firingSound = SoundFactory.createSoundFromAsset(engine.getSoundManager(), activity, "snd/firing.ogg");
+		} catch (IOException e) {
+			Log.e("ResourceManager", "Failed loading firing sound");
+		}
+
+		try {
+			hitSound = SoundFactory.createSoundFromAsset(engine.getSoundManager(), activity, "snd/ricochet.ogg");
+		} catch (IOException e) {
+			Log.e("ResourceManager", "Failed loading hit sound");
+		}
+
+		try {
+			explosionSound = SoundFactory.createSoundFromAsset(engine.getSoundManager(), activity, "snd/explosion.ogg");
+		} catch (IOException e) {
+			Log.e("ResourceManager", "Failed loading explosion sound");
+		}
+
+		try {
+			backgroundLoop =
+					MusicFactory.createMusicFromAsset(engine.getMusicManager(), activity, "snd/background.ogg");
+			backgroundLoop.setLooping(true);
+		} catch (IOException e) {
+			Log.e("ResourceManager", "Failed loading background loop");
+		}
 	}
 
 }

@@ -2,6 +2,7 @@ package se.bengtsson.thegame.game.objects.fighter;
 
 import static org.andengine.extension.physics.box2d.util.constants.PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT;
 
+import org.andengine.audio.sound.Sound;
 import org.andengine.entity.Entity;
 import org.andengine.entity.shape.IAreaShape;
 import org.andengine.entity.sprite.AnimatedSprite;
@@ -51,6 +52,12 @@ public class Fighter extends Entity {
 	private AnimatedSprite explosion;
 	private Body fighterBody;
 
+	private Sound firingSound;
+	private Sound hitSound;
+	private Sound explosionSound;
+	private Sound engineSound;
+	private boolean engineSoundPlaying;
+
 	public Fighter(Controller controller, BulletPool bulletPool, ResourceManager resources, float xPos, float yPos,
 			boolean enemy) {
 
@@ -99,6 +106,18 @@ public class Fighter extends Entity {
 		rightThrust.setVisible(false);
 		explosion.setVisible(false);
 
+		this.firingSound = resources.firingSound;
+		this.hitSound = resources.hitSound;
+		this.explosionSound = resources.explosionSound;
+		this.engineSound = resources.engineSound;
+
+		this.firingSound.setVolume(0.2f);
+		this.hitSound.setVolume(0.4f);
+		this.explosionSound.setVolume(0.5f);
+		this.engineSound.setVolume(0.5f);
+
+		engineSoundPlaying = false;
+
 	}
 
 	@Override
@@ -108,8 +127,17 @@ public class Fighter extends Entity {
 			if (controller.isRightTriggerPressed()) {
 				mainThrust.setVisible(true);
 				accelerate();
+				if (!enemy && !engineSoundPlaying) {
+					engineSound.play();
+					engineSoundPlaying = true;
+				}
+
 			} else {
 				mainThrust.setVisible(false);
+				if (!enemy && engineSoundPlaying) {
+					engineSound.stop();
+					engineSoundPlaying = false;
+				}
 			}
 
 			if (controller.isLeftTriggerPressed()) {
@@ -168,6 +196,10 @@ public class Fighter extends Entity {
 		long time = System.currentTimeMillis();
 
 		if (time - lastFired > 1000 / RATE_OF_FIRE) {
+			if (!enemy) {
+				firingSound.play();
+			}
+
 			float offsetX = 15 / PIXEL_TO_METER_RATIO_DEFAULT;
 			float offsetY;
 
@@ -194,6 +226,9 @@ public class Fighter extends Entity {
 
 	public void hit() {
 		if (alive) {
+			if (!enemy) {
+				hitSound.play();
+			}
 			health -= 10;
 			timesHit++;
 			if (health <= 0) {
@@ -204,6 +239,7 @@ public class Fighter extends Entity {
 	}
 
 	public void explode() {
+		explosionSound.play();
 		explosion.setVisible(true);
 		fighter.setVisible(false);
 		mainThrust.setVisible(false);
