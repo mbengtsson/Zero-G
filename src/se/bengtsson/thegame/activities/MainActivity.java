@@ -12,6 +12,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 public class MainActivity extends Activity {
@@ -22,6 +23,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.d("MainActivity", "Activity created");
 		setContentView(R.layout.activity_main);
 
 		fragmentManager = getFragmentManager();
@@ -44,6 +46,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void titleClick(View view) {
+		Log.d("MainActivity", "Title clicked");
 		TitleFragment titleFragment = new TitleFragment();
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
 		if (tablet) {
@@ -57,11 +60,13 @@ public class MainActivity extends Activity {
 	}
 
 	public void singlePlayerClick(View view) {
+		Log.d("MainActivity", "Single-player clicked");
 		Intent intent = new Intent(this, SingleplayerGameActivity.class);
 		startActivity(intent);
 	}
 
 	public void multiPlayerClick(View view) {
+		Log.d("MainActivity", "Multi-player clicked");
 
 		if (tablet) {
 			MultiPlayerFragment multiplayerFragment = new MultiPlayerFragment();
@@ -77,6 +82,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void statisticsClick(View view) {
+		Log.d("MainActivity", "Statistics clicked");
 
 		if (tablet) {
 			StatisticsFragment statFragmet = new StatisticsFragment();
@@ -92,6 +98,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void shareClick(View view) {
+		Log.d("MainActivity", "Share clicked");
 
 		if (tablet) {
 			ShareWithContactFragment shareFragment = new ShareWithContactFragment();
@@ -109,6 +116,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
+		Log.d("MainActivity", "Exiting app");
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_MAIN);
 		intent.addCategory(Intent.CATEGORY_HOME);

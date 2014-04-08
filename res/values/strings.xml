@@ -43,5 +43,6 @@
     <string name="connecting_to_server">Connecting to server...</string>
    	<string name="connecting">Connecting...</string>
    	<string name="cancel">Cancel</string>
+   	<string name="no_contacts_found">No contacts found</string>
 
 </resources>

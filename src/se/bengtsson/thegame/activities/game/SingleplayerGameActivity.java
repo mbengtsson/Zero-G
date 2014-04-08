@@ -5,6 +5,7 @@ import org.andengine.entity.scene.Scene;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
 import se.bengtsson.thegame.game.objects.pools.BulletPool.Bullet;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -16,10 +17,9 @@ public class SingleplayerGameActivity extends GameActivity {
 
 	private Ai ai;
 
-	private int tick = 0;
-
 	@Override
 	protected void onCreate(Bundle pSavedInstanceState) {
+		Log.d("SinglePlayerGameActivity", "Activity created");
 		super.onCreate(pSavedInstanceState);
 		ai = new Ai();
 	}

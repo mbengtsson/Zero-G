@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -61,6 +62,7 @@ public class MultiplayerGameActivity extends GameActivity {
 	@Override
 	protected void onCreate(Bundle pSavedInstanceState) {
 		super.onCreate(pSavedInstanceState);
+		Log.d("MultiPlayerGameActivity", "Activity created");
 		server = getIntent().getBooleanExtra("isServer", false);
 	}
 

@@ -53,13 +53,14 @@ public class BluetoothCommunicationService extends Service {
 
 	@Override
 	public void onCreate() {
-		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		super.onCreate();
+		Log.d("BluetoothCommunicationService", "Service created");
 
+		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		originalWifiState = wifi.isWifiEnabled();
 		wifi.setWifiEnabled(false);
-		Log.d("BluetoothCommunicationService", "Wifi status disabled");
+		Log.d("BluetoothCommunicationService", "Wifi disabled");
 
-		super.onCreate();
 	}
 
 	public void initiate(BluetoothSocket socket) {
@@ -69,10 +70,12 @@ public class BluetoothCommunicationService extends Service {
 	}
 
 	public void addBluetoothCommunicationListener(BluetoothCommunicationListener listener) {
+		Log.d("BluetoothCommunicationService", "BluetoothCommunicationListener added");
 		listeners.add(listener);
 	}
 
 	public void removeBluetoothCommunicationListener(BluetoothCommunicationListener listener) {
+		Log.d("BluetoothCommunicationService", "BluetoothCommunicationListener removed");
 		listeners.remove(listener);
 	}
 
@@ -162,9 +165,10 @@ public class BluetoothCommunicationService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		Log.d("BluetoothCommunicationService", "Service destroyed");
 
 		wifi.setWifiEnabled(originalWifiState);
-		Log.d("BluetoothCommunicationService", "Wifi status restored to original state");
+		Log.d("BluetoothCommunicationService", "Wifi restored to original state");
 
 		if (communicationThread != null) {
 			communicationThread.cancel();
@@ -183,6 +187,8 @@ public class BluetoothCommunicationService extends Service {
 		private final DataOutputStream outputStream;
 
 		public BluetoothCommunicationThread(BluetoothSocket socket) {
+			Log.d("BluetoothCommunicationThread", "Thread created");
+
 			this.socket = socket;
 			InputStream tmpIn = null;
 			OutputStream tmpOut = null;

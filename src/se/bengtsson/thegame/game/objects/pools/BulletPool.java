@@ -8,7 +8,6 @@ import org.andengine.util.adt.pool.GenericPool;
 
 import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.objects.pools.BulletPool.Bullet;
-import android.util.Log;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -41,7 +40,6 @@ public class BulletPool extends GenericPool<Bullet> {
 	@Override
 	protected void onHandleRecycleItem(final Bullet bullet) {
 		super.onHandleRecycleItem(bullet);
-		Log.d("BulletPool", "start recycling");
 		resources.engine.runOnUpdateThread(new Runnable() {
 
 			@Override
