@@ -40,7 +40,7 @@ public class StatisticsFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Log.d("hStatisticsFragment", "Fragment created");
+		Log.d("StatisticsFragment", "Fragment created");
 
 		view = inflater.inflate(R.layout.fragment_statistics, container, false);
 
@@ -78,7 +78,7 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void readMultiPlayerStatisticsFromSharedPreferences() {
-		Log.d("hareWithContactFragment", "Reading multi-player statistics");
+		Log.d("StatisticsFragment", "Reading multi-player statistics");
 		totalWinsMp = statistics.getInt("totalWinsMp", 0);
 		totalLossesMp = statistics.getInt("totalLossesMp", 0);
 		totalBulletsFiredMp = statistics.getInt("totalBulletsFiredMp", 0);
@@ -86,7 +86,7 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void readSinglePlayerStatisticsFromSharedPreferences() {
-		Log.d("hareWithContactFragment", "Reading single-player statistics");
+		Log.d("StatisticsFragment", "Reading single-player statistics");
 		totalWinsSp = statistics.getInt("totalWinsSp", 0);
 		totalLossesSp = statistics.getInt("totalLossesSp", 0);
 		totalBulletsFiredSp = statistics.getInt("totalBulletsFiredSp", 0);
@@ -94,7 +94,7 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void writeMultiPlayerStatisticsToSharedPreferences() {
-		Log.d("hareWithContactFragment", "Writing multi-player statistics");
+		Log.d("StatisticsFragment", "Writing multi-player statistics");
 		SharedPreferences.Editor editor = statistics.edit();
 		editor.putInt("totalWinsMp", totalWinsMp);
 		editor.putInt("totalLossesMp", totalLossesMp);
@@ -104,7 +104,7 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void writeSinglePlayerStatisticsToSharedPreferences() {
-		Log.d("hareWithContactFragment", "Writing single-player statistics");
+		Log.d("StatisticsFragment", "Writing single-player statistics");
 		SharedPreferences.Editor editor = statistics.edit();
 		editor.putInt("totalWinsSp", totalWinsSp);
 		editor.putInt("totalLossesSp", totalLossesSp);
@@ -114,7 +114,7 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void updateMultiPlayerStatistics() {
-		Log.d("hareWithContactFragment", "Updating multi-player statistics");
+		Log.d("StatisticsFragment", "Updating multi-player statistics");
 		if (winner) {
 			totalWinsMp++;
 		} else {
@@ -126,7 +126,7 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void updateSinglePlayerStatistics() {
-		Log.d("hareWithContactFragment", "Updating single-player statistics");
+		Log.d("StatisticsFragment", "Updating single-player statistics");
 		if (winner) {
 			totalWinsSp++;
 		} else {
@@ -138,13 +138,13 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void calculateMultiPlayerRatios() {
-		Log.d("hareWithContactFragment", "Calculate multi-player ratios");
+		Log.d("StatisticsFragment", "Calculate multi-player ratios");
 		winRatioMp = calculateRatio(totalWinsMp, totalLossesMp + totalWinsMp);
 		totalHitRatioMp = calculateRatio(totalHitsMp, totalBulletsFiredMp);
 	}
 
 	private void calculateSinglePlayerRatios() {
-		Log.d("hareWithContactFragment", "Calculate Single-player ratios");
+		Log.d("StatisticsFragment", "Calculate Single-player ratios");
 		winRatioSp = calculateRatio(totalWinsSp, totalLossesSp + totalWinsSp);
 		totalHitRatioSp = calculateRatio(totalHitsSp, totalBulletsFiredSp);
 	}
@@ -158,7 +158,7 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void displayStatistics() {
-		Log.d("hareWithContactFragment", "Displaying statistics");
+		Log.d("StatisticsFragment", "Displaying statistics");
 
 		TextView greetingText = (TextView) view.findViewById(R.id.post_fight_greeting);
 		TextView bulletsFiredText = (TextView) view.findViewById(R.id.bullets_fired);
@@ -192,7 +192,7 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void displayMultiPlayerStatistics() {
-		Log.d("hareWithContactFragment", "Displaying multi-player statistics");
+		Log.d("StatisticsFragment", "Displaying multi-player statistics");
 
 		TextView totalWinsTextMp = (TextView) view.findViewById(R.id.total_winns_mp);
 		TextView totalLossesTextMp = (TextView) view.findViewById(R.id.total_losses_mp);
@@ -221,7 +221,7 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void displaySinglePlayerStatistics() {
-		Log.d("hareWithContactFragment", "Displaying single-player statistics");
+		Log.d("StatisticsFragment", "Displaying single-player statistics");
 
 		TextView totalWinsTextSp = (TextView) view.findViewById(R.id.total_winns_sp);
 		TextView totalLossesTextSp = (TextView) view.findViewById(R.id.total_losses_sp);
