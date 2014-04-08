@@ -19,7 +19,9 @@ import se.bengtsson.thegame.bluetooth.message.SyncVelocityMessage;
 import se.bengtsson.thegame.bluetooth.message.ThrustMessage;
 import android.app.Service;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -38,12 +40,26 @@ public class BluetoothCommunicationService extends Service {
 	public static final byte OPPONENT_HIT_FLAG = 0x8;
 
 	private BluetoothCommunicationThread communicationThread;
+	private WifiManager wifi;
 
 	private Set<BluetoothCommunicationListener> listeners = new HashSet<BluetoothCommunicationListener>();
+
+	private boolean originalWifiState = false;
 
 	@Override
 	public IBinder onBind(Intent intent) {
 		return binder;
+	}
+
+	@Override
+	public void onCreate() {
+		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		if (wifi.isWifiEnabled()) {
+			originalWifiState = true;
+			wifi.setWifiEnabled(false);
+			Log.d("BluetoothCommunicationService", "Wifi status disabled");
+		}
+		super.onCreate();
 	}
 
 	public void initiate(BluetoothSocket socket) {
@@ -146,6 +162,10 @@ public class BluetoothCommunicationService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+
+		wifi.setWifiEnabled(originalWifiState);
+		Log.d("BluetoothCommunicationService", "Wifi status restored to original state");
+
 		if (communicationThread != null) {
 			communicationThread.cancel();
 			try {
