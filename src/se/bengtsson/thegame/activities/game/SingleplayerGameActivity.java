@@ -4,6 +4,7 @@ import org.andengine.entity.scene.Scene;
 
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
 import se.bengtsson.thegame.game.objects.pools.BulletPool.Bullet;
+import android.os.Bundle;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -12,6 +13,16 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class SingleplayerGameActivity extends GameActivity {
+
+	private Ai ai;
+
+	private int tick = 0;
+
+	@Override
+	protected void onCreate(Bundle pSavedInstanceState) {
+		super.onCreate(pSavedInstanceState);
+		ai = new Ai();
+	}
 
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
@@ -22,7 +33,11 @@ public class SingleplayerGameActivity extends GameActivity {
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
 
-		updateAi();
+		tick++;
+
+		if (tick > 90) {
+			ai.updateAi();
+		}
 
 		if (!gameOver) {
 			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter(), false);
@@ -30,63 +45,6 @@ public class SingleplayerGameActivity extends GameActivity {
 		}
 
 		super.onUpdate(pSecondsElapsed);
-	}
-
-	private void updateAi() {
-		float playerX = sceneManager.getPlayerFighter().getXpos();
-		float playerY = sceneManager.getPlayerFighter().getYpos();
-		float enemyX = sceneManager.getEnemyFighter().getXpos();
-		float enemyY = sceneManager.getEnemyFighter().getYpos();
-		float velocityX = sceneManager.getEnemyFighter().getVelocityX();
-		float velocityY = sceneManager.getEnemyFighter().getVelocityY();
-
-		float xDiff = playerX - enemyX;
-		float yDiff = playerY - enemyY;
-
-		double rotation = (sceneManager.getEnemyFighter().getRotation() % (Math.PI * 2));
-
-		double angle = (Math.atan2(yDiff, xDiff) - (rotation) + (Math.PI / 2)) % (Math.PI * 2);
-		if (angle > Math.PI) {
-			angle = -((Math.PI * 2) - angle);
-		} else if (angle < -Math.PI) {
-			angle = (Math.PI * 2) + angle;
-		}
-
-		double distance =
-				Math.abs(Math.sqrt(((playerX - enemyX) * (playerX - enemyX))
-						+ ((playerY - enemyY) * (playerY - enemyY))));
-
-		double velocity = Math.abs(Math.sqrt(((velocityX) * (velocityX)) + ((velocityY) * (velocityY))));
-		double heading = (Math.atan2(velocityY, velocityX) + (Math.PI * 1.5)) % (Math.PI * 2);
-		if (heading > Math.PI) {
-			heading = -((Math.PI * 2) - heading);
-		} else if (angle < -Math.PI) {
-			heading = (Math.PI * 2) + heading;
-		}
-
-		if (velocity < 8) {
-			externalController.setTilt((byte) (angle > 0 ? (angle * 10) + 2 : (angle * 10) - 2));
-
-			if ((angle < 0.7 && angle > 0.2 || angle > -0.7 && angle < -0.2) && distance > 6) {
-				externalController.setRightTriggerPressed(true);
-			} else {
-				externalController.setRightTriggerPressed(false);
-			}
-		} else {
-			externalController.setTilt((byte) (heading > 0 ? (heading * 12) + 2 : (heading * 12) - 2));
-
-			if ((angle - heading < 0.7 && angle - heading > -0.7)) {
-				externalController.setRightTriggerPressed(true);
-			} else {
-				externalController.setRightTriggerPressed(false);
-			}
-		}
-
-		if (angle < 0.1 && angle > -0.1) {
-			externalController.setLeftTriggerPressed(true);
-		} else {
-			externalController.setLeftTriggerPressed(false);
-		}
 	}
 
 	@Override
@@ -150,5 +108,123 @@ public class SingleplayerGameActivity extends GameActivity {
 			}
 		};
 		return contactListener;
+	}
+
+	private class Ai {
+
+		private float breakingVelocity = 12;
+
+		private float playerX;
+		private float playerY;
+		private float enemyX;
+		private float enemyY;
+		private float velocityX;
+		private float velocityY;
+
+		private double rotation;
+		private double angleToTarget;
+		private double distanceToTarget;
+		private double velocity;
+		private double breakHeading;
+
+		public void updateAi() {
+
+			playerX = sceneManager.getPlayerFighter().getXpos();
+			playerY = sceneManager.getPlayerFighter().getYpos();
+			enemyX = sceneManager.getEnemyFighter().getXpos();
+			enemyY = sceneManager.getEnemyFighter().getYpos();
+			velocityX = sceneManager.getEnemyFighter().getVelocityX();
+			velocityY = sceneManager.getEnemyFighter().getVelocityY();
+
+			calculateRotation();
+			calculateAngleToTarget();
+			calculateVelocity();
+
+			if (velocity < breakingVelocity) {
+				calculateDistanceToTarget();
+				accelerateToTarget();
+			} else {
+				calculateBreakeHeading();
+				turnAndBreak();
+			}
+
+			fireIfInRange();
+		}
+
+		private void calculateRotation() {
+			rotation = (sceneManager.getEnemyFighter().getRotation() % (Math.PI * 2));
+			if (rotation > Math.PI) {
+				rotation = -((Math.PI * 2) - rotation);
+			} else if (rotation < -Math.PI) {
+				rotation = (Math.PI * 2) + rotation;
+			}
+		}
+
+		private void calculateAngleToTarget() {
+
+			float xDiff = playerX - enemyX;
+			float yDiff = playerY - enemyY;
+
+			angleToTarget = (Math.atan2(yDiff, xDiff) - (rotation) + (Math.PI / 2)) % (Math.PI * 2);
+			if (angleToTarget > Math.PI) {
+				angleToTarget = -((Math.PI * 2) - angleToTarget);
+			} else if (angleToTarget < -Math.PI) {
+				angleToTarget = (Math.PI * 2) + angleToTarget;
+			}
+		}
+
+		private void calculateDistanceToTarget() {
+			distanceToTarget =
+					Math.abs(Math.sqrt(((playerX - enemyX) * (playerX - enemyX))
+							+ ((playerY - enemyY) * (playerY - enemyY))));
+		}
+
+		private void calculateVelocity() {
+			velocity = Math.abs(Math.sqrt(((velocityX) * (velocityX)) + ((velocityY) * (velocityY))));
+		}
+
+		private void calculateBreakeHeading() {
+			breakHeading = (Math.atan2(velocityY, velocityX) - (rotation) + (Math.PI * 1.5)) % (Math.PI * 2);
+			if (breakHeading > Math.PI) {
+				breakHeading = -((Math.PI * 2) - breakHeading);
+			} else if (angleToTarget < -Math.PI) {
+				breakHeading = (Math.PI * 2) + breakHeading;
+			}
+		}
+
+		private void accelerateToTarget() {
+			breakingVelocity = 12;
+
+			externalController
+					.setTilt((byte) (angleToTarget > 0 ? (angleToTarget * 10) + 2 : (angleToTarget * 10) - 2));
+
+			if ((angleToTarget < 0.7 && angleToTarget > 0.2 || angleToTarget > -0.7 && angleToTarget < -0.2)
+					&& distanceToTarget > 6) {
+				externalController.setRightTriggerPressed(true);
+			} else {
+				externalController.setRightTriggerPressed(false);
+			}
+		}
+
+		private void turnAndBreak() {
+			breakingVelocity = 8;
+
+			externalController.setTilt((byte) (breakHeading > 0 ? (breakHeading * 12) + 2 : (breakHeading * 12) - 2));
+
+			if (breakHeading < 0.7 && breakHeading > -0.7) {
+				externalController.setRightTriggerPressed(true);
+			} else {
+				externalController.setRightTriggerPressed(false);
+			}
+		}
+
+		private void fireIfInRange() {
+			if (angleToTarget < 0.1 && angleToTarget > -0.1) {
+				externalController.setLeftTriggerPressed(true);
+			} else {
+				externalController.setLeftTriggerPressed(false);
+			}
+		}
+
 	}
 }

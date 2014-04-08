@@ -107,7 +107,6 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 			Toast.makeText(getActivity(), getActivity().getString(R.string.bluetooth_not_suported), Toast.LENGTH_LONG)
 					.show();
 			getActivity().finish();
-			return view;
 		} else {
 			if (!bluetoothAdapter.isEnabled()) {
 				Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
