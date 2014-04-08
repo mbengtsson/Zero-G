@@ -24,7 +24,10 @@ import se.bengtsson.thegame.game.hud.PlayerHUD;
 import se.bengtsson.thegame.game.manager.ResourceManager;
 import se.bengtsson.thegame.game.manager.SceneManager;
 import se.bengtsson.thegame.game.objects.fighter.Fighter;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -46,6 +49,10 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	private Camera camera;
 	protected FixedStepPhysicsWorld physicsWorld;
 	protected PlayerController playerController;
+	protected ExternalController externalController;
+
+	private SensorManager sensorManager;
+	private Sensor accelerometer;
 
 	protected ResourceManager resources;
 	protected SceneManager sceneManager;
@@ -56,8 +63,6 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	private Sprite background;
 
-	protected ExternalController externalController;
-
 	protected boolean gameOver = false;
 	protected boolean winner = false;
 
@@ -65,6 +70,8 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	protected void onCreate(Bundle pSavedInstanceState) {
 		super.onCreate(pSavedInstanceState);
 		handler = new Handler();
+		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 	}
 
 	@Override
@@ -97,8 +104,8 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		resources = ResourceManager.getInstance();
 
 		resources.loadTextures();
-		resources.loadSounds();
 		resources.loadFonts();
+		resources.loadSounds();
 
 		pOnCreateResourcesCallback.onCreateResourcesFinished();
 	}
@@ -172,13 +179,13 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	@Override
 	public void onResumeGame() {
 		super.onResumeGame();
-		this.enableAccelerationSensor(playerController);
+		sensorManager.registerListener(playerController, accelerometer, SensorManager.SENSOR_DELAY_GAME);
 	}
 
 	@Override
 	public void onPauseGame() {
 		super.onPauseGame();
-		this.disableAccelerationSensor();
+		sensorManager.unregisterListener(playerController);
 	}
 
 	@Override
@@ -198,7 +205,6 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 
 	}
 

@@ -1,16 +1,17 @@
 package se.bengtsson.thegame.game.controller;
 
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.input.sensor.acceleration.AccelerationData;
-import org.andengine.input.sensor.acceleration.IAccelerationListener;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import se.bengtsson.thegame.game.manager.ResourceManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.util.Log;
 
-public class PlayerController implements Controller, IAccelerationListener {
+public class PlayerController implements Controller, SensorEventListener {
 
 	private Trigger leftTrigger;
 	private Trigger rightTrigger;
@@ -33,14 +34,14 @@ public class PlayerController implements Controller, IAccelerationListener {
 	}
 
 	@Override
-	public void onAccelerationAccuracyChanged(AccelerationData pAccelerationData) {
+	public void onSensorChanged(SensorEvent event) {
+
+		tilt = (byte) (event.values[1] * 10);
 
 	}
 
 	@Override
-	public void onAccelerationChanged(AccelerationData pAccelerationData) {
-
-		tilt = (byte) (pAccelerationData.getX() * 10);
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
 	}
 
