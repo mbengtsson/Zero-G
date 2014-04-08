@@ -112,7 +112,11 @@ public class SingleplayerGameActivity extends GameActivity {
 
 	private class Ai {
 
-		private float breakingVelocity = 12;
+		private final int BASE_ROTATION = 2;
+		private final int ROTATION_MODIFIER = 10;
+		private final int SPEED_LIMIT_HIGH = 12;
+		private final int SPEED_LIMIT_LOW = 8;
+		private final int MIN_THRUST_DISTANCE = 5;
 
 		private float playerX;
 		private float playerY;
@@ -121,11 +125,16 @@ public class SingleplayerGameActivity extends GameActivity {
 		private float velocityX;
 		private float velocityY;
 
+		private float breakingVelocity;
 		private double rotation;
 		private double angleToTarget;
 		private double distanceToTarget;
 		private double velocity;
 		private double breakHeading;
+
+		public Ai() {
+			breakingVelocity = SPEED_LIMIT_HIGH;
+		}
 
 		public void updateAi() {
 
@@ -193,13 +202,13 @@ public class SingleplayerGameActivity extends GameActivity {
 		}
 
 		private void accelerateToTarget() {
-			breakingVelocity = 12;
+			breakingVelocity = SPEED_LIMIT_HIGH;
 
-			externalController
-					.setTilt((byte) (angleToTarget > 0 ? (angleToTarget * 10) + 2 : (angleToTarget * 10) - 2));
+			externalController.setTilt((byte) (angleToTarget > 0 ? (angleToTarget * ROTATION_MODIFIER) + BASE_ROTATION
+					: (angleToTarget * ROTATION_MODIFIER) - BASE_ROTATION));
 
 			if ((angleToTarget < 0.7 && angleToTarget > 0.2 || angleToTarget > -0.7 && angleToTarget < -0.2)
-					&& distanceToTarget > 6) {
+					&& distanceToTarget > MIN_THRUST_DISTANCE) {
 				externalController.setRightTriggerPressed(true);
 			} else {
 				externalController.setRightTriggerPressed(false);
@@ -207,9 +216,10 @@ public class SingleplayerGameActivity extends GameActivity {
 		}
 
 		private void turnAndBreak() {
-			breakingVelocity = 8;
+			breakingVelocity = SPEED_LIMIT_LOW;
 
-			externalController.setTilt((byte) (breakHeading > 0 ? (breakHeading * 12) + 2 : (breakHeading * 12) - 2));
+			externalController.setTilt((byte) (breakHeading > 0 ? (breakHeading * ROTATION_MODIFIER) + BASE_ROTATION
+					: (breakHeading * ROTATION_MODIFIER) - BASE_ROTATION));
 
 			if (breakHeading < 0.7 && breakHeading > -0.7) {
 				externalController.setRightTriggerPressed(true);
