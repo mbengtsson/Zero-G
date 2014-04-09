@@ -43,7 +43,8 @@ public class ResourceManager {
 	public ITextureRegion fighterLeftTextureRegion;
 	public ITextureRegion fighterRightTextureRegion;
 	public ITextureRegion fighterThrustTextureRegion;
-	public ITextureRegion triggerTextureRegion;
+	public ITextureRegion thrustTriggerTextureRegion;
+	public ITextureRegion fireTriggerTextureRegion;
 	public ITextureRegion bulletTextureRegion;
 	public TiledTextureRegion explosionTextureRegion;
 
@@ -61,7 +62,8 @@ public class ResourceManager {
 	private ITexture fighterLeftTexture;
 	private ITexture fighterRightTexture;
 	private ITexture fighterThrustTexture;
-	private ITexture triggerTexture;
+	private ITexture thrustTriggerTexture;
+	private ITexture fireTriggerTexture;
 	private ITexture bulletTexture;
 	private BuildableBitmapTextureAtlas explosionTextureAtlas;
 
@@ -122,9 +124,15 @@ public class ResourceManager {
 		fighterThrustTextureRegion = TextureRegionFactory.extractFromTexture(fighterThrustTexture);
 		fighterThrustTexture.load();
 
-		triggerTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/trigger.png");
-		triggerTextureRegion = TextureRegionFactory.extractFromTexture(triggerTexture);
-		triggerTexture.load();
+		thrustTriggerTexture =
+				new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/thrust_trigger.png");
+		thrustTriggerTextureRegion = TextureRegionFactory.extractFromTexture(thrustTriggerTexture);
+		thrustTriggerTexture.load();
+
+		fireTriggerTexture =
+				new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/fire_trigger.png");
+		fireTriggerTextureRegion = TextureRegionFactory.extractFromTexture(fireTriggerTexture);
+		fireTriggerTexture.load();
 
 		bulletTexture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), "gfx/bullet.png");
 		bulletTextureRegion = TextureRegionFactory.extractFromTexture(bulletTexture);

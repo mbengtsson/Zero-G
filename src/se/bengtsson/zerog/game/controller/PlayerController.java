@@ -21,15 +21,15 @@ public class PlayerController implements Controller, SensorEventListener {
 	public PlayerController() {
 		ResourceManager resources = ResourceManager.getInstance();
 
-		float triggerSize = resources.triggerTextureRegion.getWidth();
+		float triggerSize = resources.thrustTriggerTextureRegion.getWidth();
 
 		this.leftTrigger =
-				new Trigger(0, resources.camera.getHeight() - triggerSize, resources.triggerTextureRegion,
+				new Trigger(0, resources.camera.getHeight() - triggerSize, resources.fireTriggerTextureRegion,
 						resources.vbom);
 
 		this.rightTrigger =
 				new Trigger(resources.camera.getWidth() - triggerSize, resources.camera.getHeight() - triggerSize,
-						resources.triggerTextureRegion, resources.vbom);
+						resources.thrustTriggerTextureRegion, resources.vbom);
 
 	}
 
