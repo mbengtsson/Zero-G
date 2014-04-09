@@ -24,7 +24,7 @@ public class ShareWithContactFragment extends Fragment implements OnItemClickLis
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Log.d("ShareWithContactFragment", "Fragment created");
+		Log.d("ShareWithContactFragment", "Creating fragment");
 
 		View view = inflater.inflate(R.layout.fragment_share_with_contact, container, false);
 

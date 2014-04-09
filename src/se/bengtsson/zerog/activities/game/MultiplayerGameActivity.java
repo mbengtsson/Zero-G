@@ -62,7 +62,7 @@ public class MultiplayerGameActivity extends GameActivity {
 	@Override
 	protected void onCreate(Bundle pSavedInstanceState) {
 		super.onCreate(pSavedInstanceState);
-		Log.d("MultiPlayerGameActivity", "Activity created");
+		Log.d("MultiPlayerGameActivity", "Creating activity");
 		server = getIntent().getBooleanExtra("isServer", false);
 	}
 

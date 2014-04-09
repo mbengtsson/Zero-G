@@ -19,7 +19,7 @@ public class SingleplayerGameActivity extends GameActivity {
 
 	@Override
 	protected void onCreate(Bundle pSavedInstanceState) {
-		Log.d("SinglePlayerGameActivity", "Activity created");
+		Log.d("SinglePlayerGameActivity", "Creating activity");
 		super.onCreate(pSavedInstanceState);
 		ai = new Ai();
 	}

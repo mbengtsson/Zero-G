@@ -6,6 +6,7 @@ import se.bengtsson.zerog.game.controller.ExternalController;
 import se.bengtsson.zerog.game.controller.PlayerController;
 import se.bengtsson.zerog.game.objects.fighter.Fighter;
 import se.bengtsson.zerog.game.objects.pools.BulletPool;
+import android.util.Log;
 
 public class SceneManager {
 
@@ -22,6 +23,7 @@ public class SceneManager {
 	private Fighter enemyFighter;
 
 	public SceneManager(Entity spriteLayer) {
+		Log.d("SceneManager", "Creating SceneManager");
 		this.resources = ResourceManager.getInstance();
 		CAMERA_WIDTH = resources.camera.getWidth();
 		CAMERA_HEIGHT = resources.camera.getHeight();
@@ -32,6 +34,7 @@ public class SceneManager {
 	}
 
 	public void setupSingleplayerScene(PlayerController playerController, ExternalController externalController) {
+		Log.d("SceneManager", "Setting up SinglePlayerScene");
 
 		this.playerController = playerController;
 		this.externalController = externalController;
@@ -60,6 +63,8 @@ public class SceneManager {
 	}
 
 	private void setupMultiPlayerServerScene() {
+		Log.d("SceneManager", "Setting up MultiPlayerServerScene");
+
 		playerFighter =
 				new Fighter(this.playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, false);
 		spriteLayer.attachChild(playerFighter);
@@ -71,6 +76,7 @@ public class SceneManager {
 	}
 
 	private void setupMultiPlayerClientScene() {
+		Log.d("SceneManager", "Setting up MultiPlayerClientScene");
 		playerFighter =
 				new Fighter(this.playerController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
 						CAMERA_HEIGHT / 2, false);

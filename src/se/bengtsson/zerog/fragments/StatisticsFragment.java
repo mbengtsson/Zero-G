@@ -40,7 +40,7 @@ public class StatisticsFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Log.d("StatisticsFragment", "Fragment created");
+		Log.d("StatisticsFragment", "Creating fragment");
 
 		view = inflater.inflate(R.layout.fragment_statistics, container, false);
 
@@ -138,13 +138,13 @@ public class StatisticsFragment extends Fragment {
 	}
 
 	private void calculateMultiPlayerRatios() {
-		Log.d("StatisticsFragment", "Calculate multi-player ratios");
+		Log.d("StatisticsFragment", "Calculating multi-player ratios");
 		winRatioMp = calculateRatio(totalWinsMp, totalLossesMp + totalWinsMp);
 		totalHitRatioMp = calculateRatio(totalHitsMp, totalBulletsFiredMp);
 	}
 
 	private void calculateSinglePlayerRatios() {
-		Log.d("StatisticsFragment", "Calculate Single-player ratios");
+		Log.d("StatisticsFragment", "Calculating Single-player ratios");
 		winRatioSp = calculateRatio(totalWinsSp, totalLossesSp + totalWinsSp);
 		totalHitRatioSp = calculateRatio(totalHitsSp, totalBulletsFiredSp);
 	}

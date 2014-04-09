@@ -62,13 +62,13 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 			String action = intent.getAction();
 
 			if (action.equals(BluetoothDevice.ACTION_FOUND)) {
-				Log.d("MultiPlayerFragment", "Bluetooth device added");
+				Log.d("MultiPlayerFragment", "Adding bluetooth-device");
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 				if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
 					newDevicesAdapter.add(device.getName() + "\n" + device.getAddress());
 				}
 			} else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
-				Log.d("MultiPlayerFragment", "Bluetooth discovery finished");
+				Log.d("MultiPlayerFragment", "Finishing bluetooth-discovery");
 
 				Button button = (Button) view.findViewById(R.id.scan_button);
 				button.setText(getActivity().getText(R.string.scan_for_devices));
@@ -91,7 +91,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			Log.d("MultiPlayerFragment", "Connected to BluetoothCommunicationService");
+			Log.d("MultiPlayerFragment", "Connecting to BluetoothCommunicationService");
 			LocalBinder binder = (LocalBinder) service;
 			communicationService = binder.getService();
 		}
@@ -99,7 +99,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Log.d("MultiPlayerFragment", "Fragment created");
+		Log.d("MultiPlayerFragment", "Creating fragment");
 
 		view = inflater.inflate(R.layout.fragment_multi_player, container, false);
 
@@ -259,7 +259,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 	}
 
 	private void disbaleButtons() {
-		Log.d("MultiPlayerFragment", "UI disabled");
+		Log.d("MultiPlayerFragment", "Disabling UI");
 
 		view.findViewById(R.id.server_button).setEnabled(false);
 		view.findViewById(R.id.client_button).setEnabled(false);
@@ -271,7 +271,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 	}
 
 	private void enableButtons() {
-		Log.d("MultiPlayerFragment", "UI enabled");
+		Log.d("MultiPlayerFragment", "Enabling UI");
 		view.findViewById(R.id.server_button).setEnabled(true);
 		view.findViewById(R.id.client_button).setEnabled(true);
 		view.findViewById(R.id.scan_button).setEnabled(true);
@@ -282,7 +282,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 	}
 
 	private void showConnectingDialog(String message) {
-		Log.d("MultiPlayerFragment", "Connection dialog created");
+		Log.d("MultiPlayerFragment", "Creating connection dialog");
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(getActivity().getString(R.string.connecting)).setMessage(message);
 		builder.setNegativeButton(getActivity().getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -318,7 +318,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 	@Override
 	public void onStop() {
-		Log.d("MultiPlayerFragment", "Fragment stopped");
+		Log.d("MultiPlayerFragment", "Stopping fragment");
 		super.onStop();
 		getActivity().unbindService(serviceConnection);
 
@@ -342,7 +342,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 	@Override
 	public void onDestroy() {
-		Log.d("MultiPlayerFragment", "Fragment destroyed");
+		Log.d("MultiPlayerFragment", "Destroying fragment");
 		super.onDestroy();
 		if (bluetoothAdapter != null) {
 			bluetoothAdapter.cancelDiscovery();
@@ -360,7 +360,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		private final BluetoothServerSocket serverSocket;
 
 		public AcceptConnectionThread() {
-			Log.d("AcceptConnectionThread", "Thread created");
+			Log.d("AcceptConnectionThread", "Creating AcceptConnectionThread");
 
 			BluetoothServerSocket tmp = null;
 			try {
@@ -385,7 +385,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 				}
 
 				if (socket != null) {
-					Log.d("AcceptConnectionThread", "BluetoothSocket created");
+					Log.d("AcceptConnectionThread", "Creating BluetoothSocket");
 					manageConnectedSocket(socket);
 
 					try {
@@ -414,7 +414,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		private final BluetoothDevice device;
 
 		public ConnectToServerThread(BluetoothDevice device) {
-			Log.d("ConnectToServerThread", "Thread created");
+			Log.d("ConnectToServerThread", "Creating ConnectToServerThread");
 
 			BluetoothSocket tmp = null;
 			this.device = device;

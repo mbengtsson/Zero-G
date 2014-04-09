@@ -12,7 +12,7 @@ public class TitleFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Log.d("TitleFragment", "Fragment created");
+		Log.d("TitleFragment", "Creating fragment");
 
 		View view = inflater.inflate(R.layout.fragment_title, container, false);
 

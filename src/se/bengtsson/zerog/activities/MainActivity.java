@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.d("MainActivity", "Activity created");
+		Log.d("MainActivity", "Creating activity");
 		setContentView(R.layout.activity_main);
 
 		fragmentManager = getFragmentManager();

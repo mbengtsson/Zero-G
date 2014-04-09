@@ -54,7 +54,7 @@ public class BluetoothCommunicationService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d("BluetoothCommunicationService", "Service created");
+		Log.d("BluetoothCommunicationService", "Creating service");
 
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		originalWifiState = wifi.isWifiEnabled();
@@ -70,12 +70,12 @@ public class BluetoothCommunicationService extends Service {
 	}
 
 	public void addBluetoothCommunicationListener(BluetoothCommunicationListener listener) {
-		Log.d("BluetoothCommunicationService", "BluetoothCommunicationListener added");
+		Log.d("BluetoothCommunicationService", "Adding BluetoothCommunicationListener");
 		listeners.add(listener);
 	}
 
 	public void removeBluetoothCommunicationListener(BluetoothCommunicationListener listener) {
-		Log.d("BluetoothCommunicationService", "BluetoothCommunicationListener removed");
+		Log.d("BluetoothCommunicationService", "Removing BluetoothCommunicationListener");
 		listeners.remove(listener);
 	}
 
@@ -165,7 +165,7 @@ public class BluetoothCommunicationService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.d("BluetoothCommunicationService", "Service destroyed");
+		Log.d("BluetoothCommunicationService", "Destroying service");
 
 		wifi.setWifiEnabled(originalWifiState);
 		Log.d("BluetoothCommunicationService", "Wifi restored to original state");
@@ -187,7 +187,7 @@ public class BluetoothCommunicationService extends Service {
 		private final DataOutputStream outputStream;
 
 		public BluetoothCommunicationThread(BluetoothSocket socket) {
-			Log.d("BluetoothCommunicationThread", "Thread created");
+			Log.d("BluetoothCommunicationThread", "Creating BluetoothCommunicationThread");
 
 			this.socket = socket;
 			InputStream tmpIn = null;
@@ -242,7 +242,7 @@ public class BluetoothCommunicationService extends Service {
 						updateListernes(reciveOpponentHitMessage());
 						break;
 					default:
-						Log.w("BluetoothCommunicationThread", "Unknown flag type");
+						Log.e("BluetoothCommunicationThread", "Unknown flag type");
 						break;
 				}
 			}

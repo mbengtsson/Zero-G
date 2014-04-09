@@ -11,7 +11,7 @@ public class StatisticsActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.d("StatisticsActivity", "Activity created");
+		Log.d("StatisticsActivity", "Creating activity");
 		setContentView(R.layout.activity_statistics);
 	}
 

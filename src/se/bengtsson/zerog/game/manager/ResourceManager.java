@@ -83,6 +83,7 @@ public class ResourceManager {
 
 	public static void prepareManager(PhysicsWorld physicsWorld, Engine engine, GameActivity activity, Camera camera,
 			VertexBufferObjectManager vbom) {
+		Log.d("ResourceManager", "Preparing ResourceManager");
 
 		getInstance().physicsWorld = physicsWorld;
 		getInstance().engine = engine;

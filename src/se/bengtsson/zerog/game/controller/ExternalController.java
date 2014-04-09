@@ -1,10 +1,16 @@
 package se.bengtsson.zerog.game.controller;
 
+import android.util.Log;
+
 public class ExternalController implements Controller {
 
 	private boolean leftTriggerPressed;
 	private boolean rightTriggerPressed;
 	private byte tilt;
+
+	public ExternalController() {
+		Log.d("ExternalController", "Creating ExternalController");
+	}
 
 	@Override
 	public boolean isLeftTriggerPressed() {

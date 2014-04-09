@@ -10,7 +10,7 @@ public class ShareWithContactActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.d("ShareWithContactActivity", "Activity created");
+		Log.d("ShareWithContactActivity", "Creating activity");
 		setContentView(R.layout.activity_share_with_contact);
 	}
 

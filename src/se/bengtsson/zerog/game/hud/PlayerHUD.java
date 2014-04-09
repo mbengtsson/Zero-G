@@ -8,6 +8,7 @@ import org.andengine.util.color.Color;
 import se.bengtsson.zerog.R;
 import se.bengtsson.zerog.game.controller.PlayerController;
 import se.bengtsson.zerog.game.manager.ResourceManager;
+import android.util.Log;
 
 public class PlayerHUD extends HUD {
 
@@ -22,6 +23,8 @@ public class PlayerHUD extends HUD {
 	private Rectangle enemyHealthBar;
 
 	public PlayerHUD(PlayerController playerController) {
+		Log.d("PlayerHUD", "Creating HUD");
+
 		this.playerController = playerController;
 		this.resources = ResourceManager.getInstance();
 		this.CAMERA_WIDTH = resources.camera.getWidth();

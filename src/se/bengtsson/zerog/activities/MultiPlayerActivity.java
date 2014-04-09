@@ -10,7 +10,7 @@ public class MultiPlayerActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.d("MultiPlayerActivity", "Activity created");
+		Log.d("MultiPlayerActivity", "Creating activity");
 		setContentView(R.layout.activity_multi_player);
 	}
 

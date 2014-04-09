@@ -19,6 +19,7 @@ public class PlayerController implements Controller, SensorEventListener {
 	private byte tilt = 0;
 
 	public PlayerController() {
+		Log.d("PlayerController", "Creating PlayerController");
 		ResourceManager resources = ResourceManager.getInstance();
 
 		float triggerSize = resources.thrustTriggerTextureRegion.getWidth();
