@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#000000"
-    tools:context="se.bengtsson.thegame.activities.game.GameActivity"
+    tools:context="se.bengtsson.zerog.activities.game.GameActivity"
     tools:ignore="MergeRootFrame" >
 
     <org.andengine.opengl.view.RenderSurfaceView

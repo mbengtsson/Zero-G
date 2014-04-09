@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="se.bengtsson.thegame.activities.StatisticsActivity"
+    tools:context="se.bengtsson.zerog.activities.StatisticsActivity"
     tools:ignore="MergeRootFrame" >
 
     <fragment
         android:id="@+id/fragment1"
-        android:name="se.bengtsson.thegame.fragments.StatisticsFragment"
+        android:name="se.bengtsson.zerog.fragments.StatisticsFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_statistics" />

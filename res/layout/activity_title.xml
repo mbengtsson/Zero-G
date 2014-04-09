@@ -3,12 +3,12 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="se.bengtsson.thegame.activities.TitleActivity"
+    tools:context="se.bengtsson.zerog.activities.TitleActivity"
     tools:ignore="MergeRootFrame" >
 
     <fragment
         android:id="@+id/fragment1"
-        android:name="se.bengtsson.thegame.fragments.TitleFragment"
+        android:name="se.bengtsson.zerog.fragments.TitleFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_title" />

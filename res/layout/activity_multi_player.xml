@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="se.bengtsson.thegame.activities.MultiPlayerActivity"
+    tools:context="se.bengtsson.zerog.activities.MultiPlayerActivity"
     android:background="?android:attr/dividerHorizontal"
     tools:ignore="MergeRootFrame" >
 
     <fragment
         android:id="@+id/fragment1"
-        android:name="se.bengtsson.thegame.fragments.MultiPlayerFragment"
+        android:name="se.bengtsson.zerog.fragments.MultiPlayerFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_multi_player" />

@@ -5,12 +5,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?android:attr/dividerHorizontal"
-    tools:context="se.bengtsson.thegame.activities.MainActivity"
+    tools:context="se.bengtsson.zerog.activities.MainActivity"
     tools:ignore="MergeRootFrame" >
 
     <fragment
         android:id="@+id/main_fragment_container"
-        android:name="se.bengtsson.thegame.fragments.MainFragment"
+        android:name="se.bengtsson.zerog.fragments.MainFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_main" />

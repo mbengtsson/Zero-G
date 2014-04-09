@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_right"
-    tools:context="se.bengtsson.thegame.fragments.StatisticsFragment"
+    tools:context="se.bengtsson.zerog.fragments.StatisticsFragment"
     tools:ignore="MergeRootFrame" >
 
 
