@@ -2,8 +2,6 @@ package se.bengtsson.thegame.game.manager;
 
 import java.io.IOException;
 
-import org.andengine.audio.music.Music;
-import org.andengine.audio.music.MusicFactory;
 import org.andengine.audio.sound.Sound;
 import org.andengine.audio.sound.SoundFactory;
 import org.andengine.engine.Engine;
@@ -56,8 +54,6 @@ public class ResourceManager {
 	public Sound firingSound;
 	public Sound hitSound;
 	public Sound explosionSound;
-
-	public Music backgroundLoop;
 
 	private ITexture backgroundTexture;
 	private ITexture redFighterTexture;
@@ -192,13 +188,6 @@ public class ResourceManager {
 			Log.e("ResourceManager", "Failed loading explosion sound");
 		}
 
-		try {
-			backgroundLoop =
-					MusicFactory.createMusicFromAsset(engine.getMusicManager(), activity, "snd/background.ogg");
-			backgroundLoop.setLooping(true);
-		} catch (IOException e) {
-			Log.e("ResourceManager", "Failed loading background loop");
-		}
 	}
 
 }

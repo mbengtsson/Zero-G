@@ -90,7 +90,6 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		engineOptions.getRenderOptions().setDithering(true);
 		engineOptions.getTouchOptions().setNeedsMultiTouch(true);
 		engineOptions.getAudioOptions().setNeedsSound(true);
-		engineOptions.getAudioOptions().setNeedsMusic(true);
 
 		return engineOptions;
 	}
@@ -182,15 +181,12 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public void onResumeGame() {
 		super.onResumeGame();
 		sensorManager.registerListener(playerController, accelerometer, SensorManager.SENSOR_DELAY_GAME);
-		resources.backgroundLoop.play();
-		resources.backgroundLoop.setVolume(4.0f);
 	}
 
 	@Override
 	public void onPauseGame() {
 		super.onPauseGame();
 		sensorManager.unregisterListener(playerController);
-		resources.backgroundLoop.stop();
 	}
 
 	@Override
