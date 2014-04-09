@@ -200,7 +200,7 @@ public class Fighter extends Entity {
 				firingSound.play();
 			}
 
-			float offsetX = 15 / PIXEL_TO_METER_RATIO_DEFAULT;
+			float offsetX = 24 / PIXEL_TO_METER_RATIO_DEFAULT;
 			float offsetY;
 
 			if (fireLeft) {

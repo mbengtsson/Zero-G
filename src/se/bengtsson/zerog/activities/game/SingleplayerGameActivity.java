@@ -3,15 +3,8 @@ package se.bengtsson.zerog.activities.game;
 import org.andengine.entity.scene.Scene;
 
 import se.bengtsson.zerog.game.objects.fighter.Fighter;
-import se.bengtsson.zerog.game.objects.pools.BulletPool.Bullet;
 import android.os.Bundle;
 import android.util.Log;
-
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class SingleplayerGameActivity extends GameActivity {
 
@@ -43,66 +36,17 @@ public class SingleplayerGameActivity extends GameActivity {
 	}
 
 	@Override
-	protected ContactListener createContactListener() {
-		ContactListener contactListener = new ContactListener() {
-			@Override
-			public void beginContact(Contact contact) {
+	protected void fighterHit(Fighter fighter) {
+		fighter.hit();
 
-				final Fixture fixtureA = contact.getFixtureA();
-				final Fixture fixtureB = contact.getFixtureB();
+		if (fighter.isEnemy()) {
+			hud.setEnemyHealth(fighter.getHealth());
 
-				if (fixtureA.getBody().getUserData() instanceof Bullet) {
-					Bullet bullet = (Bullet) fixtureA.getBody().getUserData();
-					sceneManager.getBulletPool().recyclePoolItem(bullet);
-					if (fixtureB.getBody().getUserData() instanceof Fighter) {
-						Fighter fighter = (Fighter) fixtureB.getBody().getUserData();
-						fighter.hit();
-						if (fighter.isEnemy()) {
+		} else {
+			hud.setPlayerHealth(fighter.getHealth());
 
-							hud.setEnemyHealth(fighter.getHealth());
-						} else {
+		}
 
-							hud.setPlayerHealth(fighter.getHealth());
-						}
-
-					}
-
-				}
-				if (fixtureB.getBody().getUserData() instanceof Bullet) {
-					Bullet bullet = (Bullet) fixtureB.getBody().getUserData();
-					sceneManager.getBulletPool().recyclePoolItem(bullet);
-					if (fixtureA.getBody().getUserData() instanceof Fighter) {
-						Fighter fighter = (Fighter) fixtureA.getBody().getUserData();
-						fighter.hit();
-						if (fighter.isEnemy()) {
-
-							hud.setEnemyHealth(fighter.getHealth());
-						} else {
-
-							hud.setPlayerHealth(fighter.getHealth());
-						}
-
-					}
-				}
-
-			}
-
-			@Override
-			public void endContact(Contact contact) {
-
-			}
-
-			@Override
-			public void preSolve(Contact contact, Manifold oldManifold) {
-
-			}
-
-			@Override
-			public void postSolve(Contact contact, ContactImpulse impulse) {
-
-			}
-		};
-		return contactListener;
 	}
 
 	private class Ai {

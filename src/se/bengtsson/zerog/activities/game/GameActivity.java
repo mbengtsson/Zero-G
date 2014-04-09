@@ -24,6 +24,7 @@ import se.bengtsson.zerog.game.hud.PlayerHUD;
 import se.bengtsson.zerog.game.manager.ResourceManager;
 import se.bengtsson.zerog.game.manager.SceneManager;
 import se.bengtsson.zerog.game.objects.fighter.Fighter;
+import se.bengtsson.zerog.game.objects.pools.BulletPool.Bullet;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -35,11 +36,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
-	protected Handler handler;
+	private Handler handler;
 
 	private boolean debug = false;
 
@@ -47,7 +49,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	private final int CAMERA_HEIGHT = 450;
 
 	private Camera camera;
-	protected FixedStepPhysicsWorld physicsWorld;
+	private FixedStepPhysicsWorld physicsWorld;
 	protected PlayerController playerController;
 	protected ExternalController externalController;
 
@@ -59,12 +61,11 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	protected PlayerHUD hud;
 	private Entity spriteLayer;
-	private Entity foregroundLayer;
 
 	private Sprite background;
 
 	protected boolean gameOver = false;
-	protected boolean winner = false;
+	private boolean winner = false;
 
 	@Override
 	protected void onCreate(Bundle pSavedInstanceState) {
@@ -116,10 +117,8 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		final Scene scene = new Scene();
 
 		spriteLayer = new Entity();
-		foregroundLayer = new Entity();
 
 		scene.attachChild(spriteLayer);
-		scene.attachChild(foregroundLayer);
 
 		scene.registerUpdateHandler(physicsWorld);
 		scene.registerUpdateHandler(this);
@@ -216,10 +215,16 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		finish();
 	}
 
-	protected ContactListener createContactListener() {
+	private ContactListener createContactListener() {
 		ContactListener contactListener = new ContactListener() {
 			@Override
 			public void beginContact(Contact contact) {
+
+				Fixture fixtureA = contact.getFixtureA();
+				Fixture fixtureB = contact.getFixtureB();
+
+				handleContact(fixtureA, fixtureB);
+				handleContact(fixtureB, fixtureA);
 
 			}
 
@@ -239,5 +244,22 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 			}
 		};
 		return contactListener;
+	}
+
+	private void handleContact(Fixture fixtureA, Fixture fixtureB) {
+
+		if (fixtureA.getBody().getUserData() instanceof Bullet) {
+			Bullet bullet = (Bullet) fixtureA.getBody().getUserData();
+			sceneManager.getBulletPool().recyclePoolItem(bullet);
+			if (fixtureB.getBody().getUserData() instanceof Fighter) {
+				Fighter fighter = (Fighter) fixtureB.getBody().getUserData();
+				fighterHit(fighter);
+			}
+
+		}
+	}
+
+	protected void fighterHit(Fighter fighter) {
+
 	}
 }
