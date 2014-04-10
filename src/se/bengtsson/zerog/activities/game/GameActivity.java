@@ -20,7 +20,7 @@ import se.bengtsson.zerog.activities.MainActivity;
 import se.bengtsson.zerog.activities.StatisticsActivity;
 import se.bengtsson.zerog.game.controller.ExternalController;
 import se.bengtsson.zerog.game.controller.PlayerController;
-import se.bengtsson.zerog.game.hud.PlayerHUD;
+import se.bengtsson.zerog.game.hud.GameHUD;
 import se.bengtsson.zerog.game.manager.ResourceManager;
 import se.bengtsson.zerog.game.manager.SceneManager;
 import se.bengtsson.zerog.game.objects.fighter.Fighter;
@@ -59,7 +59,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	protected ResourceManager resources;
 	protected SceneManager sceneManager;
 
-	protected PlayerHUD hud;
+	protected GameHUD hud;
 	private Entity spriteLayer;
 
 	private Sprite background;
@@ -129,7 +129,7 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		playerController = new PlayerController();
 		externalController = new ExternalController();
 
-		hud = new PlayerHUD(playerController);
+		hud = new GameHUD(playerController);
 		camera.setHUD(hud);
 
 		if (debug) {
@@ -148,7 +148,9 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		pOnPopulateSceneCallback.onPopulateSceneFinished();
 	}
 
-	protected void checkGameOver(Fighter player, Fighter enemy, final boolean multiPlayer) {
+	protected void checkGameOver(final boolean multiPlayer) {
+		Fighter player = sceneManager.getPlayerFighter();
+		Fighter enemy = sceneManager.getEnemyFighter();
 
 		if (!player.isAlive() || !enemy.isAlive()) {
 			if (player.isAlive()) {

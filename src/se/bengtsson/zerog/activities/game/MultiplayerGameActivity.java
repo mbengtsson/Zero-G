@@ -85,7 +85,7 @@ public class MultiplayerGameActivity extends GameActivity {
 		sendBluetoothMessages();
 
 		if (!gameOver) {
-			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter(), true);
+			checkGameOver(true);
 		}
 
 		super.onUpdate(pSecondsElapsed);

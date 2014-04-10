@@ -10,7 +10,7 @@ import se.bengtsson.zerog.game.controller.PlayerController;
 import se.bengtsson.zerog.game.manager.ResourceManager;
 import android.util.Log;
 
-public class PlayerHUD extends HUD {
+public class GameHUD extends HUD {
 
 	private final int HEALTH_BAR_WIDTH = 300;
 	private final int HEALTH_BAR_HEIGHT = 5;
@@ -22,8 +22,8 @@ public class PlayerHUD extends HUD {
 	private Rectangle playerHealthBar;
 	private Rectangle enemyHealthBar;
 
-	public PlayerHUD(PlayerController playerController) {
-		Log.d("PlayerHUD", "Creating HUD");
+	public GameHUD(PlayerController playerController) {
+		Log.d("GameHUD", "Creating HUD");
 
 		this.playerController = playerController;
 		this.resources = ResourceManager.getInstance();

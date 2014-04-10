@@ -29,7 +29,7 @@ public class SingleplayerGameActivity extends GameActivity {
 		ai.updateAi();
 
 		if (!gameOver) {
-			checkGameOver(sceneManager.getPlayerFighter(), sceneManager.getEnemyFighter(), false);
+			checkGameOver(false);
 		}
 
 		super.onUpdate(pSecondsElapsed);
