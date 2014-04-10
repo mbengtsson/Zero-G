@@ -29,7 +29,7 @@ import android.widget.TextView;
 
 public class ShareWithContactFragment extends Fragment implements OnItemClickListener {
 
-	ArrayAdapter<String> contactsAdapter;
+	private ArrayAdapter<String> contactsAdapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class ShareWithContactFragment extends Fragment implements OnItemClickLis
 		return view;
 	}
 
-	public void addContacts() {
+	private void addContacts() {
 		Log.d("ShareWithContactFragment", "Adding contacts");
 
 		ContentResolver contentResolver = getActivity().getContentResolver();
@@ -77,7 +77,7 @@ public class ShareWithContactFragment extends Fragment implements OnItemClickLis
 
 	}
 
-	public void sortContacts() {
+	private void sortContacts() {
 		Log.d("ShareWithContactFragment", "Sorting contacts");
 
 		contactsAdapter.sort(new Comparator<String>() {

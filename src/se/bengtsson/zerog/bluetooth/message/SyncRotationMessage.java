@@ -12,10 +12,6 @@ public class SyncRotationMessage extends BluetoothMessage {
 
 	private float payload;
 
-	public SyncRotationMessage() {
-		setFlag(BluetoothCommunicationService.SYNC_ROTATION_FLAG);
-	}
-
 	public SyncRotationMessage(float payload) {
 		setFlag(BluetoothCommunicationService.SYNC_ROTATION_FLAG);
 		setPayload(payload);
@@ -25,7 +21,7 @@ public class SyncRotationMessage extends BluetoothMessage {
 		return payload;
 	}
 
-	public void setPayload(float payload) {
+	private void setPayload(float payload) {
 		this.payload = payload;
 	}
 }

@@ -14,7 +14,7 @@ public abstract class BluetoothMessage {
 		return flag;
 	}
 
-	public void setFlag(byte flag) {
+	protected void setFlag(byte flag) {
 		this.flag = flag;
 	}
 }

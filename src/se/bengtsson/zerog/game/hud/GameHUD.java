@@ -54,16 +54,6 @@ public class GameHUD extends HUD {
 		changeColour(enemyHealthBar);
 	}
 
-	public void changeColour(Rectangle healthBar) {
-		if (healthBar.getWidth() <= HEALTH_BAR_WIDTH / 4) {
-			healthBar.setColor(Color.RED);
-			healthBar.setAlpha(0.5f);
-		} else if (healthBar.getWidth() <= HEALTH_BAR_WIDTH / 2) {
-			healthBar.setColor(Color.YELLOW);
-			healthBar.setAlpha(0.5f);
-		}
-	}
-
 	public void showGameOverMessage(boolean winner) {
 
 		String message =
@@ -81,6 +71,16 @@ public class GameHUD extends HUD {
 		registerTouchArea(playerController.getLeftTrigger());
 		registerTouchArea(playerController.getRightTrigger());
 
+	}
+
+	private void changeColour(Rectangle healthBar) {
+		if (healthBar.getWidth() <= HEALTH_BAR_WIDTH / 4) {
+			healthBar.setColor(Color.RED);
+			healthBar.setAlpha(0.5f);
+		} else if (healthBar.getWidth() <= HEALTH_BAR_WIDTH / 2) {
+			healthBar.setColor(Color.YELLOW);
+			healthBar.setAlpha(0.5f);
+		}
 	}
 
 	private void createPlayerHealthBar() {

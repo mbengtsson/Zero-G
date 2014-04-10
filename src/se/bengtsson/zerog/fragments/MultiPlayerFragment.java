@@ -179,7 +179,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		addPairedDevices();
 	}
 
-	public void addPairedDevices() {
+	private void addPairedDevices() {
 		Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 		if (pairedDevices.size() > 0) {
 			view.findViewById(R.id.paired_devices_title).setVisibility(View.VISIBLE);
@@ -368,7 +368,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 
 		private final BluetoothServerSocket serverSocket;
 
-		public AcceptConnectionThread() {
+		private AcceptConnectionThread() {
 			Log.d("AcceptConnectionThread", "Creating AcceptConnectionThread");
 
 			BluetoothServerSocket tmp = null;
@@ -407,7 +407,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 			}
 		}
 
-		public void cancel() {
+		private void cancel() {
 			Log.d("AcceptConnectionThread", "Closing BluetoothServerSocket");
 			try {
 				serverSocket.close();
@@ -422,7 +422,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		private final BluetoothSocket socket;
 		private final BluetoothDevice device;
 
-		public ConnectToServerThread(BluetoothDevice device) {
+		private ConnectToServerThread(BluetoothDevice device) {
 			Log.d("ConnectToServerThread", "Creating ConnectToServerThread");
 
 			BluetoothSocket tmp = null;
@@ -458,7 +458,7 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 			manageConnectedSocket(socket);
 		}
 
-		public void cancel() {
+		private void cancel() {
 			try {
 				Log.d("ConnectToServerThread", "Closing BluetoothSocket");
 				socket.close();

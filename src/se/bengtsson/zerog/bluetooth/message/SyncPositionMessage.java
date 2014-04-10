@@ -12,10 +12,6 @@ public class SyncPositionMessage extends BluetoothMessage {
 
 	private float[] payload;
 
-	public SyncPositionMessage() {
-		setFlag(BluetoothCommunicationService.SYNC_POSITION_FLAG);
-	}
-
 	public SyncPositionMessage(float[] payload) {
 		setFlag(BluetoothCommunicationService.SYNC_POSITION_FLAG);
 		setPayload(payload);
@@ -25,7 +21,7 @@ public class SyncPositionMessage extends BluetoothMessage {
 		return payload;
 	}
 
-	public void setPayload(float[] payload) {
+	private void setPayload(float[] payload) {
 		this.payload = payload;
 	}
 }

@@ -12,10 +12,6 @@ public class RotationMessage extends BluetoothMessage {
 
 	private byte payload;
 
-	public RotationMessage() {
-		setFlag(BluetoothCommunicationService.ROTATION_FLAG);
-	}
-
 	public RotationMessage(byte payload) {
 		setFlag(BluetoothCommunicationService.ROTATION_FLAG);
 		setPayload(payload);
@@ -25,7 +21,7 @@ public class RotationMessage extends BluetoothMessage {
 		return payload;
 	}
 
-	public void setPayload(byte payload) {
+	private void setPayload(byte payload) {
 		this.payload = payload;
 	}
 }

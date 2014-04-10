@@ -86,7 +86,7 @@ public class SingleplayerGameActivity extends GameActivity {
 			breakingVelocity = SPEED_LIMIT_HIGH;
 		}
 
-		public void updateAi() {
+		private void updateAi() {
 
 			tick++;
 			if (tick < DELAYED_START) {

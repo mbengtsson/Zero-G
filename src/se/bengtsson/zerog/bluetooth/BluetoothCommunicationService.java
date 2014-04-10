@@ -85,12 +85,6 @@ public class BluetoothCommunicationService extends Service {
 		listeners.remove(listener);
 	}
 
-	public void updateListernes(BluetoothMessage message) {
-		for (BluetoothCommunicationListener listener : listeners) {
-			listener.onDataRecived(message);
-		}
-	}
-
 	public void sendMessage(BluetoothMessage message) {
 		switch (message.getFlag()) {
 
@@ -166,6 +160,12 @@ public class BluetoothCommunicationService extends Service {
 	private void sendOpponentHitMessage(OpponentHitMessage message) {
 		communicationThread.writeByte(message.getFlag());
 
+	}
+
+	private void updateListernes(BluetoothMessage message) {
+		for (BluetoothCommunicationListener listener : listeners) {
+			listener.onDataRecived(message);
+		}
 	}
 
 	@Override
@@ -321,7 +321,7 @@ public class BluetoothCommunicationService extends Service {
 			return new OpponentHitMessage();
 		}
 
-		public void writeByte(byte data) {
+		private void writeByte(byte data) {
 			try {
 				outputStream.writeByte(data);
 			} catch (IOException e) {
@@ -329,7 +329,7 @@ public class BluetoothCommunicationService extends Service {
 			}
 		}
 
-		public void writeFloat(float data) {
+		private void writeFloat(float data) {
 			try {
 				outputStream.writeFloat(data);
 			} catch (IOException e) {
@@ -337,7 +337,7 @@ public class BluetoothCommunicationService extends Service {
 			}
 		}
 
-		public void writeFloatArray(float[] data) {
+		private void writeFloatArray(float[] data) {
 			try {
 				for (int i = 0; i < data.length; i++) {
 					outputStream.writeFloat(data[i]);
@@ -347,7 +347,7 @@ public class BluetoothCommunicationService extends Service {
 			}
 		}
 
-		public void cancel() {
+		private void cancel() {
 			try {
 				socket.close();
 			} catch (IOException e) {
