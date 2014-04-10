@@ -12,6 +12,12 @@ import se.bengtsson.zerog.game.objects.pools.BulletPool.Bullet;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class BulletPool extends GenericPool<Bullet> {
 
 	private ResourceManager resources;

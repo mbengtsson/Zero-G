@@ -6,6 +6,12 @@ import se.bengtsson.zerog.game.objects.fighter.Fighter;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class SingleplayerGameActivity extends GameActivity {
 
 	private Ai ai;
@@ -19,7 +25,7 @@ public class SingleplayerGameActivity extends GameActivity {
 
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
-		sceneManager.setupSingleplayerScene(playerController, externalController);
+		sceneManager.setupSingleplayerScene();
 		super.onPopulateScene(pScene, pOnPopulateSceneCallback);
 	}
 

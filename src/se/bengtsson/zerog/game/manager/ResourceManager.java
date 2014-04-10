@@ -27,6 +27,12 @@ import se.bengtsson.zerog.activities.game.GameActivity;
 import android.graphics.Color;
 import android.util.Log;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class ResourceManager {
 
 	private static ResourceManager INSTANCE;

@@ -15,6 +15,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class MainActivity extends Activity {
 
 	private FragmentManager fragmentManager;

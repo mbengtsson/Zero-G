@@ -11,6 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class StatisticsFragment extends Fragment {
 
 	private SharedPreferences statistics;

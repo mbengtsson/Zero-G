@@ -36,6 +36,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class MultiPlayerFragment extends Fragment implements OnItemClickListener, OnClickListener {
 
 	private final UUID MY_UUID = UUID.fromString("F91829ED-DC57-42F0-98A5-F4A695AD64DD");

@@ -2,11 +2,16 @@ package se.bengtsson.zerog.game.manager;
 
 import org.andengine.entity.Entity;
 
-import se.bengtsson.zerog.game.controller.ExternalController;
-import se.bengtsson.zerog.game.controller.PlayerController;
+import se.bengtsson.zerog.game.controller.Controller;
 import se.bengtsson.zerog.game.objects.fighter.Fighter;
 import se.bengtsson.zerog.game.objects.pools.BulletPool;
 import android.util.Log;
+
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
 
 public class SceneManager {
 
@@ -16,13 +21,13 @@ public class SceneManager {
 	private ResourceManager resources;
 	private Entity spriteLayer;
 	private BulletPool bulletPool;
-	private PlayerController playerController;
-	private ExternalController externalController;
+	private Controller playerController;
+	private Controller externalController;
 
 	private Fighter playerFighter;
 	private Fighter enemyFighter;
 
-	public SceneManager(Entity spriteLayer) {
+	public SceneManager(Entity spriteLayer, Controller playerController, Controller externalController) {
 		Log.d("SceneManager", "Creating SceneManager");
 		this.resources = ResourceManager.getInstance();
 		CAMERA_WIDTH = resources.camera.getWidth();
@@ -30,30 +35,25 @@ public class SceneManager {
 
 		this.spriteLayer = spriteLayer;
 		this.bulletPool = new BulletPool(spriteLayer);
-
-	}
-
-	public void setupSingleplayerScene(PlayerController playerController, ExternalController externalController) {
-		Log.d("SceneManager", "Setting up SinglePlayerScene");
-
 		this.playerController = playerController;
 		this.externalController = externalController;
 
+	}
+
+	public void setupSingleplayerScene() {
+		Log.d("SceneManager", "Setting up SinglePlayerScene");
+
 		playerFighter =
-				new Fighter(this.playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, false);
+				new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, false);
 		spriteLayer.attachChild(playerFighter);
 
 		enemyFighter =
-				new Fighter(this.externalController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
+				new Fighter(externalController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
 						CAMERA_HEIGHT / 2, true);
 		spriteLayer.attachChild(enemyFighter);
 	}
 
-	public void setupMultiPlayerScene(PlayerController playerController, ExternalController externalController,
-			boolean server) {
-
-		this.playerController = playerController;
-		this.externalController = externalController;
+	public void setupMultiPlayerScene(boolean server) {
 
 		if (server) {
 			setupMultiPlayerServerScene();
@@ -66,11 +66,11 @@ public class SceneManager {
 		Log.d("SceneManager", "Setting up MultiPlayerServerScene");
 
 		playerFighter =
-				new Fighter(this.playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, false);
+				new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, false);
 		spriteLayer.attachChild(playerFighter);
 
 		enemyFighter =
-				new Fighter(this.externalController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
+				new Fighter(externalController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
 						CAMERA_HEIGHT / 2, true);
 		spriteLayer.attachChild(enemyFighter);
 	}
@@ -78,12 +78,12 @@ public class SceneManager {
 	private void setupMultiPlayerClientScene() {
 		Log.d("SceneManager", "Setting up MultiPlayerClientScene");
 		playerFighter =
-				new Fighter(this.playerController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
+				new Fighter(playerController, bulletPool, resources, CAMERA_WIDTH - (CAMERA_WIDTH / 4),
 						CAMERA_HEIGHT / 2, false);
 		spriteLayer.attachChild(playerFighter);
 
 		enemyFighter =
-				new Fighter(this.externalController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, true);
+				new Fighter(externalController, bulletPool, resources, CAMERA_WIDTH / 4, CAMERA_HEIGHT / 2, true);
 		spriteLayer.attachChild(enemyFighter);
 	}
 

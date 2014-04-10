@@ -20,6 +20,12 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class Fighter extends Entity {
 
 	private final float WORLD_WIDTH;
@@ -254,6 +260,9 @@ public class Fighter extends Entity {
 	}
 
 	public void explode() {
+		if (engineSoundPlaying) {
+			engineSound.stop();
+		}
 		explosionSound.play();
 		explosion.setVisible(true);
 		fighter.setVisible(false);

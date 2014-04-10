@@ -11,6 +11,12 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.util.Log;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class PlayerController implements Controller, SensorEventListener {
 
 	private Trigger leftTrigger;

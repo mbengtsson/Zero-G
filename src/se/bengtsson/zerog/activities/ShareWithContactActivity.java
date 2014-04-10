@@ -5,6 +5,12 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class ShareWithContactActivity extends Activity {
 
 	@Override

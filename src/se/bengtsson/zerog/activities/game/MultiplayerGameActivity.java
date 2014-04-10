@@ -23,6 +23,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class MultiplayerGameActivity extends GameActivity {
 
 	private BluetoothCommunicationService communicationService;
@@ -75,7 +81,7 @@ public class MultiplayerGameActivity extends GameActivity {
 
 	@Override
 	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
-		sceneManager.setupMultiPlayerScene(playerController, externalController, server);
+		sceneManager.setupMultiPlayerScene(server);
 		super.onPopulateScene(pScene, pOnPopulateSceneCallback);
 	}
 

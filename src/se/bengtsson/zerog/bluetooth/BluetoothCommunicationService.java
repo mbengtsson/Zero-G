@@ -26,6 +26,12 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class BluetoothCommunicationService extends Service {
 
 	public static final byte ROTATION_FLAG = 0x1;

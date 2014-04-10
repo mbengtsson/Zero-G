@@ -2,6 +2,12 @@ package se.bengtsson.zerog.bluetooth.message;
 
 import se.bengtsson.zerog.bluetooth.BluetoothCommunicationService;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class RotationMessage extends BluetoothMessage {
 
 	private byte payload;

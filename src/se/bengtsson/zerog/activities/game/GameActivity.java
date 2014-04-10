@@ -40,7 +40,13 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
-public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
+public abstract class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
 	private final int CAMERA_WIDTH = 800;
 	private final int CAMERA_HEIGHT = 450;
@@ -123,10 +129,10 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		scene.registerUpdateHandler(this);
 		scene.setTouchAreaBindingOnActionDownEnabled(true);
 
-		sceneManager = new SceneManager(spriteLayer);
-
 		playerController = new PlayerController();
 		externalController = new ExternalController();
+
+		sceneManager = new SceneManager(spriteLayer, playerController, externalController);
 
 		hud = new GameHUD(playerController);
 		camera.setHUD(hud);
@@ -267,7 +273,5 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 		}
 	}
 
-	protected void fighterHit(Fighter fighter) {
-
-	}
+	protected abstract void fighterHit(Fighter fighter);
 }

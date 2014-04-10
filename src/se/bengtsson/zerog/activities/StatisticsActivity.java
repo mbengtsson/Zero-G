@@ -6,6 +6,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class StatisticsActivity extends Activity {
 
 	@Override

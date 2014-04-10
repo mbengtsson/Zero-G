@@ -21,6 +21,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class ShareWithContactFragment extends Fragment implements OnItemClickListener {
 
 	ArrayAdapter<String> contactsAdapter;

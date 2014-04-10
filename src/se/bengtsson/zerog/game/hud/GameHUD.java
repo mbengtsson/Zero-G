@@ -10,6 +10,12 @@ import se.bengtsson.zerog.game.controller.PlayerController;
 import se.bengtsson.zerog.game.manager.ResourceManager;
 import android.util.Log;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class GameHUD extends HUD {
 
 	private final int HEALTH_BAR_WIDTH = 300;

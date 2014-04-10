@@ -2,6 +2,12 @@ package se.bengtsson.zerog.game.controller;
 
 import android.util.Log;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class ExternalController implements Controller {
 
 	private boolean leftTriggerPressed;

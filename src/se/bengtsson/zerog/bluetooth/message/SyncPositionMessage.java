@@ -2,6 +2,12 @@ package se.bengtsson.zerog.bluetooth.message;
 
 import se.bengtsson.zerog.bluetooth.BluetoothCommunicationService;
 
+/**
+ * 
+ * @author Marcus Bengtsson
+ * 
+ */
+
 public class SyncPositionMessage extends BluetoothMessage {
 
 	private float[] payload;
