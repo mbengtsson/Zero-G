@@ -36,29 +36,26 @@ public class GameHUD extends HUD {
 
 	}
 
-	public void decreasePlayerHealth(int health) {
-		playerHealthBar.setWidth(playerHealthBar.getWidth() - health);
-		if (playerHealthBar.getWidth() < 0) {
-			playerHealthBar.setWidth(0);
-		}
-	}
-
-	public void decreaseEnemyHealth(int health) {
-		enemyHealthBar.setWidth(enemyHealthBar.getWidth() - health);
-		if (enemyHealthBar.getWidth() < 0) {
-			enemyHealthBar.setWidth(0);
-		}
-		enemyHealthBar.setX(CAMERA_WIDTH - enemyHealthBar.getWidth() - 5);
-	}
-
 	public void setPlayerHealth(int health) {
 		playerHealthBar.setWidth(health * 3);
+		changeColour(playerHealthBar);
 
 	}
 
 	public void setEnemyHealth(int health) {
 		enemyHealthBar.setWidth(health * 3);
 		enemyHealthBar.setX(CAMERA_WIDTH - enemyHealthBar.getWidth() - 5);
+		changeColour(enemyHealthBar);
+	}
+
+	public void changeColour(Rectangle healthBar) {
+		if (healthBar.getWidth() <= HEALTH_BAR_WIDTH / 4) {
+			healthBar.setColor(Color.RED);
+			healthBar.setAlpha(0.5f);
+		} else if (healthBar.getWidth() <= HEALTH_BAR_WIDTH / 2) {
+			healthBar.setColor(Color.YELLOW);
+			healthBar.setAlpha(0.5f);
+		}
 	}
 
 	public void showGameOverMessage(boolean winner) {

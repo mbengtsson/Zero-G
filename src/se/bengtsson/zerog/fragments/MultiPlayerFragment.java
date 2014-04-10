@@ -38,22 +38,21 @@ import android.widget.Toast;
 
 public class MultiPlayerFragment extends Fragment implements OnItemClickListener, OnClickListener {
 
-	private View view;
-
 	private final UUID MY_UUID = UUID.fromString("F91829ED-DC57-42F0-98A5-F4A695AD64DD");
 	private final int REQUEST_ENABLE_BT = 1;
 
-	private boolean isServer;
-
+	private BluetoothCommunicationService communicationService;
 	private BluetoothAdapter bluetoothAdapter;
+
+	private AcceptConnectionThread acceptConnectionThread;
+	private ConnectToServerThread connectToServerThread;
 
 	private ArrayAdapter<String> pairedDevicesAdapter;
 	private ArrayAdapter<String> newDevicesAdapter;
 
-	private BluetoothCommunicationService communicationService;
+	private View view;
 
-	private AcceptConnectionThread acceptConnectionThread;
-	private ConnectToServerThread connectToServerThread;
+	private boolean isServer;
 
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 

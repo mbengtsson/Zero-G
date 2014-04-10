@@ -31,6 +31,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -41,30 +42,28 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 
-	private Handler handler;
-
-	private boolean debug = false;
-
 	private final int CAMERA_WIDTH = 800;
 	private final int CAMERA_HEIGHT = 450;
-
-	private Camera camera;
-	private FixedStepPhysicsWorld physicsWorld;
-	protected PlayerController playerController;
-	protected ExternalController externalController;
-
-	private SensorManager sensorManager;
-	private Sensor accelerometer;
 
 	protected ResourceManager resources;
 	protected SceneManager sceneManager;
 
+	protected PlayerController playerController;
+	protected ExternalController externalController;
 	protected GameHUD hud;
-	private Entity spriteLayer;
-
-	private Sprite background;
 
 	protected boolean gameOver = false;
+
+	private Camera camera;
+	private FixedStepPhysicsWorld physicsWorld;
+	private Handler handler;
+	private SensorManager sensorManager;
+	private Sensor accelerometer;
+
+	private Entity spriteLayer;
+	private Sprite background;
+
+	private boolean debug = false;
 	private boolean winner = false;
 
 	@Override
@@ -188,6 +187,13 @@ public class GameActivity extends LayoutGameActivity implements IUpdateHandler {
 	public void onPauseGame() {
 		super.onPauseGame();
 		sensorManager.unregisterListener(playerController);
+	}
+
+	@Override
+	protected void onStop() {
+		Log.d("GameActivity", "stop");
+		sceneManager.cleanUp();
+		super.onStop();
 	}
 
 	@Override

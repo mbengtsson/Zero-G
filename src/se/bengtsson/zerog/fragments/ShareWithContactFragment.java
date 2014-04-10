@@ -24,7 +24,6 @@ import android.widget.TextView;
 public class ShareWithContactFragment extends Fragment implements OnItemClickListener {
 
 	ArrayAdapter<String> contactsAdapter;
-	ListView contactsList;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,7 +32,7 @@ public class ShareWithContactFragment extends Fragment implements OnItemClickLis
 		View view = inflater.inflate(R.layout.fragment_share_with_contact, container, false);
 
 		contactsAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1);
-		contactsList = (ListView) view.findViewById(R.id.contacts_list);
+		ListView contactsList = (ListView) view.findViewById(R.id.contacts_list);
 		contactsList.setAdapter(contactsAdapter);
 		contactsList.setOnItemClickListener(this);
 
@@ -92,8 +91,8 @@ public class ShareWithContactFragment extends Fragment implements OnItemClickLis
 		String emailAddress = item.substring(item.indexOf('\n') + 1);
 
 		Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", emailAddress, null));
-		intent.putExtra(Intent.EXTRA_SUBJECT, "Check this game out");
-		intent.putExtra(Intent.EXTRA_TEXT, "Hi, download \"Zero-G\", it's awesome!!");
+		intent.putExtra(Intent.EXTRA_SUBJECT, "Download \"Zero-G\"");
+		intent.putExtra(Intent.EXTRA_TEXT, "Hi, download \"Zero-G\" from: \nhttps://bitbucket.org/mbengtsson/zero-g");
 
 		Log.d("ShareWithContactFragment", "Send mail");
 		startActivity(Intent.createChooser(intent, "Send mail..."));

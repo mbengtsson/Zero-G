@@ -22,9 +22,6 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class Fighter extends Entity {
 
-	private Controller controller;
-	private ResourceManager resources;
-
 	private final float WORLD_WIDTH;
 	private final float WORLD_HEIGHT;
 
@@ -33,17 +30,9 @@ public class Fighter extends Entity {
 
 	private final float RATE_OF_FIRE = 5;
 
-	private long lastFired;
-	private boolean fireLeft;
-
-	private int bulletsFired;
-	private int timesHit;
-
+	private Controller controller;
+	private ResourceManager resources;
 	private BulletPool bulletPool;
-
-	private boolean enemy;
-	private boolean alive = true;
-	private int health = 100;
 
 	private Sprite fighter;
 	private Sprite mainThrust;
@@ -56,13 +45,21 @@ public class Fighter extends Entity {
 	private Sound hitSound;
 	private Sound explosionSound;
 	private Sound engineSound;
+
+	private long lastFired;
+	private boolean fireLeft;
+	private int bulletsFired;
+	private int timesHit;
+	private boolean enemy;
+	private boolean alive = true;
+	private int health = 100;
+
 	private boolean engineSoundPlaying;
 
 	public Fighter(Controller controller, BulletPool bulletPool, ResourceManager resources, float xPos, float yPos,
 			boolean enemy) {
 
 		this.resources = resources;
-
 		this.controller = controller;
 		this.bulletPool = bulletPool;
 		this.WORLD_WIDTH = resources.camera.getWidth() / PIXEL_TO_METER_RATIO_DEFAULT;
@@ -71,19 +68,29 @@ public class Fighter extends Entity {
 
 		bulletsFired = 0;
 		timesHit = 0;
+		engineSoundPlaying = false;
 
+		createSprites(xPos, yPos);
+		createBody();
+		attachSprites();
+		addSounds();
+
+	}
+
+	private void createSprites(float xPos, float yPos) {
 		if (enemy) {
-			this.fighter = new Sprite(xPos, yPos, resources.redFighterTextureRegion, resources.vbom);
+			fighter = new Sprite(xPos, yPos, resources.redFighterTextureRegion, resources.vbom);
 		} else {
-			this.fighter = new Sprite(xPos, yPos, resources.blueFighterTextureRegion, resources.vbom);
+			fighter = new Sprite(xPos, yPos, resources.blueFighterTextureRegion, resources.vbom);
 		}
 
-		this.mainThrust = new Sprite(xPos, yPos, resources.fighterThrustTextureRegion, resources.vbom);
-		this.leftThrust = new Sprite(xPos, yPos, resources.fighterLeftTextureRegion, resources.vbom);
-		this.rightThrust = new Sprite(xPos, yPos, resources.fighterRightTextureRegion, resources.vbom);
+		mainThrust = new Sprite(xPos, yPos, resources.fighterThrustTextureRegion, resources.vbom);
+		leftThrust = new Sprite(xPos, yPos, resources.fighterLeftTextureRegion, resources.vbom);
+		rightThrust = new Sprite(xPos, yPos, resources.fighterRightTextureRegion, resources.vbom);
+		explosion = new AnimatedSprite(xPos, yPos, resources.explosionTextureRegion, resources.vbom);
+	}
 
-		this.explosion = new AnimatedSprite(xPos, yPos, resources.explosionTextureRegion, resources.vbom);
-
+	private void createBody() {
 		fighterBody =
 				createFighterBody(resources.physicsWorld, fighter, BodyType.DynamicBody,
 						PhysicsFactory.createFixtureDef(5.0f, 0.2f, 0.5f));
@@ -94,59 +101,69 @@ public class Fighter extends Entity {
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(leftThrust, fighterBody, true, true));
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(rightThrust, fighterBody, true, true));
 		resources.physicsWorld.registerPhysicsConnector(new PhysicsConnector(explosion, fighterBody, true, false));
+	}
 
-		this.attachChild(fighter);
-		this.attachChild(mainThrust);
-		this.attachChild(leftThrust);
-		this.attachChild(rightThrust);
-		this.attachChild(explosion);
+	private void attachSprites() {
+		attachChild(fighter);
+		attachChild(mainThrust);
+		attachChild(leftThrust);
+		attachChild(rightThrust);
+		attachChild(explosion);
 
 		mainThrust.setVisible(false);
 		leftThrust.setVisible(false);
 		rightThrust.setVisible(false);
 		explosion.setVisible(false);
+	}
 
+	private void addSounds() {
 		this.firingSound = resources.firingSound;
 		this.hitSound = resources.hitSound;
 		this.explosionSound = resources.explosionSound;
 		this.engineSound = resources.engineSound;
 
-		this.firingSound.setVolume(0.2f);
-		this.hitSound.setVolume(0.4f);
-		this.explosionSound.setVolume(0.5f);
-		this.engineSound.setVolume(0.5f);
-
-		engineSoundPlaying = false;
-
+		firingSound.setVolume(0.2f);
+		hitSound.setVolume(0.4f);
+		explosionSound.setVolume(0.5f);
+		engineSound.setVolume(0.5f);
 	}
 
 	@Override
 	protected void onManagedUpdate(float pSecondsElapsed) {
 
 		if (alive) {
-			if (controller.isRightTriggerPressed()) {
-				mainThrust.setVisible(true);
-				accelerate();
-				if (!enemy && !engineSoundPlaying) {
-					engineSound.play();
-					engineSoundPlaying = true;
-				}
+			move();
+		}
+		checkIfOutOfBounds();
 
-			} else {
-				mainThrust.setVisible(false);
-				if (!enemy && engineSoundPlaying) {
-					engineSound.stop();
-					engineSoundPlaying = false;
-				}
+		super.onManagedUpdate(pSecondsElapsed);
+	}
+
+	private void move() {
+		if (controller.isRightTriggerPressed()) {
+			mainThrust.setVisible(true);
+			accelerate();
+			if (!enemy && !engineSoundPlaying) {
+				engineSound.play();
+				engineSoundPlaying = true;
 			}
 
-			if (controller.isLeftTriggerPressed()) {
-				fire();
+		} else {
+			mainThrust.setVisible(false);
+			if (!enemy && engineSoundPlaying) {
+				engineSound.stop();
+				engineSoundPlaying = false;
 			}
-
-			rotate(controller.getTilt() * ROTATION_MODIFIER);
 		}
 
+		if (controller.isLeftTriggerPressed()) {
+			fire();
+		}
+
+		rotate(controller.getTilt() * ROTATION_MODIFIER);
+	}
+
+	private void checkIfOutOfBounds() {
 		if (fighterBody.getPosition().x < 0) {
 			fighterBody.setTransform(WORLD_WIDTH, fighterBody.getPosition().y, fighterBody.getAngle());
 		} else if (fighterBody.getPosition().x > WORLD_WIDTH) {
@@ -158,8 +175,6 @@ public class Fighter extends Entity {
 		} else if (fighterBody.getPosition().y > WORLD_HEIGHT) {
 			fighterBody.setTransform(fighterBody.getPosition().x, 0, fighterBody.getAngle());
 		}
-
-		super.onManagedUpdate(pSecondsElapsed);
 	}
 
 	public void rotate(float velocity) {

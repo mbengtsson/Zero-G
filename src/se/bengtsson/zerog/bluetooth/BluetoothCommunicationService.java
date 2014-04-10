@@ -28,8 +28,6 @@ import android.util.Log;
 
 public class BluetoothCommunicationService extends Service {
 
-	private final IBinder binder = new LocalBinder();
-
 	public static final byte ROTATION_FLAG = 0x1;
 	public static final byte THRUST_FLAG = 0x2;
 	public static final byte FIRE_FLAG = 0x3;
@@ -38,6 +36,8 @@ public class BluetoothCommunicationService extends Service {
 	public static final byte SYNC_POSITION_FLAG = 0x6;
 	public static final byte PLAYER_HIT_FLAG = 0x7;
 	public static final byte OPPONENT_HIT_FLAG = 0x8;
+
+	private final IBinder binder = new LocalBinder();
 
 	private BluetoothCommunicationThread communicationThread;
 	private WifiManager wifi;

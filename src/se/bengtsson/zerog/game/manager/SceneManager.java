@@ -99,4 +99,9 @@ public class SceneManager {
 		return enemyFighter;
 	}
 
+	public void cleanUp() {
+		playerFighter.destroy();
+		enemyFighter.destroy();
+	}
+
 }
