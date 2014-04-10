@@ -178,7 +178,7 @@ public class SingleplayerGameActivity extends GameActivity {
 		}
 
 		private void fireIfInRange() {
-			if (angleToTarget < 0.1 && angleToTarget > -0.1) {
+			if (angleToTarget < 0.1 && angleToTarget > -0.1 && sceneManager.getPlayerFighter().isAlive()) {
 				externalController.setLeftTriggerPressed(true);
 			} else {
 				externalController.setLeftTriggerPressed(false);

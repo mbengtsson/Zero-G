@@ -246,6 +246,7 @@ public class Fighter extends Entity {
 		leftThrust.setVisible(false);
 		rightThrust.setVisible(false);
 		setVelocity(fighterBody.getLinearVelocity().x / 10, fighterBody.getLinearVelocity().y / 10);
+		rotate(0f);
 		explosion.animate(100, 0);
 	}
 

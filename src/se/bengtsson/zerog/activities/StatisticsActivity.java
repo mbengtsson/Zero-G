@@ -17,9 +17,10 @@ public class StatisticsActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
-		Intent intent = new Intent(this, MainActivity.class);
 		Log.d("StatisticsActivity", "Returning to MainActivity");
+		Intent intent = new Intent(this, MainActivity.class);
 		startActivity(intent);
+		finish();
 	}
 
 }

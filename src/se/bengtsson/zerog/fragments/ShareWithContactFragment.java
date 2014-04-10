@@ -1,5 +1,6 @@
 package se.bengtsson.zerog.fragments;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,32 +23,44 @@ import android.widget.TextView;
 
 public class ShareWithContactFragment extends Fragment implements OnItemClickListener {
 
+	ArrayAdapter<String> contactsAdapter;
+	ListView contactsList;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		Log.d("ShareWithContactFragment", "Creating fragment");
 
 		View view = inflater.inflate(R.layout.fragment_share_with_contact, container, false);
 
+		contactsAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1);
+		contactsList = (ListView) view.findViewById(R.id.contacts_list);
+		contactsList.setAdapter(contactsAdapter);
+		contactsList.setOnItemClickListener(this);
+
+		addContacts();
+		sortContacts();
+
+		return view;
+	}
+
+	public void addContacts() {
+		Log.d("ShareWithContactFragment", "Adding contacts");
+
 		ContentResolver contentResolver = getActivity().getContentResolver();
 		Cursor cursor =
 				contentResolver.query(android.provider.ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, null,
 						null, null);
-
-		ArrayAdapter<String> contactsAdapter =
-				new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1);
-		ListView contactsList = (ListView) view.findViewById(R.id.contacts_list);
-		contactsList.setAdapter(contactsAdapter);
-		contactsList.setOnItemClickListener(this);
-
 		Set<String> noDuplicates = new HashSet<String>();
+
 		while (cursor.moveToNext()) {
 			Log.d("ShareWithContactFragment", "Contact added");
 			int emailId = cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Email.DATA);
-			int contactId = cursor.getColumnIndex(android.provider.ContactsContract.Contacts.DISPLAY_NAME);
+			int contactId =
+					cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Email.DISPLAY_NAME_PRIMARY);
 			String emailAdress = cursor.getString(emailId);
 			String contactName = cursor.getString(contactId);
-			if (emailAdress != null && noDuplicates.add(emailAdress)) {
-				contactsAdapter.add(contactName + "\n" + emailAdress);
+			if (noDuplicates.add(emailAdress)) {
+				contactsAdapter.add(contactName + "\n" + emailAdress.trim());
 			}
 		}
 
@@ -55,8 +68,20 @@ public class ShareWithContactFragment extends Fragment implements OnItemClickLis
 			Log.d("ShareWithContactFragment", "No contacts found");
 			contactsAdapter.add(getActivity().getString(R.string.no_contacts_found));
 		}
+		cursor.close();
 
-		return view;
+	}
+
+	public void sortContacts() {
+		Log.d("ShareWithContactFragment", "Sorting contacts");
+
+		contactsAdapter.sort(new Comparator<String>() {
+
+			@Override
+			public int compare(String lhs, String rhs) {
+				return lhs.compareToIgnoreCase(rhs);
+			}
+		});
 	}
 
 	@Override

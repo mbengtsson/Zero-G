@@ -171,6 +171,10 @@ public class MultiPlayerFragment extends Fragment implements OnItemClickListener
 		filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		getActivity().registerReceiver(broadcastReceiver, filter);
 
+		addPairedDevices();
+	}
+
+	public void addPairedDevices() {
 		Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 		if (pairedDevices.size() > 0) {
 			view.findViewById(R.id.paired_devices_title).setVisibility(View.VISIBLE);
