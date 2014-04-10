@@ -272,6 +272,7 @@ public class Fighter extends Entity {
 				detachChild(leftThrust);
 				detachChild(mainThrust);
 				detachChild(rightThrust);
+				detachChild(explosion);
 				detachSelf();
 
 			}

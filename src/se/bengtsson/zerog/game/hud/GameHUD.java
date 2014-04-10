@@ -41,7 +41,6 @@ public class GameHUD extends HUD {
 		if (playerHealthBar.getWidth() < 0) {
 			playerHealthBar.setWidth(0);
 		}
-
 	}
 
 	public void decreaseEnemyHealth(int health) {
@@ -54,6 +53,7 @@ public class GameHUD extends HUD {
 
 	public void setPlayerHealth(int health) {
 		playerHealthBar.setWidth(health * 3);
+
 	}
 
 	public void setEnemyHealth(int health) {
@@ -67,7 +67,7 @@ public class GameHUD extends HUD {
 				winner ? resources.activity.getString(R.string.victory_message) : resources.activity
 						.getString(R.string.defeat_message);
 
-		attachChild(new Text((CAMERA_WIDTH / 2) - 100, (CAMERA_HEIGHT / 2) - 25, resources.messageFont, message,
+		attachChild(new Text((CAMERA_WIDTH / 2) - 70, (CAMERA_HEIGHT / 2) - 25, resources.messageFont, message,
 				resources.vbom));
 	}
 
